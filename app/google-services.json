@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "493133199450",
+    "project_id": "healthyroutine-c914c",
+    "storage_bucket": "healthyroutine-c914c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:493133199450:android:0fc8a90d290ba13647c063",
+        "android_client_info": {
+          "package_name": "com.example.healthyroutine"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyABDZ8GP3dq0sPsAV5gGyq53a6kQQQMqWo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
