@@ -1,10 +1,12 @@
 package com.example.healthyroutine
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import com.google.firebase.auth.FirebaseAuth
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
@@ -13,7 +15,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.healthyroutine.ui.theme.HealthyRoutineTheme
-import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : ComponentActivity() {
 
@@ -40,7 +41,9 @@ class MainActivity : ComponentActivity() {
                         if (task.isSuccessful) {
                             // Sign in success
                             Toast.makeText(this, "Login successful", Toast.LENGTH_SHORT).show()
-                            // Navigate to the next screen
+                            // Navigate to MyPageActivity
+                            val intent = Intent(this, MyPageActivity::class.java)
+                            startActivity(intent)
                         } else {
                             // If sign in fails, display a message to the user.
                             Toast.makeText(this, "Authentication failed.", Toast.LENGTH_SHORT).show()
