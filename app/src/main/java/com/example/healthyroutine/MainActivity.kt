@@ -32,18 +32,18 @@ class MainActivity : ComponentActivity() {
                     .addOnCompleteListener(this) { task ->
                         if (task.isSuccessful) {
                             // Sign in success
-                            Toast.makeText(this, "Login successful", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this, "로그인 성공", Toast.LENGTH_SHORT).show()
                             // Navigate to HomeActivity
                             val intent = Intent(this, HomeActivity::class.java)
                             startActivity(intent)
                             finish() // Optional: Call finish() if you don't want to allow user to return to MainActivity
                         } else {
                             // If sign in fails, display a message to the user.
-                            Toast.makeText(this, "Authentication failed.", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this, "다시 입력해주세요", Toast.LENGTH_SHORT).show()
                         }
                     }
             } else {
-                Toast.makeText(this, "Please enter email and password.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "id 또는 비밀번호를 입력해주세요", Toast.LENGTH_SHORT).show()
             }
         }
     }
