@@ -7,14 +7,6 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import com.google.firebase.auth.FirebaseAuth
-import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.healthyroutine.ui.theme.HealthyRoutineTheme
 
 class MainActivity : ComponentActivity() {
 
@@ -41,9 +33,10 @@ class MainActivity : ComponentActivity() {
                         if (task.isSuccessful) {
                             // Sign in success
                             Toast.makeText(this, "Login successful", Toast.LENGTH_SHORT).show()
-                            // Navigate to MyPageActivity
-                            val intent = Intent(this, MyPageActivity::class.java)
+                            // Navigate to HomeActivity
+                            val intent = Intent(this, HomeActivity::class.java)
                             startActivity(intent)
+                            finish() // Optional: Call finish() if you don't want to allow user to return to MainActivity
                         } else {
                             // If sign in fails, display a message to the user.
                             Toast.makeText(this, "Authentication failed.", Toast.LENGTH_SHORT).show()
