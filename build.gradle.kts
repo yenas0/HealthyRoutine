@@ -5,6 +5,6 @@ plugins {
     id("com.google.gms.google-services") version "4.4.2" apply false
 }
 dependencies{
-    implementation ("androidx.appcompat:appcompat:1.3.1")
-    implementation ("com.google.android.material:material:1.4.0")
+    implementation 'androidx.appcompat:appcompat:1.3.1'
+    implementation 'com.google.android.material:material:1.4.0'
 }
