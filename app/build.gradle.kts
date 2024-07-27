@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.healthyroutine"
-        minSdk = 34
+        minSdk = 21
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -71,5 +71,5 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
-    implementation ("com.kakao.sdk:v2-user:2.12.1")
+    implementation("com.kakao.sdk:v2-user:2.12.1")
 }

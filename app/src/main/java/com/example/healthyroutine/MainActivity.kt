@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import com.google.firebase.auth.FirebaseAuth
@@ -25,6 +26,7 @@ class MainActivity : ComponentActivity() {
         val passwordEditText = findViewById<EditText>(R.id.passwordEditText)
         val loginButton = findViewById<Button>(R.id.loginButton)
         val kakaoLoginImageView = findViewById<ImageView>(R.id.kakaoLoginImageView)
+        val signUpTextView = findViewById<TextView>(R.id.signUpTextView) // Make sure there's a TextView with this ID in your layout
 
         loginButton.setOnClickListener {
             val email = emailEditText.text.toString()
@@ -64,6 +66,11 @@ class MainActivity : ComponentActivity() {
                     finish()
                 }
             }
+        }
+
+        signUpTextView.setOnClickListener {
+            val intent = Intent(this, SignUpActivity::class.java)
+            startActivity(intent)
         }
     }
 
