@@ -24,5 +24,7 @@ class RecommendActivity : TabActivity() {
         tabHost.addTab(tabSpecLife)
 
         tabHost.currentTab = 0
+
+        //루틴 추가 페이지 생성 후 코드 복붙 예정 (루틴 추천 페이지 버튼 기능)
     }
 }
