@@ -6,10 +6,8 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.layout.Column
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.healthyroutine.R
 
 class HomeActivity : AppCompatActivity() {
     private lateinit var checklistAdapter: ChecklistAdapter
@@ -25,8 +23,6 @@ class HomeActivity : AppCompatActivity() {
 
         checklistAdapter = ChecklistAdapter(mutableListOf())
         recyclerView.adapter = checklistAdapter
-        recyclerView.layoutManager = LinearLayoutManager(this) }
-
-
-        }
-
+        recyclerView.layoutManager = LinearLayoutManager(this)
+    }
+}
