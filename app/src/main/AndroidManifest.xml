@@ -74,6 +74,7 @@
         </activity>
         <activity android:name=".MyPostsActivity"/>
         <activity android:name=".LikedPostsActivity"/>
+        <activity android:name=".SettingsActivity"/>
 
 
     </application>
