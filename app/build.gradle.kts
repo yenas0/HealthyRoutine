@@ -72,4 +72,5 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
     implementation("com.kakao.sdk:v2-user:2.12.1")
+    implementation("com.google.android.material:material:1.9.0")
 }
