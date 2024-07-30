@@ -29,6 +29,7 @@ class MainActivity : ComponentActivity() {
         val loginButton = findViewById<Button>(R.id.loginButton)
         val kakaoLoginImageView = findViewById<ImageView>(R.id.kakaoLoginImageView)
         val signUpTextView = findViewById<TextView>(R.id.signUpTextView)
+        val forgotPasswordTextView = findViewById<TextView>(R.id.forgotPasswordTextView) // New line
 
         // Set up the login button click listener
         loginButton.setOnClickListener {
@@ -73,6 +74,12 @@ class MainActivity : ComponentActivity() {
         // Set up the sign-up text view click listener
         signUpTextView.setOnClickListener {
             val intent = Intent(this, SignUpActivity::class.java)
+            startActivity(intent)
+        }
+
+        // Set up the forgot password text view click listener
+        forgotPasswordTextView.setOnClickListener {
+            val intent = Intent(this, FindAccountActivity::class.java)
             startActivity(intent)
         }
     }
