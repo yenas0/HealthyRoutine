@@ -12,17 +12,19 @@ class SignUpActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_signup) // Make sure the layout file name is activity_sign_up.xml
+        setContentView(R.layout.activity_signup)
 
         // Initialize Firebase Auth
         auth = FirebaseAuth.getInstance()
 
+        // Initialize UI components
         val etId = findViewById<EditText>(R.id.et_id)
         val etPassword = findViewById<EditText>(R.id.et_password)
         val etPasswordConfirm = findViewById<EditText>(R.id.et_password_confirm)
         val etNickname = findViewById<EditText>(R.id.et_nickname)
         val btnSignUp = findViewById<Button>(R.id.btn_signup)
 
+        // Set up the sign-up button click listener
         btnSignUp.setOnClickListener {
             val email = etId.text.toString()
             val password = etPassword.text.toString()
@@ -33,14 +35,12 @@ class SignUpActivity : ComponentActivity() {
                 auth.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener(this) { task ->
                         if (task.isSuccessful) {
-                            // Sign up success
                             Toast.makeText(this, "회원가입 성공", Toast.LENGTH_SHORT).show()
                             // Navigate back to MainActivity to log in
                             val intent = Intent(this, MainActivity::class.java)
                             startActivity(intent)
                             finish()
                         } else {
-                            // If sign up fails, display a message to the user.
                             Toast.makeText(this, "회원가입 실패: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                         }
                     }

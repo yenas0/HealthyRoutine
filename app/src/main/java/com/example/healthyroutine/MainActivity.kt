@@ -23,12 +23,14 @@ class MainActivity : ComponentActivity() {
         // Initialize Firebase Auth
         auth = FirebaseAuth.getInstance()
 
+        // Initialize UI components
         val emailEditText = findViewById<EditText>(R.id.emailEditText)
         val passwordEditText = findViewById<EditText>(R.id.passwordEditText)
         val loginButton = findViewById<Button>(R.id.loginButton)
         val kakaoLoginImageView = findViewById<ImageView>(R.id.kakaoLoginImageView)
-        val signUpTextView = findViewById<TextView>(R.id.signUpTextView) // Make sure there's a TextView with this ID in your layout
+        val signUpTextView = findViewById<TextView>(R.id.signUpTextView)
 
+        // Set up the login button click listener
         loginButton.setOnClickListener {
             val email = emailEditText.text.toString()
             val password = passwordEditText.text.toString()
@@ -37,14 +39,12 @@ class MainActivity : ComponentActivity() {
                 auth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener(this) { task ->
                         if (task.isSuccessful) {
-                            // Sign in success
                             Toast.makeText(this, "로그인 성공", Toast.LENGTH_SHORT).show()
                             // Navigate to HomeActivity
                             val intent = Intent(this, HomeActivity::class.java)
                             startActivity(intent)
-                            finish() // Optional: Call finish() if you don't want to allow user to return to MainActivity
+                            finish() // Call finish() to prevent returning to the login screen
                         } else {
-                            // If sign in fails, display a message to the user.
                             Toast.makeText(this, "다시 입력해주세요", Toast.LENGTH_SHORT).show()
                         }
                     }
@@ -53,6 +53,7 @@ class MainActivity : ComponentActivity() {
             }
         }
 
+        // Set up the Kakao login button click listener
         kakaoLoginImageView.setOnClickListener {
             UserApiClient.instance.loginWithKakaoTalk(this) { token, error ->
                 if (error != null) {
@@ -69,6 +70,7 @@ class MainActivity : ComponentActivity() {
             }
         }
 
+        // Set up the sign-up text view click listener
         signUpTextView.setOnClickListener {
             val intent = Intent(this, SignUpActivity::class.java)
             startActivity(intent)
@@ -80,7 +82,7 @@ class MainActivity : ComponentActivity() {
             Toast.makeText(this, "카카오 로그인 실패", Toast.LENGTH_SHORT).show()
         } else if (token != null) {
             Toast.makeText(this, "카카오 로그인 성공", Toast.LENGTH_SHORT).show()
-            // Firebase 인증 추가
+            // Authenticate with Firebase
             val credential = KakaoAuthProvider.getCredential(token.accessToken)
             auth.signInWithCredential(credential)
                 .addOnCompleteListener(this) { task ->
