@@ -3,13 +3,58 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@android:id/tabhost"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:context=".RecommendActivity">
 
     <LinearLayout
         android:id="@+id/linearLayout1"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
+
+        <!-- 상단바 -->
+        <LinearLayout
+            android:id="@+id/top_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:background="@color/white"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:elevation="4dp">
+
+            <!-- 상단바의 자식 뷰들 -->
+            <ImageView
+                android:id="@+id/icon"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_icon" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_weight="1"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/region_selector"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="루틴 추천  "
+                    android:textColor="@color/black"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/notification_icon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_notification" />
+        </LinearLayout>
 
         <TabWidget
             android:id="@android:id/tabs"
@@ -22,131 +67,191 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
+            <!--건강 루틴 탭-->
             <LinearLayout
                 android:id="@+id/tabHealth"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical">
 
-                <TextView
+                <ScrollView
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:layout_marginTop="50dp"
-                    android:layout_marginBottom="50dp"
-                    android:text="클릭하면 루틴을 추가할 수 있어요"/>
+                    android:layout_height="0dp"
+                    android:layout_weight="1">
 
-                <Button
-                    android:id="@+id/btnH1"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="아침에 물 한잔" />
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
 
-                <Button
-                    android:id="@+id/btnH2"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="영양제 챙겨 먹기" />
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:layout_marginTop="40dp"
+                            android:layout_marginBottom="40dp"
+                            android:text="클릭하면 루틴을 추가할 수 있어요"/>
 
-                <Button
-                    android:id="@+id/btnH3"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="모닝 스트레칭" />
+                        <Button
+                            android:id="@+id/btnH1"
+                            android:layout_width="300dp"
+                            android:layout_height="75dp"
+                            android:text="아침에 물 한잔"
+                            android:layout_gravity="center"
+                            android:background="@drawable/bg_recommend2"/>
 
-                <Button
-                    android:id="@+id/btnH4"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="아침 챙겨 먹기" />
+                        <Button
+                            android:id="@+id/btnH2"
+                            android:text="영양제 챙겨 먹기"
+                            android:layout_width="300dp"
+                            android:layout_height="75dp"
+                            android:layout_gravity="center"
+                            android:background="@drawable/bg_recommend2"/>
 
-                <Button
-                    android:id="@+id/btnH5"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="아침 러닝" />
+                        <Button
+                            android:id="@+id/btnH3"
+                            android:layout_width="300dp"
+                            android:layout_height="75dp"
+                            android:layout_gravity="center"
+                            android:background="@drawable/bg_recommend1"
+                            android:text="모닝 스트레칭" />
 
-                <Button
-                    android:id="@+id/btnH6"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="간식 먹은 것 메모로 기록하기" />
+                        <Button
+                            android:id="@+id/btnH4"
+                            android:layout_width="300dp"
+                            android:layout_height="75dp"
+                            android:layout_gravity="center"
+                            android:background="@drawable/bg_recommend1"
+                            android:text="아침 챙겨 먹기" />
 
-                <Button
-                    android:id="@+id/btnH7"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="매일 스쿼트 20개" />
+                        <Button
+                            android:id="@+id/btnH5"
+                            android:layout_width="300dp"
+                            android:layout_height="75dp"
+                            android:layout_gravity="center"
+                            android:background="@drawable/bg_recommend2"
+                            android:text="아침 러닝" />
 
-                <Button
-                    android:id="@+id/btnH8"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="하루 마무리 스트레칭" />
+                        <Button
+                            android:id="@+id/btnH6"
+                            android:layout_width="300dp"
+                            android:layout_height="75dp"
+                            android:layout_gravity="center"
+                            android:background="@drawable/bg_recommend1"
+                            android:text="간식 먹은 것 메모로 기록하기" />
+
+                        <Button
+                            android:id="@+id/btnH7"
+                            android:layout_width="300dp"
+                            android:layout_height="75dp"
+                            android:layout_gravity="center"
+                            android:background="@drawable/bg_recommend1"
+                            android:text="매일 스쿼트 20개" />
+
+                        <Button
+                            android:id="@+id/btnH8"
+                            android:layout_width="300dp"
+                            android:layout_height="75dp"
+                            android:layout_gravity="center"
+                            android:background="@drawable/bg_recommend2"
+                            android:text="하루 마무리 스트레칭" />
+
+                    </LinearLayout>
+                </ScrollView>
 
             </LinearLayout>
 
+            <!--생활 루틴 탭-->
             <LinearLayout
                 android:id="@+id/tabLife"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical">
 
-                <TextView
+                <ScrollView
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:layout_marginTop="50dp"
-                    android:layout_marginBottom="50dp"
-                    android:text="클릭하면 루틴을 추가할 수 있어요"/>
+                    android:layout_height="0dp"
+                    android:layout_weight="1">
 
-                <Button
-                    android:id="@+id/btnL1"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="일어나면 이불 정리" />
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
 
-                <Button
-                    android:id="@+id/btnL2"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="집 오면 바로 씻기" />
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:layout_marginTop="40dp"
+                            android:layout_marginBottom="40dp"
+                            android:text="클릭하면 루틴을 추가할 수 있어요"/>
 
-                <Button
-                    android:id="@+id/btnL3"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="내일 입을 옷 준비하기" />
+                        <Button
+                            android:id="@+id/btnL1"
+                            android:layout_width="300dp"
+                            android:layout_height="75dp"
+                            android:layout_gravity="center"
+                            android:background="@drawable/bg_recommend2"
+                            android:text="일어나면 이불 정리" />
 
-                <Button
-                    android:id="@+id/btnL4"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="책상 정리" />
+                        <Button
+                            android:id="@+id/btnL2"
+                            android:layout_width="300dp"
+                            android:layout_height="75dp"
+                            android:layout_gravity="center"
+                            android:background="@drawable/bg_recommend1"
+                            android:text="집 오면 바로 씻기" />
 
-                <Button
-                    android:id="@+id/btnL5"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="목표 시간에 눕기" />
+                        <Button
+                            android:id="@+id/btnL3"
+                            android:layout_width="300dp"
+                            android:layout_height="75dp"
+                            android:layout_gravity="center"
+                            android:background="@drawable/bg_recommend1"
+                            android:text="내일 입을 옷 준비하기" />
 
-                <Button
-                    android:id="@+id/btnL6"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="일기 쓰기" />
+                        <Button
+                            android:id="@+id/btnL4"
+                            android:layout_width="300dp"
+                            android:layout_height="75dp"
+                            android:layout_gravity="center"
+                            android:background="@drawable/bg_recommend2"
+                            android:text="책상 정리" />
 
-                <Button
-                    android:id="@+id/btnL7"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="자기 전 전자기기 금지" />
+                        <Button
+                            android:id="@+id/btnL5"
+                            android:layout_width="300dp"
+                            android:layout_height="75dp"
+                            android:layout_gravity="center"
+                            android:background="@drawable/bg_recommend1"
+                            android:text="목표 시간에 눕기" />
 
-                <Button
-                    android:id="@+id/btnL8"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="침대에서 핸드폰 20분만" />
+                        <Button
+                            android:id="@+id/btnL6"
+                            android:layout_width="300dp"
+                            android:layout_height="75dp"
+                            android:layout_gravity="center"
+                            android:background="@drawable/bg_recommend2"
+                            android:text="일기 쓰기" />
+
+                        <Button
+                            android:id="@+id/btnL7"
+                            android:layout_width="300dp"
+                            android:layout_height="75dp"
+                            android:layout_gravity="center"
+                            android:background="@drawable/bg_recommend2"
+                            android:text="자기 전 전자기기 금지" />
+
+                        <Button
+                            android:id="@+id/btnL8"
+                            android:layout_width="300dp"
+                            android:layout_height="75dp"
+                            android:layout_gravity="center"
+                            android:background="@drawable/bg_recommend1"
+                            android:text="침대에서 핸드폰 20분만" />
+
+                    </LinearLayout>
+                </ScrollView>
 
             </LinearLayout>
 
