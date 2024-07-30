@@ -17,7 +17,7 @@ class HomeActivity : AppCompatActivity() {
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_home)
 
         val recyclerView: RecyclerView = findViewById(R.id.recycler_view)
         val editText: EditText = findViewById(R.id.et_new_item)

@@ -30,22 +30,32 @@ class BoardActivity : AppCompatActivity() {
             when (item.itemId) {
                 R.id.navigation_home -> {
                     // 홈 화면으로 이동
+                    val intent = Intent(this, HomeActivity::class.java)
+                    startActivity(intent)
                     true
                 }
                 R.id.navigation_recommend -> {
                     // 추천 화면으로 이동
+                    val intent = Intent(this, RecommendActivity::class.java)
+                    startActivity(intent)
                     true
                 }
                 R.id.navigation_board -> {
                     // 게시판 화면으로 이동
+                    val intent = Intent(this, BoardActivity::class.java)
+                    startActivity(intent)
                     true
                 }
                 R.id.navigation_ranking -> {
                     // 랭킹 화면으로 이동
+                    //val intent = Intent(this, RankingActivity::class.java)
+                    //startActivity(intent)
                     true
                 }
                 R.id.navigation_profile -> {
                     // 마이페이지 화면으로 이동
+                    val intent = Intent(this, MyPageActivity::class.java)
+                    startActivity(intent)
                     true
                 }
                 else -> false
