@@ -1,0 +1,414 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/white"
+    tools:context=".BoardActivity">
+
+    <!-- 상단바 -->
+    <LinearLayout
+        android:id="@+id/top_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:background="@color/white"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:elevation="4dp">
+        <!-- 상단바의 자식 뷰들 -->
+        <ImageView
+            android:id="@+id/icon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_icon" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_weight="1"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/region_selector"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="노원구 게시판"
+                android:textSize="18sp"
+                android:textColor="@color/black"
+                android:textStyle="bold"/>
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_marginStart="4dp"
+                android:src="@drawable/ic_dropdown_arrow" />
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/notification_icon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_notification" />
+    </LinearLayout>
+
+
+    <!-- 실시간 인기글 -->
+    <LinearLayout
+        android:id="@+id/realtime_popular"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="16dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
+
+        <TextView
+            android:id="@+id/realtime_popular_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="실시간 인기글"
+            android:textColor="@color/colorPrimary"
+            android:textSize="16sp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/realtime_popular_subtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="게시글을 클릭하여 루틴을 추가할 수 있어요"
+            android:textColor="@color/gray"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <!-- 인기글 컨테이너 -->
+    <LinearLayout
+        android:id="@+id/popular_post_container"
+        android:layout_width="wrap_content"
+        android:layout_height="110dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/bg_popular_post"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/popular_post_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="공릉동 철길 산책"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/popular_post_likes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:text="15"
+                android:textColor="@color/gray"
+                android:textSize="14sp" />
+
+            <ImageView
+                android:id="@+id/popular_post_like_icon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_like_empty" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/popular_post_content"
+            android:layout_width="wrap_content"
+            android:layout_height="111dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="40dp"
+            android:ellipsize="end"
+            android:text="요즘 매일 선선한 저녁 쯤에 화랑대역에서 서울여대 사이에 이어지는 공릉동 철길 산책 하고 있는데 너무 좋아서 루틴 공유해요!! \n 나무가 많아서 그런지 시원하고 평화로워서 좋더라구요. \n게다가 운 좋으면 철길냥이 영접도 가능 ㅎㅎ"
+            android:textColor="@color/black"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <!-- 게시글 목록을 담는 스크롤뷰와 글 작성 버튼을 FrameLayout으로 감쌉니다 -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <!-- 게시글 목록을 담는 스크롤뷰 -->
+        <ScrollView
+            android:id="@+id/scroll_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="56dp">
+
+            <LinearLayout
+                android:id="@+id/posts_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/gray" />
+
+                <!-- 게시글 항목 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:id="@+id/post_title_1"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="카페인 대신 차 마시기"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/black"/>
+
+                        <TextView
+                            android:id="@+id/post_likes_1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="3"
+                            android:textSize="14sp"
+                            android:textColor="@color/gray"
+                            android:layout_marginEnd="8dp"/>
+
+                        <ImageView
+                            android:id="@+id/post_like_icon_1"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_like_empty" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/post_content_1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="요즘 너무 카페인에 불잡혀 사는 것 같아서 카페인을 조금씩 끊어보기 위해 차를 대신 마셔주고 있는데 생각보다 종류도 많고 맛있어서 쉽게 성공중!!"
+                        android:textSize="14sp"
+                        android:textColor="@color/black"/>
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/gray" />
+
+                <!-- 게시글 항목 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:id="@+id/post_title_2"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="저랑 같이 빡세게 다이어트 하실분!!!!!"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/black"/>
+
+                        <TextView
+                            android:id="@+id/post_likes_2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="5"
+                            android:textSize="14sp"
+                            android:textColor="@color/gray"
+                            android:layout_marginEnd="8dp"/>
+
+                        <ImageView
+                            android:id="@+id/post_like_icon_2"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_like_empty" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/post_content_2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="하루에 1시간 이상 운동하기 루틴입니다!! 유산소, 근력, 산책하기 등등 상관 없어요!!! 저랑 같이 으싸으싸 해서 다이어트 성공해보자구요~!!"
+                        android:textSize="14sp"
+                        android:textColor="@color/black"/>
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/gray" />
+
+                <!-- 게시글 항목 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:id="@+id/post_title_3"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="학생분들을 위한 어깨 스트레칭"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/black"/>
+
+                        <TextView
+                            android:id="@+id/post_likes_3"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="2"
+                            android:textSize="14sp"
+                            android:textColor="@color/gray"
+                            android:layout_marginEnd="8dp"/>
+
+                        <ImageView
+                            android:id="@+id/post_like_icon_3"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_like_empty" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/post_content_3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="무거운 가방 메고 다니시는 학생분들, 수험생분들 저도 요즘 어깨가 아파서 이런저런 방법 찾아보다가 어깨 스트레칭과 승모근 운동을 했더니 훨씬 좋아졌습니다 하루 한번씩이라도 따라해보세요"
+                        android:textSize="14sp"
+                        android:textColor="@color/black"/>
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/gray" />
+
+                <!-- 게시글 항목 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:id="@+id/post_title_4"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="영어 실력 향상하기!!!"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/black"/>
+
+                        <TextView
+                            android:id="@+id/post_likes_4"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="7"
+                            android:textSize="14sp"
+                            android:textColor="@color/gray"
+                            android:layout_marginEnd="8dp"/>
+
+                        <ImageView
+                            android:id="@+id/post_like_icon_4"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_like_empty" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/post_content_4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="토익, 토플, 수험생, 취미 상관 없이 영어 실력 늘릴 수 있는 초간단 루틴입니다!! 조건은 하루에 영단어 10개, 문장 3개 암기하기.. 간단해 보이시나요!? 그래도 당신의 실력은 찬찬히 늘어갈 것!"
+                        android:textSize="14sp"
+                        android:textColor="@color/black"/>
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/gray" />
+
+            </LinearLayout>
+        </ScrollView>
+
+        <!-- 글 작성 버튼 -->
+        <ImageButton
+            android:id="@+id/btn_add_post"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:src="@drawable/ic_add"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:scaleType="centerInside"
+            android:layout_gravity="end|bottom"
+            android:layout_margin="16dp"/>
+
+    </FrameLayout>
+
+
+
+    <!-- 하단 메뉴 바 -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_navigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?android:attr/windowBackground"
+        app:menu="@menu/bottom_navigation_menu" />
+
+</LinearLayout>

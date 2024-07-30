@@ -32,11 +32,27 @@
         </activity>
 
         <activity
+            android:name=".BoardActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
             android:name=".AuthCodeHandlerActivity"
             android:exported="true" />
 
         <activity
             android:name=".popupActivity"
             android:theme="@style/DialogTheme" />
+
+        <!-- PostWriteActivity 선언 -->
+        <activity android:name=".PostWriteActivity" />
+
+        <!-- RoutineAddActivity 선언 -->
+        <activity android:name=".RoutineAddActivity" />
+
     </application>
 </manifest>
