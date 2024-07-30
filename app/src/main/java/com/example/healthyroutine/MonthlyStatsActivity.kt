@@ -36,11 +36,12 @@ class MonthlyStatsActivity : AppCompatActivity() {
 
     private fun getRoutineById(id: Int): Routine? {
         // 데이터베이스에서 루틴을 가져오는 로직
-        val routines = null
-        return routines.find {
-            val it = null
-            it.id == id
-        }
+        val routines = listOf(
+            Routine(1, "Morning Stretch"),
+            Routine(2, "Evening Run"),
+            // 다른 루틴들...
+        )
+        return routines.find { it.id == id }
     }
 
     private fun getCheckCountForMonth(routineId: Int): Int {

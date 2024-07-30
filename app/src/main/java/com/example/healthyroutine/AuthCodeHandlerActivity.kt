@@ -9,7 +9,6 @@ import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.user.UserApiClient
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.KakaoAuthProvider
 
 class AuthCodeHandlerActivity : AppCompatActivity() {
 
@@ -36,7 +35,7 @@ class AuthCodeHandlerActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-// 카카오톡 설치 확인
+        // 카카오톡 설치 확인
         if (UserApiClient.instance.isKakaoTalkLoginAvailable(this)) {
             // 카카오톡 로그인
             UserApiClient.instance.loginWithKakaoTalk(this) { token, error ->

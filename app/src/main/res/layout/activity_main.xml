@@ -12,9 +12,9 @@
     <ImageView
         android:id="@+id/logoImageView"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/logo"
-        android:layout_marginBottom="16dp" />
+        android:layout_height="77dp"
+        android:layout_marginBottom="16dp"
+        android:src="@drawable/logo" />
 
     <TextView
         android:id="@+id/appNameTextView"
@@ -104,7 +104,7 @@
 
     <!-- 회원가입 옵션 -->
     <TextView
-        android:id="@+id/signupTextView"
+        android:id="@+id/signUpTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="계정이 없나요? 회원가입 하기"

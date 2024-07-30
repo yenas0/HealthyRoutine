@@ -7,7 +7,7 @@ pluginManagement {
 }
 
 dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS) // 여기서 FAIL_ON_PROJECT_REPOS를 PREFER_SETTINGS로 변경
     repositories {
         google()
         mavenCentral()

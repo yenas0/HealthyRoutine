@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.healthyroutine"
-        minSdk = 21
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -57,7 +57,7 @@ dependencies {
     implementation(platform("androidx.compose:compose-bom:2023.08.00"))
     implementation(platform("com.google.firebase:firebase-bom:33.1.2"))
     implementation("com.google.firebase:firebase-analytics")
-    implementation("com.google.firebase:firebase-auth")  // Firebase Authentication 추가
+    implementation("com.google.firebase:firebase-auth")
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")

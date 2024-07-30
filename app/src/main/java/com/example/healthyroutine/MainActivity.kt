@@ -9,6 +9,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import com.google.firebase.auth.FirebaseAuth
+import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.user.UserApiClient
 
 class MainActivity : ComponentActivity() {

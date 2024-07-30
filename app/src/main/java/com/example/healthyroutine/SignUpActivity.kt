@@ -12,7 +12,7 @@ class SignUpActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_sign_up) // Make sure the layout file name is activity_sign_up.xml
+        setContentView(R.layout.activity_signup) // Make sure the layout file name is activity_sign_up.xml
 
         // Initialize Firebase Auth
         auth = FirebaseAuth.getInstance()
