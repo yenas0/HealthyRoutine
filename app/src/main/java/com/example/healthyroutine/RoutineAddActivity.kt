@@ -20,6 +20,11 @@ class RoutineAddActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_routine_add)
 
+        //루틴 추천 버튼 누르면 루틴 이름 그대로 들어가게
+        val routine_Name = intent.getStringExtra("BUTTON_TEXT")
+        val healthRoutineName = findViewById<EditText>(R.id.routine_title)
+        healthRoutineName.setText(routine_Name)
+
         routineTitle = findViewById(R.id.routine_title)
         startDateTextView = findViewById(R.id.tv_start_date)
         dayButtons = listOf(
