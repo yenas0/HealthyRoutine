@@ -1,4 +1,4 @@
-package com.example.yourapp
+package com.example.healthyroutine
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
