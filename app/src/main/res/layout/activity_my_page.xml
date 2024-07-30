@@ -3,14 +3,60 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:background="@color/white">
 
-    <!-- User Information Section -->
+    <!-- 상단바 -->
+    <LinearLayout
+        android:id="@+id/top_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:background="@color/white"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:elevation="4dp">
+
+        <!-- 상단바의 자식 뷰들 -->
+        <ImageView
+            android:id="@+id/icon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_icon" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_weight="1"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/region_selector"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="10dp"
+                android:text="마이페이지"
+                android:textSize="18sp"
+                android:textColor="@color/black"
+                android:textStyle="bold"/>
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/notification_icon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_notification" />
+    </LinearLayout>
+
+    <!-- 사용자 정보 -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="16dp">
+        android:padding="16dp"
+        android:layout_marginTop="20dp"
+        android:gravity="center_vertical">
 
         <ImageView
             android:id="@+id/profileImageView"
@@ -40,6 +86,15 @@
                 android:text="usermail@gmail.com" />
         </LinearLayout>
 
+        <Button
+            android:id="@+id/logout_button"
+            android:layout_width="60dp"
+            android:layout_height="31dp"
+            android:layout_marginEnd="15dp"
+            android:background="@drawable/ic_logout"
+            android:padding="8dp"
+            android:textColor="@color/black" />
+
         <ImageView
             android:id="@+id/settingsImageView"
             android:layout_width="32dp"
@@ -47,15 +102,18 @@
             android:src="@drawable/ic_settings" />
     </LinearLayout>
 
-    <!-- Statistics Section -->
+    <!-- 통계 정보 -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="76dp"
+        android:layout_height="105dp"
+        android:layout_marginTop="16dp"
         android:background="@drawable/bg_my_page"
         android:orientation="horizontal"
-        android:padding="16dp">
+        android:padding="16dp"
+        android:layout_margin="16dp">
 
         <LinearLayout
+            android:id="@+id/postsCountLayout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -66,7 +124,10 @@
                 android:id="@+id/postsCountTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:layout_marginRight="10dp"
                 android:text="내가 쓴 글"
+                android:textSize="16sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -74,10 +135,13 @@
                 android:layout_height="wrap_content"
                 android:text="5"
                 android:textColor="@color/colorPrimary"
-                android:textStyle="bold"/>
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:layout_marginRight="10dp"/>
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/likedCountLayout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -88,18 +152,22 @@
                 android:id="@+id/scrapCountTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="스크랩한 글"
-                android:textStyle="bold" />
+                android:text="좋아요한 글"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="12dp"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="3"
                 android:textColor="@color/colorPrimary"
-                android:textStyle="bold"/>
+                android:textSize="20sp"
+                android:textStyle="bold" />
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/pointsTextView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -107,18 +175,23 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/pointsTextView"
+                android:id="@+id/pointsText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="나의 포인트"
-                android:textStyle="bold" />
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="12dp"
+                android:layout_marginLeft="10dp"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="300p"
                 android:textColor="@color/colorPrimary"
-                android:textStyle="bold" />
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:layout_marginLeft="10dp" />
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>
