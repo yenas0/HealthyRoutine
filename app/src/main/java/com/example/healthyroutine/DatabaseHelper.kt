@@ -16,12 +16,12 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 + COLUMN_CONTENT + " TEXT,"
                 + COLUMN_LIKES + " INTEGER,"
                 + COLUMN_ROUTINE + " TEXT,"
-                + COLUMN_ROUTINE_DAYS + " TEXT, "
+                + COLUMN_ROUTINE_DAYS + " TEXT,"
                 + "$COLUMN_USER_ID INTEGER)")  // 사용자 ID 컬럼 추가
 
         val createLikesTable = ("CREATE TABLE " + TABLE_LIKES + "("
                 + COLUMN_LIKE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                + COLUMN_POST_ID + " INTEGER"
+                + COLUMN_POST_ID + " INTEGER,"
                 + "$COLUMN_USER_ID INTEGER)")  // 사용자 ID 컬럼 추가
 
         db.execSQL(createPostTable)
@@ -29,15 +29,13 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        // 데이터베이스 스키마 변경 및 업그레이드 처리 코드
         if (oldVersion < newVersion) {
-            db.execSQL("DROP TABLE IF EXISTS posts")
-            onCreate(db)
+            db.execSQL("ALTER TABLE $TABLE_POSTS ADD COLUMN $COLUMN_USER_ID INTEGER DEFAULT 1")
+            db.execSQL("ALTER TABLE $TABLE_LIKES ADD COLUMN $COLUMN_USER_ID INTEGER DEFAULT 1")
         }
     }
 
     override fun onDowngrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        // 필요에 따라 onDowngrade를 재정의하여 데이터베이스 다운그레이드를 처리할 수 있습니다.
         onUpgrade(db, oldVersion, newVersion)
     }
 
@@ -52,6 +50,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             put(COLUMN_LIKES, 0)
             put(COLUMN_ROUTINE, routine)
             put(COLUMN_ROUTINE_DAYS, routineDays)
+            put(COLUMN_USER_ID, currentUserId)  // 사용자 ID 추가
         }
         db.insert(TABLE_POSTS, null, values)
         db.close()
@@ -118,6 +117,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         val db = this.writableDatabase
         val values = ContentValues().apply {
             put(COLUMN_POST_ID, postId)
+            put(COLUMN_USER_ID, currentUserId)  // 사용자 ID 추가
         }
         db.insert(TABLE_LIKES, null, values)
         db.close()
@@ -125,70 +125,20 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
 
     fun removeLike(postId: Int) {
         val db = this.writableDatabase
-        db.delete(TABLE_LIKES, "$COLUMN_POST_ID = ?", arrayOf(postId.toString()))
+        db.delete(TABLE_LIKES, "$COLUMN_POST_ID = ? AND $COLUMN_USER_ID = ?", arrayOf(postId.toString(), currentUserId.toString()))
         db.close()
     }
 
     fun isLiked(postId: Int): Boolean {
         val db = this.readableDatabase
-        val cursor = db.rawQuery("SELECT * FROM $TABLE_LIKES WHERE $COLUMN_POST_ID = ?", arrayOf(postId.toString()))
+        val cursor = db.rawQuery("SELECT * FROM $TABLE_LIKES WHERE $COLUMN_POST_ID = ? AND $COLUMN_USER_ID = ?", arrayOf(postId.toString(), currentUserId.toString()))
         val isLiked = cursor.count > 0
         cursor.close()
         db.close()
         return isLiked
     }
 
-    fun getPostsByUser(userId: String): List<Post> {
-        // 사용자 ID 또는 이름으로 필터링하여 게시글 목록을 반환하는 로직
-        val posts = mutableListOf<Post>()
-        val db = this.readableDatabase
-        val cursor = db.rawQuery("SELECT * FROM $TABLE_POSTS WHERE $COLUMN_TITLE LIKE ?", arrayOf("%$userId%"))
-        if (cursor.moveToFirst()) {
-            do {
-                val post = Post(
-                    id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID)),
-                    title = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TITLE)),
-                    content = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_CONTENT)),
-                    likes = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_LIKES)),
-                    routine = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ROUTINE)),
-                    routineDays = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ROUTINE_DAYS))
-                )
-                posts.add(post)
-            } while (cursor.moveToNext())
-        }
-        cursor.close()
-        db.close()
-        return posts
-    }
-
-    fun getLikedPostsByUser(userId: String): List<Post> {
-        // 사용자가 좋아요를 누른 게시글 목록을 반환하는 로직
-        val likedPosts = mutableListOf<Post>()
-        val db = this.readableDatabase
-        val cursor = db.rawQuery(
-            "SELECT * FROM $TABLE_POSTS p INNER JOIN $TABLE_LIKES l ON p.$COLUMN_ID = l.$COLUMN_POST_ID WHERE p.$COLUMN_TITLE LIKE ?",
-            arrayOf("%$userId%")
-        )
-        if (cursor.moveToFirst()) {
-            do {
-                val post = Post(
-                    id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID)),
-                    title = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TITLE)),
-                    content = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_CONTENT)),
-                    likes = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_LIKES)),
-                    routine = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ROUTINE)),
-                    routineDays = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ROUTINE_DAYS))
-                )
-                likedPosts.add(post)
-            } while (cursor.moveToNext())
-        }
-        cursor.close()
-        db.close()
-        return likedPosts
-    }
-
     fun getMyPosts(): List<Post> {
-        // 데이터베이스에서 사용자가 작성한 글을 가져오는 로직을 추가합니다.
         val posts = mutableListOf<Post>()
         val db = this.readableDatabase
         val cursor = db.rawQuery("SELECT * FROM $TABLE_POSTS WHERE $COLUMN_USER_ID = ? ORDER BY $COLUMN_ID DESC", arrayOf(currentUserId.toString()))
@@ -211,7 +161,6 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
     }
 
     fun getLikedPosts(): List<Post> {
-        // 데이터베이스에서 사용자가 좋아요를 누른 글을 가져오는 로직을 추가합니다.
         val posts = mutableListOf<Post>()
         val db = this.readableDatabase
         val cursor = db.rawQuery("SELECT * FROM $TABLE_POSTS WHERE $COLUMN_ID IN (SELECT $COLUMN_POST_ID FROM $TABLE_LIKES WHERE $COLUMN_USER_ID = ?)", arrayOf(currentUserId.toString()))
@@ -247,6 +196,6 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         const val TABLE_LIKES = "likes"
         const val COLUMN_LIKE_ID = "like_id"
         const val COLUMN_POST_ID = "post_id"
-        private const val COLUMN_USER_ID = "user_id"
+        const val COLUMN_USER_ID = "user_id"
     }
 }

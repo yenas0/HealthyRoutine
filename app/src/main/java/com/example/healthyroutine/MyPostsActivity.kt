@@ -1,6 +1,5 @@
 package com.example.healthyroutine
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
@@ -8,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.example.healthyroutine.DatabaseHelper
+import com.example.healthyroutine.R
 
 class MyPostsActivity : AppCompatActivity() {
 
@@ -19,14 +19,13 @@ class MyPostsActivity : AppCompatActivity() {
 
         dbHelper = DatabaseHelper(this)
 
+        loadMyPosts()
+
+        // Back button
         val backButton: ImageView = findViewById(R.id.back_button)
         backButton.setOnClickListener {
-            val intent = Intent(this, MyPageActivity::class.java)
-            startActivity(intent)
             finish()
         }
-
-        loadMyPosts()
     }
 
     private fun loadMyPosts() {
@@ -45,6 +44,24 @@ class MyPostsActivity : AppCompatActivity() {
             titleTextView.text = post.title
             contentTextView.text = post.content
             likesTextView.text = post.likes.toString()
+
+            var isLiked = dbHelper.isLiked(post.id)
+            likeIcon.setImageResource(if (isLiked) R.drawable.ic_like_filled else R.drawable.ic_like_empty)
+
+            likeIcon.setOnClickListener {
+                if (isLiked) {
+                    post.likes -= 1
+                    likeIcon.setImageResource(R.drawable.ic_like_empty)
+                    dbHelper.removeLike(post.id)
+                } else {
+                    post.likes += 1
+                    likeIcon.setImageResource(R.drawable.ic_like_filled)
+                    dbHelper.addLike(post.id)
+                }
+                isLiked = !isLiked
+                dbHelper.updatePost(post)
+                likesTextView.text = post.likes.toString()
+            }
 
             postsContainer.addView(postView)
 
