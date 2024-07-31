@@ -6,6 +6,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
+import com.example.healthyroutine.com.example.healthyroutine.RankingActivity
 
 class MyPageActivity : AppCompatActivity() {
 
@@ -39,8 +40,8 @@ class MyPageActivity : AppCompatActivity() {
 
         // 나의 포인트 영역 클릭 이벤트 설정
         pointsCountLayout.setOnClickListener{
-//            val intent = Intent(this, RankingActivity::class.java)
-//            startActivity(intent)
+            val intent = Intent(this, RankingActivity::class.java)
+            startActivity(intent)
         }
 
         // 로그아웃 버튼 클릭 이벤트 설정

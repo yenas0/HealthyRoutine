@@ -19,8 +19,8 @@ class SettingsActivity : AppCompatActivity() {
 
     fun onEditProfileClick(view: View) {
         // 회원 정보 수정 화면으로 이동
-        // val intent = Intent(this, EditProfileActivity::class.java)
-        // startActivity(intent)
+         val intent = Intent(this, EditProfileActivity::class.java)
+         startActivity(intent)
     }
 
     fun onNotificationSettingsClick(view: View) {
