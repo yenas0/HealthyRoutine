@@ -131,6 +131,7 @@
                 android:textStyle="bold" />
 
             <TextView
+                android:id="@+id/postsCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="5"
@@ -149,7 +150,7 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/scrapCountTextView"
+                android:id="@+id/likedCountTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="좋아요한 글"
@@ -158,6 +159,7 @@
                 android:layout_marginBottom="12dp"/>
 
             <TextView
+                android:id="@+id/likedCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="3"
@@ -185,6 +187,7 @@
                 android:layout_marginLeft="10dp"/>
 
             <TextView
+                android:id="@+id/pointsCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="300p"
