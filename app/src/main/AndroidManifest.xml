@@ -76,6 +76,7 @@
         <activity android:name=".LikedPostsActivity"/>
         <activity android:name=".SettingsActivity"/>
         <activity android:name=".EditProfileActivity"/>
+        <activity android:name=".NotificationSettingsActivity"/>
 
 
     </application>

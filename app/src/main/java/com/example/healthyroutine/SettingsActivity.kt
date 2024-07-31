@@ -25,8 +25,8 @@ class SettingsActivity : AppCompatActivity() {
 
     fun onNotificationSettingsClick(view: View) {
         // 알림 설정 화면으로 이동
-        // val intent = Intent(this, NotificationSettingsActivity::class.java)
-        // startActivity(intent)
+         val intent = Intent(this, NotificationSettingsActivity::class.java)
+         startActivity(intent)
     }
 
     fun onDeleteAccountClick(view: View) {
