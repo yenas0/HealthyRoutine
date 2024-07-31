@@ -64,6 +64,8 @@ dependencies {
     implementation("androidx.compose.material3:material3")
     implementation("androidx.recyclerview:recyclerview:1.3.2")
     implementation("androidx.appcompat:appcompat:1.7.0")
+    implementation("com.google.firebase:firebase-firestore-ktx:25.0.0")
+    implementation("com.google.firebase:firebase-storage-ktx:21.0.0")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
@@ -74,4 +76,6 @@ dependencies {
     implementation("com.kakao.sdk:v2-user:2.12.1")
     implementation("com.google.android.material:material:1.9.0")
     implementation("androidx.viewpager2:viewpager2:1.0.0")
+    implementation ("com.github.bumptech.glide:glide:4.12.0")
+    implementation ("com.google.android.gms:play-services-auth:19.2.0")
 }
