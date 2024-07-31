@@ -36,16 +36,11 @@
                 android:id="@+id/region_selector"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="노원구 게시판"
+                android:text="루틴 공유 게시판"
                 android:textSize="18sp"
                 android:textColor="@color/black"
                 android:textStyle="bold"/>
 
-            <ImageView
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:layout_marginStart="4dp"
-                android:src="@drawable/ic_dropdown_arrow" />
         </LinearLayout>
 
         <ImageView
