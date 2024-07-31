@@ -46,7 +46,8 @@ class MyPageActivity : AppCompatActivity() {
 
         // 로그아웃 버튼 클릭 이벤트 설정
         logoutButton.setOnClickListener {
-            // 로그아웃 처리 로직
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
         }
 
         // 설정 클릭 이벤트 설정
