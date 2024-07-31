@@ -7,14 +7,21 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.ComponentActivity
+import androidx.appcompat.app.AppCompatActivity
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.user.UserApiClient
+import com.google.firebase.auth.GoogleAuthProvider
 
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
+    private lateinit var googleSignInClient: GoogleSignInClient
+    private val RC_SIGN_IN = 9001
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,7 +30,16 @@ class MainActivity : ComponentActivity() {
         // Initialize Firebase Auth
         auth = FirebaseAuth.getInstance()
 
+        // Configure Google Sign In
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(getString(R.string.default_web_client_id))
+            .requestEmail()
+            .build()
+
+        googleSignInClient = GoogleSignIn.getClient(this, gso)
+
         // Initialize UI components
+        val googleLoginImageView = findViewById<ImageView>(R.id.googleLoginImageView)
         val emailEditText = findViewById<EditText>(R.id.emailEditText)
         val passwordEditText = findViewById<EditText>(R.id.passwordEditText)
         val loginButton = findViewById<Button>(R.id.loginButton)
@@ -54,6 +70,11 @@ class MainActivity : ComponentActivity() {
             }
         }
 
+        // Set up the Google login button click listener
+        googleLoginImageView.setOnClickListener {
+            signInWithGoogle()
+        }
+
         // Set up the Kakao login button click listener
         kakaoLoginImageView.setOnClickListener {
             UserApiClient.instance.loginWithKakaoTalk(this) { token, error ->
@@ -82,6 +103,46 @@ class MainActivity : ComponentActivity() {
             val intent = Intent(this, FindAccountActivity::class.java)
             startActivity(intent)
         }
+    }
+
+    private fun signInWithGoogle() {
+        val signInIntent = googleSignInClient.signInIntent
+        startActivityForResult(signInIntent, RC_SIGN_IN)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...)
+        if (requestCode == RC_SIGN_IN) {
+            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
+            handleSignInResult(task.result)
+        }
+    }
+
+    private fun handleSignInResult(account: GoogleSignInAccount?) {
+        try {
+            if (account != null) {
+                firebaseAuthWithGoogle(account)
+            }
+        } catch (e: Exception) {
+            Toast.makeText(this, "Google sign-in failed: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun firebaseAuthWithGoogle(account: GoogleSignInAccount) {
+        val credential = GoogleAuthProvider.getCredential(account.idToken, null)
+        auth.signInWithCredential(credential)
+            .addOnCompleteListener(this) { task ->
+                if (task.isSuccessful) {
+                    Toast.makeText(this, "Google sign-in successful", Toast.LENGTH_SHORT).show()
+                    val intent = Intent(this, HomeActivity::class.java)
+                    startActivity(intent)
+                    finish()
+                } else {
+                    Toast.makeText(this, "Google sign-in failed", Toast.LENGTH_SHORT).show()
+                }
+            }
     }
 
     private val mCallback: (OAuthToken?, Throwable?) -> Unit = { token, error ->

@@ -1,6 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.healthyroutine">
 
+    <!-- 인터넷 권한 추가 -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:name=".GlobalApplication"
         android:allowBackup="true"
@@ -9,6 +12,17 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.HealthyRoutine">
+
+        <!-- 구글 서비스 관련 메타데이터 추가 -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="@string/admob_app_id"/>
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version"/>
+        <meta-data
+            android:name="com.google.android.gms.auth.api.signin.API_KEY"
+            android:value="@string/google_api_key"/>
 
         <activity
             android:name=".MainActivity"
@@ -76,7 +90,6 @@
         <activity android:name=".LikedPostsActivity"/>
         <activity android:name=".SettingsActivity"/>
         <activity android:name=".EditProfileActivity"/>
-
 
     </application>
 </manifest>
