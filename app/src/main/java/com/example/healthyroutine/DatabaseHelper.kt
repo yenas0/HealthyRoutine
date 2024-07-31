@@ -42,6 +42,10 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
     // 현재 로그인한 사용자 ID를 관리할 변수
     private var currentUserId: Int = 1  // 예시로 1로 설정, 실제로는 로그인된 사용자 ID를 설정
 
+    fun setCurrentUserId(userId: Int) {
+        currentUserId = userId
+    }
+
     fun addPost(title: String, content: String, routine: String?, routineDays: String?) {
         val db = this.writableDatabase
         val values = ContentValues().apply {

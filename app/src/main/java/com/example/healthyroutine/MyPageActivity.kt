@@ -20,7 +20,6 @@ class MyPageActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
     private lateinit var firestore: FirebaseFirestore
-    private lateinit var dbHelper: DatabaseHelper
     private var currentUser: FirebaseUser? = null
 
     private lateinit var profileImageView: ImageView
@@ -35,6 +34,7 @@ class MyPageActivity : AppCompatActivity() {
     private lateinit var pointsCountLayout: LinearLayout
     private lateinit var logoutButton: Button
     private lateinit var settingsImageView: ImageView
+    private lateinit var dbHelper: DatabaseHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,7 +42,6 @@ class MyPageActivity : AppCompatActivity() {
 
         auth = FirebaseAuth.getInstance()
         firestore = FirebaseFirestore.getInstance()
-        dbHelper = DatabaseHelper(this)
         currentUser = auth.currentUser
 
         profileImageView = findViewById(R.id.profileImageView)
@@ -58,15 +57,20 @@ class MyPageActivity : AppCompatActivity() {
         logoutButton = findViewById(R.id.logoutButton)
         settingsImageView = findViewById(R.id.settingsImageView)
 
+        dbHelper = DatabaseHelper(this)
+        currentUser?.let { dbHelper.setCurrentUserId(it.uid.hashCode()) } // 현재 사용자 ID 설정
+
         // 내가 쓴 글 영역 클릭 이벤트 설정
         postsCountLayout.setOnClickListener {
             val intent = Intent(this, MyPostsActivity::class.java)
+            intent.putExtra("user_id", currentUser?.uid.hashCode())
             startActivity(intent)
         }
 
         // 좋아요한 글 영역 클릭 이벤트 설정
         likedCountLayout.setOnClickListener {
             val intent = Intent(this, LikedPostsActivity::class.java)
+            intent.putExtra("user_id", currentUser?.uid.hashCode())
             startActivity(intent)
         }
 
@@ -78,8 +82,10 @@ class MyPageActivity : AppCompatActivity() {
 
         // 로그아웃 버튼 클릭 이벤트 설정
         logoutButton.setOnClickListener {
+            auth.signOut()
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
+            finish()
         }
 
         // 설정 클릭 이벤트 설정
@@ -115,7 +121,7 @@ class MyPageActivity : AppCompatActivity() {
                                 .into(profileImageView)
                         }
 
-                        updatePostCounts()
+                        updatePostCounts(user.uid.hashCode())
                     } else {
                         Log.w("MyPageActivity", "No such document")
                         Toast.makeText(this, "프로필 정보를 불러올 수 없습니다.", Toast.LENGTH_SHORT).show()
@@ -130,11 +136,11 @@ class MyPageActivity : AppCompatActivity() {
         }
     }
 
-    private fun updatePostCounts() {
+    private fun updatePostCounts(userId: Int) {
         val myPostsCount = dbHelper.getMyPosts().size
-        val likedPostsCount = dbHelper.getLikedPosts().size
-
         postsCountTextView.text = myPostsCount.toString()
+
+        val likedPostsCount = dbHelper.getLikedPosts().size
         likedCountTextView.text = likedPostsCount.toString()
     }
 }

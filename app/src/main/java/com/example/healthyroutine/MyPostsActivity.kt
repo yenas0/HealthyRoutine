@@ -11,13 +11,15 @@ import com.example.healthyroutine.R
 
 class MyPostsActivity : AppCompatActivity() {
 
-    lateinit var dbHelper: DatabaseHelper
+    private lateinit var dbHelper: DatabaseHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_my_posts)
 
         dbHelper = DatabaseHelper(this)
+        val currentUserId = intent.getIntExtra("user_id", -1)
+        dbHelper.setCurrentUserId(currentUserId)
 
         loadMyPosts()
 
@@ -32,7 +34,7 @@ class MyPostsActivity : AppCompatActivity() {
         val postsContainer: LinearLayout = findViewById(R.id.my_posts_container)
         postsContainer.removeAllViews()
 
-        val posts = dbHelper.getMyPosts() // 이 함수는 사용자가 작성한 글을 가져옵니다.
+        val posts = dbHelper.getMyPosts()
         for (post in posts) {
             val postView = layoutInflater.inflate(R.layout.post_item, null)
 

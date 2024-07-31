@@ -6,6 +6,7 @@ import android.util.Patterns
 import android.widget.*
 import androidx.activity.ComponentActivity
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 class SignUpActivity : ComponentActivity() {
 
@@ -25,6 +26,10 @@ class SignUpActivity : ComponentActivity() {
         val etNickname = findViewById<EditText>(R.id.et_nickname)
         val btnCheck = findViewById<Button>(R.id.btn_check)
         val btnSignUp = findViewById<Button>(R.id.btn_signup)
+        val cbAllAgree = findViewById<CheckBox>(R.id.cb_all_agree)
+        val cbTermsAgree = findViewById<CheckBox>(R.id.cb_terms_agree)
+        val cbPrivacyAgree = findViewById<CheckBox>(R.id.cb_privacy_agree)
+        val cbMarketingAgree = findViewById<CheckBox>(R.id.cb_marketing_agree)
 
         btnCheck.setOnClickListener {
             val email = etId.text.toString()
@@ -45,7 +50,18 @@ class SignUpActivity : ComponentActivity() {
             }
         }
 
-        // Set up the sign-up button click listener
+        cbAllAgree.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                cbTermsAgree.isChecked = true
+                cbPrivacyAgree.isChecked = true
+                cbMarketingAgree.isChecked = true
+            } else {
+                cbTermsAgree.isChecked = false
+                cbPrivacyAgree.isChecked = false
+                cbMarketingAgree.isChecked = false
+            }
+        }
+
         btnSignUp.setOnClickListener {
             val email = etId.text.toString()
             val password = etPassword.text.toString()
@@ -82,6 +98,11 @@ class SignUpActivity : ComponentActivity() {
                 return@setOnClickListener
             }
 
+            if (!cbTermsAgree.isChecked || !cbPrivacyAgree.isChecked || !cbMarketingAgree.isChecked) {
+                Toast.makeText(this, "모든 약관에 동의해주세요", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
             checkEmailExists(email) { exists ->
                 if (exists) {
                     etId.error = "이미 사용중인 이메일입니다"
@@ -110,14 +131,33 @@ class SignUpActivity : ComponentActivity() {
     }
 
     private fun createUser(email: String, password: String) {
+        val nickname = findViewById<EditText>(R.id.et_nickname).text.toString()
+
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    Toast.makeText(this, "회원가입 성공", Toast.LENGTH_SHORT).show()
-                    // Navigate back to MainActivity to log in
-                    val intent = Intent(this, MainActivity::class.java)
-                    startActivity(intent)
-                    finish()
+                    val user = auth.currentUser
+                    val userId = user?.uid
+
+                    if (userId != null) {
+                        val db = FirebaseFirestore.getInstance()
+                        val userMap = hashMapOf(
+                            "email" to email,
+                            "nickname" to nickname
+                        )
+
+                        db.collection("users").document(userId).set(userMap)
+                            .addOnSuccessListener {
+                                Toast.makeText(this, "회원가입 성공", Toast.LENGTH_SHORT).show()
+                                // Navigate back to MainActivity to log in
+                                val intent = Intent(this, MainActivity::class.java)
+                                startActivity(intent)
+                                finish()
+                            }
+                            .addOnFailureListener { e ->
+                                Toast.makeText(this, "회원가입 실패: ${e.message}", Toast.LENGTH_SHORT).show()
+                            }
+                    }
                 } else {
                     Toast.makeText(this, "회원가입 실패: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                 }

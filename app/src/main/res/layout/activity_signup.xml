@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="25dp">
 
         <!-- 아이디 (이메일) -->
         <TextView
@@ -18,33 +18,44 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="아이디 (이메일)"
-            android:textColor="#4CAF50"
-            android:textSize="16sp"
+            android:textColor="@color/colorPrimary"
+            android:textSize="18sp"
+            android:textStyle="bold"
             android:layout_marginTop="20dp" />
 
-        <com.google.android.material.textfield.TextInputLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:errorEnabled="true">
+            android:orientation="horizontal">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/et_id"
-                android:layout_width="match_parent"
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:hint="아이디 (이메일)"
-                android:inputType="textEmailAddress"
-                android:layout_marginTop="8dp" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:layout_weight="1"
+                app:errorEnabled="true">
 
-        <Button
-            android:id="@+id/btn_check"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="중복확인"
-            android:textColor="#4CAF50"
-            android:background="@android:color/transparent"
-            android:layout_gravity="end"
-            android:layout_marginTop="4dp" />
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_id"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="아이디 (이메일)"
+                    android:inputType="textEmailAddress"
+                    android:layout_marginTop="8dp"
+                    android:textColor="@color/black"
+                    android:textColorHint="@color/gray" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <Button
+                android:id="@+id/btn_check"
+                android:layout_width="67dp"
+                android:layout_height="37dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="4dp"
+                android:background="@drawable/ic_id_check"
+                android:text=""
+                android:textColor="@color/colorPrimary" />
+        </LinearLayout>
 
         <!-- 비밀번호 -->
         <TextView
@@ -52,8 +63,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="비밀번호"
-            android:textColor="#4CAF50"
-            android:textSize="16sp"
+            android:textColor="@color/colorPrimary"
+            android:textSize="18sp"
+            android:textStyle="bold"
             android:layout_marginTop="20dp" />
 
         <com.google.android.material.textfield.TextInputLayout
@@ -67,7 +79,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:hint="비밀번호"
-                android:inputType="textPassword" />
+                android:inputType="textPassword"
+                android:textColor="@color/black"
+                android:textColorHint="@color/gray" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- 비밀번호 확인 -->
@@ -76,8 +90,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="비밀번호 확인"
-            android:textColor="#4CAF50"
-            android:textSize="16sp"
+            android:textColor="@color/colorPrimary"
+            android:textSize="18sp"
+            android:textStyle="bold"
             android:layout_marginTop="20dp" />
 
         <com.google.android.material.textfield.TextInputLayout
@@ -91,7 +106,9 @@
                 android:layout_height="wrap_content"
                 android:hint="비밀번호 확인"
                 android:inputType="textPassword"
-                android:layout_marginTop="8dp" />
+                android:layout_marginTop="8dp"
+                android:textColor="@color/black"
+                android:textColorHint="@color/gray" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- 닉네임 -->
@@ -100,8 +117,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="닉네임"
-            android:textColor="#4CAF50"
-            android:textSize="16sp"
+            android:textColor="@color/colorPrimary"
+            android:textSize="18sp"
+            android:textStyle="bold"
             android:layout_marginTop="20dp" />
 
         <EditText
@@ -109,44 +127,50 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="닉네임"
-            android:layout_marginTop="8dp" />
+            android:layout_marginTop="8dp"
+            android:textColor="@color/black"
+            android:textColorHint="@color/gray" />
 
         <!-- 동의사항 -->
-        <RadioGroup
-            android:id="@+id/rg_agreement"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:layout_marginTop="20dp">
 
-            <RadioButton
-                android:id="@+id/rb_all_agree"
+            <CheckBox
+                android:id="@+id/cb_all_agree"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="모두 동의합니다."
-                android:textColor="#4CAF50" />
+                android:textColor="@color/colorPrimary"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
-            <RadioButton
-                android:id="@+id/rb_terms_agree"
+            <CheckBox
+                android:id="@+id/cb_terms_agree"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="이용약관 동의"
-                android:textColor="#4CAF50" />
+                android:textColor="@color/black"
+                android:textSize="14sp" />
 
-            <RadioButton
-                android:id="@+id/rb_privacy_agree"
+            <CheckBox
+                android:id="@+id/cb_privacy_agree"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="개인정보 처리방침 동의"
-                android:textColor="#4CAF50" />
+                android:textColor="@color/black"
+                android:textSize="14sp" />
 
-            <RadioButton
-                android:id="@+id/rb_marketing_agree"
+            <CheckBox
+                android:id="@+id/cb_marketing_agree"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="마케팅 정보 수신 동의"
-                android:textColor="#4CAF50" />
-        </RadioGroup>
+                android:textColor="@color/black"
+                android:textSize="14sp" />
+        </LinearLayout>
 
         <!-- 회원가입 완료 버튼 -->
         <Button
@@ -154,7 +178,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:backgroundTint="#4CAF50"
+            android:backgroundTint="@color/colorPrimary"
             android:text="회원가입 완료"
             android:textColor="#FFFFFF" />
 

@@ -11,13 +11,15 @@ import com.example.healthyroutine.R
 
 class LikedPostsActivity : AppCompatActivity() {
 
-    lateinit var dbHelper: DatabaseHelper
+    private lateinit var dbHelper: DatabaseHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_liked_posts)
 
         dbHelper = DatabaseHelper(this)
+        val currentUserId = intent.getIntExtra("user_id", -1)
+        dbHelper.setCurrentUserId(currentUserId)
 
         loadLikedPosts()
 
@@ -32,7 +34,7 @@ class LikedPostsActivity : AppCompatActivity() {
         val postsContainer: LinearLayout = findViewById(R.id.liked_posts_container)
         postsContainer.removeAllViews()
 
-        val posts = dbHelper.getLikedPosts() // 이 함수는 사용자가 좋아요를 누른 글을 가져옵니다.
+        val posts = dbHelper.getLikedPosts()
         for (post in posts) {
             val postView = layoutInflater.inflate(R.layout.post_item, null)
 
