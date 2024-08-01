@@ -4,8 +4,8 @@ import android.os.Bundle
 import android.widget.CalendarView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import java.time.LocalDate
 
-// MonthlyStatsActivity.kt
 class MonthlyStatsActivity : AppCompatActivity() {
 
     private lateinit var calendarView: CalendarView
@@ -34,11 +34,11 @@ class MonthlyStatsActivity : AppCompatActivity() {
         checkCountTextView.text = "체크 횟수: $checkCount"
     }
 
-    private fun getRoutineById(id: Int): Routine? {
+    private fun getRoutineById(id: Int): RoutineData? {
         // 데이터베이스에서 루틴을 가져오는 로직
         val routines = listOf(
-            Routine(1, "Morning Stretch"),
-            Routine(2, "Evening Run"),
+            RoutineData(1, "Morning Stretch", LocalDate.now(), false),
+            RoutineData(2, "Evening Run", LocalDate.now(), false)
             // 다른 루틴들...
         )
         return routines.find { it.id == id }
