@@ -1,10 +1,10 @@
 package com.example.healthyroutine
 
-import android.graphics.Color
 import android.os.Bundle
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
+import android.widget.CalendarView
 import android.widget.HorizontalScrollView
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.time.temporal.TemporalAdjusters
 import java.util.Locale
@@ -27,12 +28,16 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var btnNextWeek: ImageView
     private lateinit var weekDatesContainer: LinearLayout
     private lateinit var horizontalScrollView: HorizontalScrollView
-    private lateinit var tvDate: TextView
+    private lateinit var tvDate: TextView // 상단바 제목 텍스트뷰
+    private lateinit var toggleButton: ImageView // 상단바 토글 버튼
+    private lateinit var calendarContainer: LinearLayout // 캘린더 컨테이너
+    private lateinit var calendarView: CalendarView // 캘린더 뷰
 
     private lateinit var checklistAdapter: ChecklistAdapter
     private var currentWeekStart: LocalDate = LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
     private lateinit var gestureDetector: GestureDetector
-    private var selectedDateView: View? = null
+
+    private var selectedDate: LocalDate? = LocalDate.now() // 기본 선택 날짜를 오늘로 설정
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,7 +49,10 @@ class HomeActivity : AppCompatActivity() {
         btnNextWeek = findViewById(R.id.btn_next_week)
         weekDatesContainer = findViewById(R.id.week_dates_container)
         horizontalScrollView = findViewById(R.id.horizontal_scroll_view)
-        tvDate = findViewById(R.id.tv_date)
+        tvDate = findViewById(R.id.tv_date) // 상단바 제목 텍스트뷰
+        toggleButton = findViewById(R.id.toggle_button) // 상단바 토글 버튼
+        calendarContainer = findViewById(R.id.calendar_container) // 캘린더 컨테이너
+        calendarView = findViewById(R.id.calendar_view) // 캘린더 뷰
 
         checklistAdapter = ChecklistAdapter(mutableListOf())
         recyclerView.adapter = checklistAdapter
@@ -60,6 +68,26 @@ class HomeActivity : AppCompatActivity() {
         btnNextWeek.setOnClickListener {
             currentWeekStart = currentWeekStart.plusWeeks(1)
             updateWeekDates()
+        }
+
+        toggleButton.setOnClickListener {
+            if (calendarContainer.visibility == View.VISIBLE) {
+                calendarContainer.visibility = View.GONE
+                toggleButton.setImageResource(R.drawable.ic_arrow_down)
+            } else {
+                calendarContainer.visibility = View.VISIBLE
+                toggleButton.setImageResource(R.drawable.ic_arrow_up)
+            }
+        }
+
+        calendarView.setOnDateChangeListener { _, year, month, dayOfMonth ->
+            val selectedCalendarDate = LocalDate.of(year, month + 1, dayOfMonth)
+            selectedDate = selectedCalendarDate
+            currentWeekStart = selectedCalendarDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+            updateWeekDates()
+            updateTopBarDate(selectedCalendarDate)
+            calendarContainer.visibility = View.GONE
+            toggleButton.setImageResource(R.drawable.ic_arrow_down)
         }
 
         gestureDetector = GestureDetector(this, object : GestureDetector.SimpleOnGestureListener() {
@@ -115,55 +143,33 @@ class HomeActivity : AppCompatActivity() {
                 }
                 date.isBefore(today) -> {
                     circleBackground.setBackgroundResource(R.drawable.circle_past_background)
-                    tvDate.setTextColor(ContextCompat.getColor(this, R.color.white))
                 }
                 date.isAfter(today) -> {
                     circleBackground.setBackgroundResource(R.drawable.circle_future_background)
-                    tvDate.setTextColor(ContextCompat.getColor(this, R.color.white))
                 }
             }
 
+            if (date == selectedDate) {
+                dateView.setBackgroundResource(R.drawable.circle_border)
+            } else {
+                dateView.setBackgroundResource(android.R.color.transparent)
+            }
+
             dateView.setOnClickListener {
-                selectDate(dateView, date)
+                selectedDate = date
+                updateWeekDates()
+                updateTopBarDate(date) // 상단바 제목 업데이트
             }
 
             weekDatesContainer.addView(dateView)
         }
+
+        // 기본 선택 날짜의 상단바 제목 업데이트
+        selectedDate?.let { updateTopBarDate(it) }
     }
 
-    private fun selectDate(view: View, date: LocalDate) {
-        selectedDateView?.let {
-            val circleBackground: View = it.findViewById(R.id.circle_background)
-            val tvDate: TextView = it.findViewById(R.id.tv_date)
-            val tvDayOfWeek: TextView = it.findViewById(R.id.tv_day_of_week)
-
-            // 기존에 선택된 날짜 스타일을 원래대로 돌려놓기
-            circleBackground.setBackgroundResource(0)
-            when {
-                date.isEqual(LocalDate.now()) -> {
-                    circleBackground.setBackgroundResource(R.drawable.circle_today_background)
-                    tvDayOfWeek.setTextColor(ContextCompat.getColor(this, R.color.gray))
-                    tvDate.setTextColor(ContextCompat.getColor(this, R.color.white))
-                }
-                date.isBefore(LocalDate.now()) -> {
-                    circleBackground.setBackgroundResource(R.drawable.circle_past_background)
-                    tvDate.setTextColor(ContextCompat.getColor(this, R.color.white))
-                }
-                date.isAfter(LocalDate.now()) -> {
-                    circleBackground.setBackgroundResource(R.drawable.circle_future_background)
-                    tvDate.setTextColor(ContextCompat.getColor(this, R.color.white))
-                }
-            }
-        }
-
-        // 새로운 선택된 날짜 스타일 적용
-        val circleBackground: View = view.findViewById(R.id.circle_background)
-        circleBackground.setBackgroundResource(R.drawable.circle_selected_background)
-
-        selectedDateView = view
-
-        // 상단 바에 년도와 월 업데이트
-        val yearMonth = date.format(java.time.format.DateTimeFormatter.ofPattern("yyyy년 M월"))
-        tvDate.text = yearMonth
+    private fun updateTopBarDate(date: LocalDate) {
+        val formatter = DateTimeFormatter.ofPattern("yyyy년 MM월", Locale.getDefault())
+        tvDate.text = date.format(formatter)
     }
 }

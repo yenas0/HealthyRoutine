@@ -32,6 +32,6 @@
             android:textColor="@color/white"
             android:textStyle="bold"
             android:layout_gravity="center"
-            android:textSize="13sp" />
+            android:textSize="12sp" />
     </LinearLayout>
 </LinearLayout>

@@ -15,19 +15,21 @@
         android:layout_height="wrap_content"
         android:padding="16dp"
         android:background="@color/white"
-        android:orientation="vertical"
-        android:gravity="center_vertical"
-        android:elevation="4dp">
+        android:orientation="horizontal"
+        android:gravity="center_vertical" >
+
+        <ImageView
+            android:id="@+id/icon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_icon" />
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <ImageView
-                android:id="@+id/icon"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:src="@drawable/ic_icon" />
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:gravity="center">
 
             <TextView
                 android:id="@+id/tv_date"
@@ -36,18 +38,39 @@
                 android:text="2024년 7월"
                 android:textSize="18sp"
                 android:textColor="@color/black"
-                android:layout_gravity="center"
-                android:layout_weight="1"
                 android:textStyle="bold"
                 android:gravity="center" />
 
             <ImageView
-                android:id="@+id/notification_icon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_notification"
-                android:layout_gravity="center"/>
+                android:id="@+id/toggle_button"
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:src="@drawable/ic_arrow_down"
+                android:layout_gravity="center"
+                android:layout_marginStart="8dp" />
         </LinearLayout>
+
+        <ImageView
+            android:id="@+id/notification_icon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_notification"
+            android:layout_gravity="center"/>
+
+    </LinearLayout>
+
+    <!-- 캘린더 뷰 -->
+    <LinearLayout
+        android:id="@+id/calendar_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <CalendarView
+            android:id="@+id/calendar_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
     </LinearLayout>
 
     <!-- 주간 날짜 선택기 -->
@@ -55,14 +78,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="center">
+        android:gravity="center"
+        android:background="@color/white"
+        android:layout_marginBottom="10dp">
 
         <ImageView
             android:id="@+id/btn_previous_week"
             android:layout_width="15dp"
             android:layout_height="15dp"
             android:src="@drawable/ic_arrow_left"
-            android:layout_margin="15dp"
+            android:layout_margin="10dp"
             android:contentDescription="Previous week"/>
 
         <HorizontalScrollView
@@ -87,9 +112,15 @@
             android:layout_width="15dp"
             android:layout_height="15dp"
             android:src="@drawable/ic_arrow_right"
-            android:layout_margin="15dp"
+            android:layout_margin="10dp"
             android:contentDescription="Next week"/>
     </LinearLayout>
+
+    <!-- 그림자 효과를 위한 뷰 -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="4dp"
+        android:background="@drawable/shadow_bottom" />
 
     <!-- 체크리스트 -->
     <androidx.recyclerview.widget.RecyclerView
