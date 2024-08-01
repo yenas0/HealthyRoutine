@@ -2,6 +2,7 @@ package com.example.healthyroutine
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Patterns
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
@@ -13,9 +14,10 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.firestore.FirebaseFirestore
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.user.UserApiClient
-import com.google.firebase.auth.GoogleAuthProvider
 
 class MainActivity : AppCompatActivity() {
 
@@ -45,28 +47,40 @@ class MainActivity : AppCompatActivity() {
         val loginButton = findViewById<Button>(R.id.loginButton)
         val kakaoLoginImageView = findViewById<ImageView>(R.id.kakaoLoginImageView)
         val signUpTextView = findViewById<TextView>(R.id.signUpTextView)
-        val forgotPasswordTextView = findViewById<TextView>(R.id.forgotPasswordTextView) // New line
+        val forgotPasswordTextView = findViewById<TextView>(R.id.forgotPasswordTextView)
 
         // Set up the login button click listener
         loginButton.setOnClickListener {
-            val email = emailEditText.text.toString()
+            val input = emailEditText.text.toString()
             val password = passwordEditText.text.toString()
 
-            if (email.isNotEmpty() && password.isNotEmpty()) {
-                auth.signInWithEmailAndPassword(email, password)
-                    .addOnCompleteListener(this) { task ->
-                        if (task.isSuccessful) {
-                            Toast.makeText(this, "로그인 성공", Toast.LENGTH_SHORT).show()
-                            // Navigate to HomeActivity
-                            val intent = Intent(this, HomeActivity::class.java)
-                            startActivity(intent)
-                            finish() // Call finish() to prevent returning to the login screen
-                        } else {
-                            Toast.makeText(this, "다시 입력해주세요", Toast.LENGTH_SHORT).show()
+            if (input.isNotEmpty() && password.isNotEmpty()) {
+                // Check if the input is an email or username
+                if (Patterns.EMAIL_ADDRESS.matcher(input).matches()) {
+                    // Input is an email, proceed with login
+                    loginWithEmail(input, password)
+                } else {
+                    // Input is a username, retrieve the associated email from Firestore
+                    val db = FirebaseFirestore.getInstance()
+                    db.collection("users").whereEqualTo("username", input)
+                        .get()
+                        .addOnCompleteListener { task ->
+                            if (task.isSuccessful && task.result != null && task.result?.documents?.isNotEmpty() == true) {
+                                val document = task.result?.documents?.first()
+                                val email = document?.getString("email")
+                                if (email != null) {
+                                    // Proceed with login using the retrieved email
+                                    loginWithEmail(email, password)
+                                } else {
+                                    Toast.makeText(this, "아이디에 해당하는 이메일을 찾을 수 없습니다", Toast.LENGTH_SHORT).show()
+                                }
+                            } else {
+                                Toast.makeText(this, "아이디가 잘못되었습니다", Toast.LENGTH_SHORT).show()
+                            }
                         }
-                    }
+                }
             } else {
-                Toast.makeText(this, "id 또는 비밀번호를 입력해주세요", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "아이디 또는 비밀번호를 입력해주세요", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -164,5 +178,19 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
         }
+    }
+
+    private fun loginWithEmail(email: String, password: String) {
+        auth.signInWithEmailAndPassword(email, password)
+            .addOnCompleteListener(this) { task ->
+                if (task.isSuccessful) {
+                    Toast.makeText(this, "로그인 성공", Toast.LENGTH_SHORT).show()
+                    val intent = Intent(this, HomeActivity::class.java)
+                    startActivity(intent)
+                    finish()
+                } else {
+                    Toast.makeText(this, "다시 입력해주세요", Toast.LENGTH_SHORT).show()
+                }
+            }
     }
 }
