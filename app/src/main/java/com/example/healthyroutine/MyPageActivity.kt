@@ -19,7 +19,6 @@ class MyPageActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
     private lateinit var firestore: FirebaseFirestore
-    private lateinit var dbHelper: DatabaseHelper
     private var currentUser: FirebaseUser? = null
 
     private lateinit var profileImageView: ImageView
@@ -41,7 +40,6 @@ class MyPageActivity : AppCompatActivity() {
 
         auth = FirebaseAuth.getInstance()
         firestore = FirebaseFirestore.getInstance()
-        dbHelper = DatabaseHelper(this)
         currentUser = auth.currentUser
 
         profileImageView = findViewById(R.id.profileImageView)
@@ -88,6 +86,9 @@ class MyPageActivity : AppCompatActivity() {
             val intent = Intent(this, SettingsActivity::class.java)
             startActivity(intent)
         }
+
+        // 포인트 업데이트
+        pointsTextView.text = "${PointsManager.getPoints()}p"
     }
 
     override fun onResume() {
@@ -104,10 +105,8 @@ class MyPageActivity : AppCompatActivity() {
                     if (document != null) {
                         val nickname = document.getString("nickname")
                         val profileImageUrl = document.getString("profileImageUrl")
-                        val points = document.getLong("points") ?: 0
 
                         usernameTextView.text = nickname
-                        pointsTextView.text = "${points}p"
 
                         profileImageUrl?.let {
                             Glide.with(this)
@@ -132,10 +131,6 @@ class MyPageActivity : AppCompatActivity() {
     }
 
     private fun updatePostCounts() {
-        val myPostsCount = dbHelper.getMyPosts().size
-        val likedPostsCount = dbHelper.getLikedPosts().size
-
-        postsCountTextView.text = myPostsCount.toString()
-        likedCountTextView.text = likedPostsCount.toString()
+        // 게시물 수 및 좋아요 수 업데이트를 위한 메소드 내용 제거
     }
 }

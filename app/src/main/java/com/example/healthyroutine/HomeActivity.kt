@@ -4,7 +4,6 @@ import ChecklistItem
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
@@ -12,6 +11,7 @@ import android.widget.CalendarView
 import android.widget.HorizontalScrollView
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.PopupWindow
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -58,7 +58,9 @@ class HomeActivity : AppCompatActivity() {
         calendarContainer = findViewById(R.id.calendar_container)
         calendarView = findViewById(R.id.calendar_view)
 
-        checklistAdapter = ChecklistAdapter(mutableListOf())
+        checklistAdapter = ChecklistAdapter(mutableListOf()) { item, view ->
+            showPopup(view, item)
+        }
         recyclerView.adapter = checklistAdapter
         recyclerView.layoutManager = LinearLayoutManager(this)
 
@@ -138,9 +140,6 @@ class HomeActivity : AppCompatActivity() {
                 val routineName = it.getStringExtra("routine_name") ?: ""
                 val notificationEnabled = it.getBooleanExtra("notification_enabled", true)
 
-                Log.d("HomeActivity", "Routine Name: $routineName")
-                Log.d("HomeActivity", "Notification Enabled: $notificationEnabled")
-
                 val routine = Routine(routineName, notificationEnabled)
                 routines.add(routine)
                 updateWeekDates()
@@ -210,6 +209,39 @@ class HomeActivity : AppCompatActivity() {
         val month = date.month.getDisplayName(TextStyle.SHORT, Locale.getDefault())
         val year = date.year
         tvDate.text = getString(R.string.date_format, year, month)
+    }
+
+    private fun showPopup(anchorView: View, item: ChecklistItem) {
+        val popupView = layoutInflater.inflate(R.layout.popup_menu, null)
+        val popupWindow = PopupWindow(popupView, LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+        popupWindow.isOutsideTouchable = true
+
+        popupWindow.setOnDismissListener {
+            checklistAdapter.clearSelection() // 팝업 창이 사라질 때 선택 해제
+        }
+
+        val itemStatistics: LinearLayout = popupView.findViewById(R.id.item_statistics)
+        itemStatistics.setOnClickListener {
+            // 통계 보기 클릭 이벤트 처리
+            popupWindow.dismiss()
+            // 통계 보기 액티비티로 이동하는 코드 추가 가능
+        }
+
+        val itemEdit: LinearLayout = popupView.findViewById(R.id.item_edit)
+        itemEdit.setOnClickListener {
+            // 수정하기 클릭 이벤트 처리
+            popupWindow.dismiss()
+            // 수정하기 액티비티로 이동하는 코드 추가 가능
+        }
+
+        val itemDelete: LinearLayout = popupView.findViewById(R.id.item_delete)
+        itemDelete.setOnClickListener {
+            // 삭제하기 클릭 이벤트 처리
+            popupWindow.dismiss()
+            checklistAdapter.removeChecklistItem(item)
+        }
+
+        popupWindow.showAsDropDown(anchorView, 0, 0)
     }
 
     companion object {

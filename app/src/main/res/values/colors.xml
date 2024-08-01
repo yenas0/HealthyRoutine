@@ -16,4 +16,5 @@
 
     <color name="completed_background">#3EB489</color> <!-- 완료된 항목 배경색 -->
     <color name="uncompleted_background">#FFFFFF</color> <!-- 미완료된 항목 배경색 -->
+    <color name="dim_overlay">#80000000</color>
 </resources>
