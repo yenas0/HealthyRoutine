@@ -1,8 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.healthyroutine">
 
-    <!-- INTERNET 권한 추가 -->
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- 인터넷 권한 추가 -->
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:name=".GlobalApplication"
@@ -24,7 +24,9 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
+        <!-- Kakao SDK에서 사용하는 Activity 설정 -->
+        <activity
+            android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -34,60 +36,36 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".BoardActivity"
-            android:exported="true">
+        <!-- 기타 액티비티들 -->
+        <activity android:name=".BoardActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".AuthCodeHandlerActivity"
-            android:exported="true" />
-
-        <activity
-            android:name=".popupActivity"
-            android:theme="@style/DialogTheme" />
-
-        <activity
-            android:name=".RecommendActivity"
-            android:exported="true">
+        <activity android:name=".AuthCodeHandlerActivity" android:exported="true" />
+        <activity android:name=".popupActivity" android:theme="@style/DialogTheme" />
+        <activity android:name=".RecommendActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <!-- RoutineAddActivity 선언 -->
-        <activity
-            android:name=".RoutineAddActivity"
-            android:exported="false"
-            android:parentActivityName=".RecommendActivity" />
-
-        <!-- PostWriteActivity 선언 -->
+        <activity android:name=".RoutineAddActivity" android:exported="false" android:parentActivityName=".RecommendActivity" />
         <activity android:name=".PostWriteActivity" />
-
-        <!-- MyPageActivity 선언 -->
-        <activity android:name=".MyPageActivity"
-            android:exported="true" >
-        </activity>
+        <activity android:name=".MyPageActivity" android:exported="true" />
         <activity android:name=".MyPostsActivity"/>
         <activity android:name=".LikedPostsActivity"/>
         <activity android:name=".SettingsActivity"/>
         <activity android:name=".EditProfileActivity"/>
         <activity android:name=".NotificationSettingsActivity"/>
-
-        <activity
-            android:name=".SignUpActivity"
-            android:exported="true">
+        <activity android:name=".SignUpActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity android:name=".HomeActivity"/>
         <activity android:name=".MonthlyStatsActivity"/>
         <activity android:name=".FindAccountActivity"/>
