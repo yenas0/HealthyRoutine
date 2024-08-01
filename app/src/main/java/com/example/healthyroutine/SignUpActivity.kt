@@ -114,7 +114,7 @@ class SignUpActivity : ComponentActivity() {
     }
 
     private fun isPasswordValid(password: String): Boolean {
-        val passwordPattern = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$"
+        val passwordPattern = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@\$!%*?&])[A-Za-z\\d@\$!%*?&]{8,}$"
         return password.matches(passwordPattern.toRegex())
     }
 
