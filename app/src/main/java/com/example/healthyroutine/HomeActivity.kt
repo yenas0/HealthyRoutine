@@ -13,9 +13,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import android.content.Intent
 import java.time.DayOfWeek
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.time.temporal.TemporalAdjusters
 import java.util.Locale
@@ -28,10 +28,10 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var btnNextWeek: ImageView
     private lateinit var weekDatesContainer: LinearLayout
     private lateinit var horizontalScrollView: HorizontalScrollView
-    private lateinit var tvDate: TextView // 상단바 제목 텍스트뷰
-    private lateinit var toggleButton: ImageView // 상단바 토글 버튼
-    private lateinit var calendarContainer: LinearLayout // 캘린더 컨테이너
-    private lateinit var calendarView: CalendarView // 캘린더 뷰
+    private lateinit var tvDate: TextView
+    private lateinit var toggleButton: ImageView
+    private lateinit var calendarContainer: LinearLayout
+    private lateinit var calendarView: CalendarView
 
     private lateinit var checklistAdapter: ChecklistAdapter
     private var currentWeekStart: LocalDate = LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
@@ -49,10 +49,10 @@ class HomeActivity : AppCompatActivity() {
         btnNextWeek = findViewById(R.id.btn_next_week)
         weekDatesContainer = findViewById(R.id.week_dates_container)
         horizontalScrollView = findViewById(R.id.horizontal_scroll_view)
-        tvDate = findViewById(R.id.tv_date) // 상단바 제목 텍스트뷰
-        toggleButton = findViewById(R.id.toggle_button) // 상단바 토글 버튼
-        calendarContainer = findViewById(R.id.calendar_container) // 캘린더 컨테이너
-        calendarView = findViewById(R.id.calendar_view) // 캘린더 뷰
+        tvDate = findViewById(R.id.tv_date)
+        toggleButton = findViewById(R.id.toggle_button)
+        calendarContainer = findViewById(R.id.calendar_container)
+        calendarView = findViewById(R.id.calendar_view)
 
         checklistAdapter = ChecklistAdapter(mutableListOf())
         recyclerView.adapter = checklistAdapter
@@ -68,26 +68,6 @@ class HomeActivity : AppCompatActivity() {
         btnNextWeek.setOnClickListener {
             currentWeekStart = currentWeekStart.plusWeeks(1)
             updateWeekDates()
-        }
-
-        toggleButton.setOnClickListener {
-            if (calendarContainer.visibility == View.VISIBLE) {
-                calendarContainer.visibility = View.GONE
-                toggleButton.setImageResource(R.drawable.ic_arrow_down)
-            } else {
-                calendarContainer.visibility = View.VISIBLE
-                toggleButton.setImageResource(R.drawable.ic_arrow_up)
-            }
-        }
-
-        calendarView.setOnDateChangeListener { _, year, month, dayOfMonth ->
-            val selectedCalendarDate = LocalDate.of(year, month + 1, dayOfMonth)
-            selectedDate = selectedCalendarDate
-            currentWeekStart = selectedCalendarDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
-            updateWeekDates()
-            updateTopBarDate(selectedCalendarDate)
-            calendarContainer.visibility = View.GONE
-            toggleButton.setImageResource(R.drawable.ic_arrow_down)
         }
 
         gestureDetector = GestureDetector(this, object : GestureDetector.SimpleOnGestureListener() {
@@ -116,6 +96,43 @@ class HomeActivity : AppCompatActivity() {
             gestureDetector.onTouchEvent(event)
             true
         }
+
+        toggleButton.setOnClickListener {
+            if (calendarContainer.visibility == View.GONE) {
+                calendarContainer.visibility = View.VISIBLE
+                toggleButton.setImageResource(R.drawable.ic_arrow_up)
+            } else {
+                calendarContainer.visibility = View.GONE
+                toggleButton.setImageResource(R.drawable.ic_arrow_down)
+            }
+        }
+
+        calendarView.setOnDateChangeListener { _, year, month, dayOfMonth ->
+            val selected = LocalDate.of(year, month + 1, dayOfMonth)
+            selectedDate = selected
+            currentWeekStart = selected.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+            updateWeekDates()
+            updateTitle(selected) // 업데이트 함수 호출
+            calendarContainer.visibility = View.GONE
+            toggleButton.setImageResource(R.drawable.ic_arrow_down)
+        }
+
+        btnAddItem.setOnClickListener {
+            val intent = Intent(this, RoutineAddActivity::class.java)
+            startActivity(intent)
+        }
+
+        updateTitle()
+    }
+
+    private fun updateTitle(date: LocalDate? = selectedDate) {
+        val yearMonth = date?.let {
+            "${it.year}년 ${it.monthValue}월"
+        } ?: run {
+            val today = LocalDate.now()
+            "${today.year}년 ${today.monthValue}월"
+        }
+        tvDate.text = yearMonth
     }
 
     private fun updateWeekDates() {
@@ -158,18 +175,10 @@ class HomeActivity : AppCompatActivity() {
             dateView.setOnClickListener {
                 selectedDate = date
                 updateWeekDates()
-                updateTopBarDate(date) // 상단바 제목 업데이트
+                updateTitle(date) // 업데이트 함수 호출
             }
 
             weekDatesContainer.addView(dateView)
         }
-
-        // 기본 선택 날짜의 상단바 제목 업데이트
-        selectedDate?.let { updateTopBarDate(it) }
-    }
-
-    private fun updateTopBarDate(date: LocalDate) {
-        val formatter = DateTimeFormatter.ofPattern("yyyy년 MM월", Locale.getDefault())
-        tvDate.text = date.format(formatter)
     }
 }
