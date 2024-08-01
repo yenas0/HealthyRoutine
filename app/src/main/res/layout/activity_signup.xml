@@ -12,12 +12,12 @@
         android:orientation="vertical"
         android:padding="25dp">
 
-        <!-- 아이디 (이메일) -->
+        <!-- 이메일 -->
         <TextView
             android:id="@+id/tv_id"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="아이디 (이메일)"
+            android:text="이메일"
             android:textColor="@color/colorPrimary"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -38,7 +38,7 @@
                     android:id="@+id/et_id"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="아이디 (이메일)"
+                    android:hint="이메일"
                     android:inputType="textEmailAddress"
                     android:layout_marginTop="8dp"
                     android:textColor="@color/black"
@@ -56,6 +56,32 @@
                 android:text=""
                 android:textColor="@color/colorPrimary" />
         </LinearLayout>
+
+        <!-- 아이디 (Username) -->
+        <TextView
+            android:id="@+id/tv_username"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="아이디"
+            android:textColor="@color/colorPrimary"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginTop="20dp" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:errorEnabled="true">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_username"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:hint="아이디"
+                android:textColor="@color/black"
+                android:textColorHint="@color/gray" />
+        </com.google.android.material.textfield.TextInputLayout>
 
         <!-- 비밀번호 -->
         <TextView

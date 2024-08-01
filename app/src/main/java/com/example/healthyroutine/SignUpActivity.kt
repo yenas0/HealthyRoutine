@@ -21,6 +21,7 @@ class SignUpActivity : ComponentActivity() {
 
         // Initialize UI components
         val etId = findViewById<EditText>(R.id.et_id)
+        val etUsername = findViewById<EditText>(R.id.et_username)
         val etPassword = findViewById<EditText>(R.id.et_password)
         val etPasswordConfirm = findViewById<EditText>(R.id.et_password_confirm)
         val etNickname = findViewById<EditText>(R.id.et_nickname)
@@ -67,6 +68,7 @@ class SignUpActivity : ComponentActivity() {
             val password = etPassword.text.toString()
             val passwordConfirm = etPasswordConfirm.text.toString()
             val nickname = etNickname.text.toString()
+            val username = etUsername.text.toString()
 
             if (email.isEmpty()) {
                 etId.error = "이메일을 입력해주세요"
@@ -98,16 +100,28 @@ class SignUpActivity : ComponentActivity() {
                 return@setOnClickListener
             }
 
+            if (username.isEmpty()) {
+                etUsername.error = "아이디를 입력해주세요"
+                return@setOnClickListener
+            }
+
             if (!cbTermsAgree.isChecked || !cbPrivacyAgree.isChecked || !cbMarketingAgree.isChecked) {
                 Toast.makeText(this, "모든 약관에 동의해주세요", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            checkEmailExists(email) { exists ->
-                if (exists) {
-                    etId.error = "이미 사용중인 이메일입니다"
+            // Check if username is unique
+            checkUsernameExists(username) { usernameExists ->
+                if (usernameExists) {
+                    etUsername.error = "이미 사용중인 아이디입니다"
                 } else {
-                    createUser(email, password)
+                    checkEmailExists(email) { emailExists ->
+                        if (emailExists) {
+                            etId.error = "이미 사용중인 이메일입니다"
+                        } else {
+                            createUser(email, password, username, nickname)
+                        }
+                    }
                 }
             }
         }
@@ -130,9 +144,21 @@ class SignUpActivity : ComponentActivity() {
         }
     }
 
-    private fun createUser(email: String, password: String) {
-        val nickname = findViewById<EditText>(R.id.et_nickname).text.toString()
+    private fun checkUsernameExists(username: String, callback: (Boolean) -> Unit) {
+        val db = FirebaseFirestore.getInstance()
+        db.collection("users").whereEqualTo("username", username)
+            .get()
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    callback(task.result?.isEmpty == false)
+                } else {
+                    Toast.makeText(this, "아이디 확인 중 오류 발생: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                    callback(false)
+                }
+            }
+    }
 
+    private fun createUser(email: String, password: String, username: String, nickname: String) {
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
@@ -143,13 +169,13 @@ class SignUpActivity : ComponentActivity() {
                         val db = FirebaseFirestore.getInstance()
                         val userMap = hashMapOf(
                             "email" to email,
+                            "username" to username,
                             "nickname" to nickname
                         )
 
                         db.collection("users").document(userId).set(userMap)
                             .addOnSuccessListener {
                                 Toast.makeText(this, "회원가입 성공", Toast.LENGTH_SHORT).show()
-                                // Navigate back to MainActivity to log in
                                 val intent = Intent(this, MainActivity::class.java)
                                 startActivity(intent)
                                 finish()
