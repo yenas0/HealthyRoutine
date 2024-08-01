@@ -1,29 +1,112 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp"
+    android:background="#FFFFFF"
     tools:context=".HomeActivity">
 
-    <EditText
-        android:id="@+id/et_new_item"
+    <!-- 상단바 -->
+    <LinearLayout
+        android:id="@+id/top_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter new item" />
+        android:padding="16dp"
+        android:background="@color/white"
+        android:orientation="vertical"
+        android:gravity="center_vertical"
+        android:elevation="4dp">
 
-    <Button
-        android:id="@+id/btn_add_item"
-        android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/icon"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_icon" />
+
+            <TextView
+                android:id="@+id/tv_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="2024년 7월"
+                android:textSize="18sp"
+                android:textColor="@color/black"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:textStyle="bold"
+                android:gravity="center" />
+
+            <ImageView
+                android:id="@+id/notification_icon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_notification"
+                android:layout_gravity="center"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- 주간 날짜 선택기 -->
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Add" />
+        android:orientation="horizontal"
+        android:gravity="center">
 
+        <ImageView
+            android:id="@+id/btn_previous_week"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:src="@drawable/ic_arrow_left"
+            android:layout_margin="15dp"
+            android:contentDescription="Previous week"/>
+
+        <HorizontalScrollView
+            android:id="@+id/horizontal_scroll_view"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:id="@+id/week_dates_container"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center">
+                <!-- 날짜 버튼들이 여기 추가될 것입니다 -->
+            </LinearLayout>
+        </HorizontalScrollView>
+
+        <ImageView
+            android:id="@+id/btn_next_week"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:src="@drawable/ic_arrow_right"
+            android:layout_margin="15dp"
+            android:contentDescription="Next week"/>
+    </LinearLayout>
+
+    <!-- 체크리스트 -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="16dp"
-        tools:ignore="MissingClass" />
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:padding="16dp" />
 
+    <!-- 루틴 추가 버튼 -->
+    <ImageButton
+        android:id="@+id/btn_add_item"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:src="@drawable/ic_add"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:scaleType="centerInside"
+        android:layout_gravity="end|bottom"
+        android:layout_margin="16dp"/>
 </LinearLayout>
