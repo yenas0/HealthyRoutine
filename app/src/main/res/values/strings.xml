@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">HealthyRoutine</string>
+    <string name="date_format">%d년 %s</string>
     <string name="default_web_client_id">493133199450-kdkdlt2mcvgjljmo1a1f71vidhqb7c12.apps.googleusercontent.com</string>
 </resources>

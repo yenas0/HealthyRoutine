@@ -3,6 +3,7 @@ package com.example.healthyroutine
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
@@ -39,6 +40,7 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var gestureDetector: GestureDetector
 
     private var selectedDate: LocalDate? = LocalDate.now() // 기본 선택 날짜를 오늘로 설정
+    private val routines = mutableListOf<Routine>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -133,12 +135,14 @@ class HomeActivity : AppCompatActivity() {
         if (requestCode == ADD_ROUTINE_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             data?.let {
                 val routineName = it.getStringExtra("routine_name") ?: ""
-                val startDate = it.getStringExtra("start_date") ?: ""
-                val days = it.getStringExtra("days") ?: ""
                 val notificationEnabled = it.getBooleanExtra("notification_enabled", true)
 
-                // 루틴 추가 로직
-                checklistAdapter.addRoutine(Routine(routineName, LocalDate.parse(startDate), days, notificationEnabled))
+                Log.d("HomeActivity", "Routine Name: $routineName")
+                Log.d("HomeActivity", "Notification Enabled: $notificationEnabled")
+
+                val routine = Routine(routineName, notificationEnabled)
+                routines.add(routine)
+                updateWeekDates()
             }
         }
     }
@@ -187,13 +191,24 @@ class HomeActivity : AppCompatActivity() {
             }
 
             weekDatesContainer.addView(dateView)
+
+            // 루틴 체크리스트 업데이트
+            updateChecklistForDate(date)
         }
+    }
+
+    private fun updateChecklistForDate(date: LocalDate) {
+        val checklistItems = routines.map { routine ->
+            ChecklistItem(routine.name, false)
+        }
+
+        checklistAdapter.updateChecklist(checklistItems)
     }
 
     private fun updateTitleDate(date: LocalDate) {
         val month = date.month.getDisplayName(TextStyle.SHORT, Locale.getDefault())
         val year = date.year
-        tvDate.text = "${year}년 $month"
+        tvDate.text = getString(R.string.date_format, year, month)
     }
 
     companion object {

@@ -6,35 +6,36 @@ import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import java.time.LocalDate
 
-data class Routine(val name: String, val startDate: LocalDate, val days: String, val notificationEnabled: Boolean)
-class ChecklistAdapter(private val routines: MutableList<Routine>) : RecyclerView.Adapter<ChecklistAdapter.RoutineViewHolder>() {
+class ChecklistAdapter(private val checklist: MutableList<ChecklistItem>) :
+    RecyclerView.Adapter<ChecklistAdapter.ChecklistViewHolder>() {
 
-    fun addRoutine(routine: Routine) {
-        routines.add(routine)
+    class ChecklistViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val taskName: TextView = itemView.findViewById(R.id.routine_name)
+        val checkBox: CheckBox = itemView.findViewById(R.id.checkbox)
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChecklistViewHolder {
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_checklist, parent, false)
+        return ChecklistViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: ChecklistViewHolder, position: Int) {
+        val item = checklist[position]
+        holder.taskName.text = item.name
+        holder.checkBox.isChecked = item.isCompleted
+    }
+
+    override fun getItemCount() = checklist.size
+
+    fun updateChecklist(newChecklist: List<ChecklistItem>) {
+        checklist.clear()
+        checklist.addAll(newChecklist)
         notifyDataSetChanged()
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RoutineViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_checklist, parent, false)
-        return RoutineViewHolder(view)
-    }
-
-    override fun onBindViewHolder(holder: RoutineViewHolder, position: Int) {
-        val routine = routines[position]
-        holder.bind(routine)
-    }
-
-    override fun getItemCount() = routines.size
-
-    inner class RoutineViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val checkBox: CheckBox = itemView.findViewById(R.id.checkbox)
-        private val routineNameTextView: TextView = itemView.findViewById(R.id.routine_name)
-
-        fun bind(routine: Routine) {
-            routineNameTextView.text = routine.name
-            // 다른 루틴 정보를 표시하거나 활용할 수 있습니다.
-        }
+    fun addRoutine(routine: Routine) {
+        checklist.add(ChecklistItem(routine.name, false))
+        notifyDataSetChanged()
     }
 }
