@@ -6,37 +6,35 @@ import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import java.time.LocalDate
 
-data class ChecklistItem(val title: String, var isChecked: Boolean)
+data class Routine(val name: String, val startDate: LocalDate, val days: String, val notificationEnabled: Boolean)
+class ChecklistAdapter(private val routines: MutableList<Routine>) : RecyclerView.Adapter<ChecklistAdapter.RoutineViewHolder>() {
 
-class ChecklistAdapter(private val items: MutableList<ChecklistItem>) : RecyclerView.Adapter<ChecklistAdapter.ChecklistViewHolder>() {
-
-    class ChecklistViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val checkBox: CheckBox = itemView.findViewById(R.id.checkbox)
-        val title: TextView = itemView.findViewById(R.id.title)
+    fun addRoutine(routine: Routine) {
+        routines.add(routine)
+        notifyDataSetChanged()
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChecklistViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RoutineViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_checklist, parent, false)
-        return ChecklistViewHolder(view)
+        return RoutineViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: ChecklistViewHolder, position: Int) {
-        val item = items[position]
-        holder.title.text = item.title
-        holder.checkBox.isChecked = item.isChecked
+    override fun onBindViewHolder(holder: RoutineViewHolder, position: Int) {
+        val routine = routines[position]
+        holder.bind(routine)
+    }
 
-        holder.checkBox.setOnCheckedChangeListener { _, isChecked ->
-            item.isChecked = isChecked
+    override fun getItemCount() = routines.size
+
+    inner class RoutineViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val checkBox: CheckBox = itemView.findViewById(R.id.checkbox)
+        private val routineNameTextView: TextView = itemView.findViewById(R.id.routine_name)
+
+        fun bind(routine: Routine) {
+            routineNameTextView.text = routine.name
+            // 다른 루틴 정보를 표시하거나 활용할 수 있습니다.
         }
-    }
-
-    override fun getItemCount(): Int {
-        return items.size
-    }
-
-    fun addItem(item: ChecklistItem) {
-        items.add(item)
-        notifyItemInserted(items.size - 1)
     }
 }
