@@ -128,9 +128,10 @@ class SignUpActivity : ComponentActivity() {
     }
 
     private fun isPasswordValid(password: String): Boolean {
-        val passwordPattern = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@\$!%*?&])[A-Za-z\\d@\$!%*?&]{8,}$"
+        val passwordPattern = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d@\$!%*?&]{8,}$"
         return password.matches(passwordPattern.toRegex())
     }
+
 
     private fun checkEmailExists(email: String, callback: (Boolean) -> Unit) {
         auth.fetchSignInMethodsForEmail(email).addOnCompleteListener { task ->
