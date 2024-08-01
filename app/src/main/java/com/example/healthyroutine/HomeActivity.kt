@@ -1,5 +1,7 @@
 package com.example.healthyroutine
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.view.GestureDetector
 import android.view.MotionEvent
@@ -13,7 +15,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import android.content.Intent
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.TextStyle
@@ -59,6 +60,7 @@ class HomeActivity : AppCompatActivity() {
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         updateWeekDates()
+        updateTitleDate(selectedDate ?: LocalDate.now())
 
         btnPreviousWeek.setOnClickListener {
             currentWeekStart = currentWeekStart.minusWeeks(1)
@@ -112,27 +114,33 @@ class HomeActivity : AppCompatActivity() {
             selectedDate = selected
             currentWeekStart = selected.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
             updateWeekDates()
-            updateTitle(selected) // 업데이트 함수 호출
-            calendarContainer.visibility = View.GONE
-            toggleButton.setImageResource(R.drawable.ic_arrow_down)
+            updateTitleDate(selected)
         }
 
         btnAddItem.setOnClickListener {
             val intent = Intent(this, RoutineAddActivity::class.java)
-            startActivity(intent)
+            startActivityForResult(intent, ADD_ROUTINE_REQUEST_CODE)
         }
-
-        updateTitle()
     }
 
-    private fun updateTitle(date: LocalDate? = selectedDate) {
-        val yearMonth = date?.let {
-            "${it.year}년 ${it.monthValue}월"
-        } ?: run {
-            val today = LocalDate.now()
-            "${today.year}년 ${today.monthValue}월"
+    override fun onResume() {
+        super.onResume()
+        updateTitleDate(selectedDate ?: LocalDate.now())
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == ADD_ROUTINE_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            data?.let {
+                val routineName = it.getStringExtra("routine_name") ?: ""
+                val startDate = it.getStringExtra("start_date") ?: ""
+                val days = it.getStringExtra("days") ?: ""
+                val notificationEnabled = it.getBooleanExtra("notification_enabled", true)
+
+                // 루틴 추가 로직
+                checklistAdapter.addRoutine(Routine(routineName, LocalDate.parse(startDate), days, notificationEnabled))
+            }
         }
-        tvDate.text = yearMonth
     }
 
     private fun updateWeekDates() {
@@ -175,10 +183,20 @@ class HomeActivity : AppCompatActivity() {
             dateView.setOnClickListener {
                 selectedDate = date
                 updateWeekDates()
-                updateTitle(date) // 업데이트 함수 호출
+                updateTitleDate(date)
             }
 
             weekDatesContainer.addView(dateView)
         }
+    }
+
+    private fun updateTitleDate(date: LocalDate) {
+        val month = date.month.getDisplayName(TextStyle.SHORT, Locale.getDefault())
+        val year = date.year
+        tvDate.text = "${year}년 $month"
+    }
+
+    companion object {
+        const val ADD_ROUTINE_REQUEST_CODE = 1
     }
 }

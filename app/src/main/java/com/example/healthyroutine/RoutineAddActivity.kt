@@ -1,10 +1,12 @@
 package com.example.healthyroutine
 
 import android.app.DatePickerDialog
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -15,15 +17,12 @@ class RoutineAddActivity : AppCompatActivity() {
     private lateinit var routineTitle: EditText
     private lateinit var startDateTextView: TextView
     private lateinit var dayButtons: List<TextView>
+    private var selectedDays: MutableList<String> = mutableListOf()
+    private var notificationEnabled: Boolean = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_routine_add)
-
-        //루틴 추천 버튼 누르면 루틴 이름 그대로 들어가게
-        val routine_Name = intent.getStringExtra("BUTTON_TEXT")
-        val healthRoutineName = findViewById<EditText>(R.id.routine_title)
-        healthRoutineName.setText(routine_Name)
 
         routineTitle = findViewById(R.id.routine_title)
         startDateTextView = findViewById(R.id.tv_start_date)
@@ -54,8 +53,24 @@ class RoutineAddActivity : AppCompatActivity() {
 
         val addButton: Button = findViewById(R.id.btn_add_routine)
         addButton.setOnClickListener {
-            // 루틴 추가 로직
-            finish() // 임시로 액티비티 종료
+            val routineName = routineTitle.text.toString()
+            val startDate = startDateTextView.text.toString()
+
+            if (routineName.isNotBlank() && selectedDays.isNotEmpty() && startDate.isNotBlank()) {
+                val intent = Intent()
+                intent.putExtra("routine_name", routineName)
+                intent.putExtra("start_date", startDate)
+                intent.putExtra("days", selectedDays.joinToString(","))
+                intent.putExtra("notification_enabled", notificationEnabled)
+                setResult(RESULT_OK, intent)
+                finish()
+            } else {
+                Toast.makeText(this, "모든 필드를 채워주세요.", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        findViewById<Switch>(R.id.notification_switch).setOnCheckedChangeListener { _, isChecked ->
+            notificationEnabled = isChecked
         }
 
         val routineName = intent.getStringExtra("routine")
@@ -95,9 +110,11 @@ class RoutineAddActivity : AppCompatActivity() {
         if (isActive) {
             button.background = resources.getDrawable(R.drawable.circle_background_inactive, null)
             button.tag = "inactive"
+            selectedDays.remove(button.text.toString())
         } else {
             button.background = resources.getDrawable(R.drawable.circle_background_active, null)
             button.tag = "active"
+            selectedDays.add(button.text.toString())
         }
     }
 

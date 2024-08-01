@@ -24,15 +24,15 @@ class RoutineDecoratorActivity : AppCompatActivity() {
         calendarView = findViewById(R.id.calendarView)
 
         // Dummy data for testing
-        routineList.add(Routine(LocalDate.of(2024, 7, 10), true))
-        routineList.add(Routine(LocalDate.of(2024, 7, 11), false))
-        routineList.add(Routine(LocalDate.of(2024, 7, 15), true))
-        routineList.add(Routine(LocalDate.of(2024, 7, 20), false))
+        routineList.add(Routine("name1", LocalDate.of(2024, 7, 10), "1", true))
+        routineList.add(Routine("name2", LocalDate.of(2024, 7, 11), "2", false))
+        routineList.add(Routine("name3", LocalDate.of(2024, 7, 15), "3", true))
+        routineList.add(Routine("name4", LocalDate.of(2024, 7, 20), "4", false))
 
-        val completedDates = routineList.filter { it.isCompleted }.map { CalendarDay.from(it.date.toDate()) }.toSet()
-        val notCompletedDates = routineList.filter { !it.isCompleted }.map { CalendarDay.from(it.date.toDate()) }.toSet()
-
-        calendarView.addDecorator(RoutineDecorator(completedDates, Color.GREEN))
-        calendarView.addDecorator(RoutineDecorator(notCompletedDates, Color.GRAY))
+//        val completedDates = routineList.filter { it.isCompleted }.map { CalendarDay.from(it.date.toDate()) }.toSet()
+//        val notCompletedDates = routineList.filter { !it.isCompleted }.map { CalendarDay.from(it.date.toDate()) }.toSet()
+//
+//        calendarView.addDecorator(RoutineDecorator(completedDates, Color.GREEN))
+//        calendarView.addDecorator(RoutineDecorator(notCompletedDates, Color.GRAY))
     }
 }

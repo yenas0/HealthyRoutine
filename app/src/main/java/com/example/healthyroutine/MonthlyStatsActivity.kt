@@ -34,14 +34,14 @@ class MonthlyStatsActivity : AppCompatActivity() {
         checkCountTextView.text = "체크 횟수: $checkCount"
     }
 
-    private fun getRoutineById(id: Int): RoutineData? {
+    private fun getRoutineById(id: Int): Routine? {
         // 데이터베이스에서 루틴을 가져오는 로직
         val routines = listOf(
-            RoutineData(1, "Morning Stretch", LocalDate.now(), false),
-            RoutineData(2, "Evening Run", LocalDate.now(), false)
+            Routine( "Morning Stretch", LocalDate.now(), "1", false),
+            Routine( "Evening Run", LocalDate.now(), "2", false)
             // 다른 루틴들...
         )
-        return routines.find { it.id == id }
+        return routines.find { id == id }
     }
 
     private fun getCheckCountForMonth(routineId: Int): Int {
