@@ -1,6 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.healthyroutine">
 
+    <!-- INTERNET 권한 추가 -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+
     <application
         android:name=".GlobalApplication"
         android:allowBackup="true"
@@ -51,7 +54,6 @@
         <activity
             android:name=".RecommendActivity"
             android:exported="true">
-            <!--이게 맞나..-->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -59,7 +61,6 @@
         </activity>
 
         <!-- RoutineAddActivity 선언 -->
-        <!--RecommendActivity랑 연결하려고 수정-->
         <activity
             android:name=".RoutineAddActivity"
             android:exported="false"
@@ -90,6 +91,12 @@
         <activity android:name=".HomeActivity"/>
         <activity android:name=".MonthlyStatsActivity"/>
         <activity android:name=".FindAccountActivity"/>
+
+        <!-- Google Sign-In 서비스 추가 -->
+        <activity
+            android:name="com.google.android.gms.auth.api.signin.internal.SignInHubActivity"
+            android:excludeFromRecents="true"
+            android:exported="false" />
 
     </application>
 </manifest>
