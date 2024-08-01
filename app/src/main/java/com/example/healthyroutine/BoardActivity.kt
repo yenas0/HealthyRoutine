@@ -10,8 +10,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 
 class BoardActivity : AppCompatActivity() {
 
@@ -19,17 +17,9 @@ class BoardActivity : AppCompatActivity() {
     lateinit var btn_add_post: ImageButton
     lateinit var dbHelper: DatabaseHelper
 
-    private lateinit var auth: FirebaseAuth
-    private lateinit var firestore: FirebaseFirestore
-    private var currentUserUid: String? = null
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_board)
-
-        auth = FirebaseAuth.getInstance()
-        firestore = FirebaseFirestore.getInstance()
-        currentUserUid = auth.currentUser?.uid
 
         bottom_navigation = findViewById(R.id.bottom_navigation)
         btn_add_post = findViewById(R.id.btn_add_post)

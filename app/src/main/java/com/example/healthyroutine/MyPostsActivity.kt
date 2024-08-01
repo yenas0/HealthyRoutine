@@ -11,15 +11,13 @@ import com.example.healthyroutine.R
 
 class MyPostsActivity : AppCompatActivity() {
 
-    private lateinit var dbHelper: DatabaseHelper
+    lateinit var dbHelper: DatabaseHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_my_posts)
 
         dbHelper = DatabaseHelper(this)
-        val currentUserId = intent.getIntExtra("user_id", -1)
-        dbHelper.setCurrentUserId(currentUserId)
 
         loadMyPosts()
 
