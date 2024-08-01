@@ -13,4 +13,7 @@
     <color name="colorAccent">#3EB489</color>
     <color name="monthly_select_background">#E0EFFF</color>
     <color name="monthly_select_text">#007AFF</color>
+
+    <color name="completed_background">#3EB489</color> <!-- 완료된 항목 배경색 -->
+    <color name="uncompleted_background">#FFFFFF</color> <!-- 미완료된 항목 배경색 -->
 </resources>
