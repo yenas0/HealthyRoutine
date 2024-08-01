@@ -27,7 +27,7 @@
         android:textStyle="bold"
         android:textColor="@color/colorPrimary"
         android:layout_gravity="left"
-        android:layout_marginBottom="8dp" />
+        android:layout_marginBottom="8dp"/>
 
     <EditText
         android:id="@+id/emailEditText"
