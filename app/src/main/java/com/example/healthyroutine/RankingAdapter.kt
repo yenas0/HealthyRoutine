@@ -17,7 +17,11 @@ class RankingAdapter : RecyclerView.Adapter<RankingAdapter.ViewHolder>() {
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.onBind(mRankerList[position])
+        //holder.onBind(mRankerList[position])
+
+        // 순위를 4부터 시작하도록 설정
+        val rank = position + 4
+        holder.onBind(mRankerList[position], rank)
     }
 
     fun setUserList(list: ArrayList<RankingUserActivity>) {
@@ -30,13 +34,13 @@ class RankingAdapter : RecyclerView.Adapter<RankingAdapter.ViewHolder>() {
     }
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val ranking: TextView = itemView.findViewById(R.id.ranking)
+        //private val ranking: TextView = itemView.findViewById(R.id.ranking)
         private val profile: ImageView = itemView.findViewById(R.id.profile)
         private val name: TextView = itemView.findViewById(R.id.name)
         private val points: TextView = itemView.findViewById(R.id.point)
 
-        fun onBind(item: RankingUserActivity) {
-            ranking.text = item.ranking.toString()
+        fun onBind(item: RankingUserActivity, rank: Int) {
+            //ranking.text = item.ranking.toString()
             profile.setImageResource(item.resourceId)
             name.text = item.name
             points.text = item.points.toString()
