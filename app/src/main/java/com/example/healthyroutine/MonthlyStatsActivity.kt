@@ -1,51 +1,45 @@
 package com.example.healthyroutine
 
+import android.annotation.SuppressLint
+import android.graphics.Color
 import android.os.Bundle
-import android.widget.CalendarView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import java.time.LocalDate
+import com.prolificinteractive.materialcalendarview.CalendarDay
+import com.prolificinteractive.materialcalendarview.MaterialCalendarView
+import java.util.*
 
 class MonthlyStatsActivity : AppCompatActivity() {
 
-    private lateinit var calendarView: CalendarView
+    private lateinit var calendarView: MaterialCalendarView
     private lateinit var routineNameTextView: TextView
-    private lateinit var checkCountTextView: TextView
 
+    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_monthly_stats)
+        setContentView(R.layout.activity_main)
 
-        calendarView = findViewById(R.id.calendar_view)
         routineNameTextView = findViewById(R.id.routine_name_text_view)
-        checkCountTextView = findViewById(R.id.check_count_text_view)
+        calendarView = findViewById(R.id.calendar_view)
 
-        val routineId = intent.getIntExtra("ROUTINE_ID", -1)
-        loadRoutineData(routineId)
+
+        val routineDays = getRoutineDaysFromDB()
+
+        val eventDates = HashSet<CalendarDay>()
+        routineDays.forEach {
+            eventDates.add(CalendarDay.from(it))
+        }
+
+
+        calendarView.addDecorator(EventDecorator(Color.RED, eventDates))
     }
 
-    private fun loadRoutineData(routineId: Int) {
-        // 루틴 이름과 체크 횟수를 불러오는 로직
-        val routine = getRoutineById(routineId)
-        routineNameTextView.text = routine?.name ?: "Unknown"
+    private fun getRoutineDaysFromDB(): List<Date> {
 
-        // 예시로 체크 횟수를 5로 설정 (실제로는 DB에서 가져와야 함)
-        val checkCount = getCheckCountForMonth(routineId)
-        checkCountTextView.text = "체크 횟수: $checkCount"
-    }
+        val dates = mutableListOf<Date>()
+        val calendar = Calendar.getInstance()
 
-    private fun getRoutineById(id: Int): RoutineData? {
-        // 데이터베이스에서 루틴을 가져오는 로직
-        val routines = listOf(
-            RoutineData(1, "Morning Stretch", LocalDate.now(), false),
-            RoutineData(2, "Evening Run", LocalDate.now(), false)
-            // 다른 루틴들...
-        )
-        return routines.find { it.id == id }
-    }
 
-    private fun getCheckCountForMonth(routineId: Int): Int {
-        // 월간 체크 횟수를 계산하는 로직
-        return 5
+        return dates
     }
 }
