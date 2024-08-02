@@ -1,5 +1,6 @@
 package com.example.healthyroutine
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -11,6 +12,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
@@ -33,6 +35,8 @@ class MyPageActivity : AppCompatActivity() {
     private lateinit var pointsCountLayout: LinearLayout
     private lateinit var logoutButton: Button
     private lateinit var settingsImageView: ImageView
+
+    lateinit var bottom_navigation: BottomNavigationView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -89,6 +93,52 @@ class MyPageActivity : AppCompatActivity() {
 
         // 포인트 업데이트
         pointsTextView.text = "${PointsManager.getPoints()}p"
+
+        bottom_navigation = findViewById(R.id.bottom_navigation)
+
+        bottom_navigation.selectedItemId = R.id.navigation_profile
+
+        // BottomNavigationView 설정
+        bottom_navigation.setOnNavigationItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.navigation_home -> {
+                    // 홈 화면으로 이동
+                    val intent = Intent(this, HomeActivity::class.java)
+                    startActivity(intent)
+                    bottom_navigation.menu.findItem(R.id.navigation_home).isChecked = true
+                    true
+                }
+                R.id.navigation_recommend -> {
+                    // 추천 화면으로 이동
+                    val intent = Intent(this, RecommendActivity::class.java)
+                    startActivity(intent)
+                    bottom_navigation.menu.findItem(R.id.navigation_recommend).isChecked = true
+                    true
+                }
+                R.id.navigation_board -> {
+                    // 게시판 화면으로 이동
+                    val intent = Intent(this, BoardActivity::class.java)
+                    startActivity(intent)
+                    bottom_navigation.menu.findItem(R.id.navigation_board).isChecked = true
+                    true
+                }
+                R.id.navigation_ranking -> {
+                    // 랭킹 화면으로 이동
+                    val intent = Intent(this, RankingActivity::class.java)
+                    startActivity(intent)
+                    bottom_navigation.menu.findItem(R.id.navigation_ranking).isChecked = true
+                    true
+                }
+                R.id.navigation_profile -> {
+                    // 마이페이지 화면으로 이동
+                    val intent = Intent(this, MyPageActivity::class.java)
+                    startActivity(intent)
+                    bottom_navigation.menu.findItem(R.id.navigation_profile).isChecked = true
+                    true
+                }
+                else -> false
+            }
+        }
     }
 
     override fun onResume() {

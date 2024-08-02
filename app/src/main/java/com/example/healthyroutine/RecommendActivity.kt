@@ -7,6 +7,7 @@ import android.widget.Button
 import android.widget.TabHost
 import com.example.healthyroutine.R
 import com.example.healthyroutine.RoutineAddActivity
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
 @Suppress("deprecation")
 class RecommendActivity : TabActivity() {
@@ -30,6 +31,9 @@ class RecommendActivity : TabActivity() {
     lateinit var btnL6: Button
     lateinit var btnL7: Button
     lateinit var btnL8: Button
+
+    lateinit var bottom_navigation: BottomNavigationView
+    lateinit var bottom_navigation2: BottomNavigationView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -159,5 +163,51 @@ class RecommendActivity : TabActivity() {
             intent.putExtra("BUTTON_TEXT", btnL8.text.toString())
             startActivity(intent)
         }
+
+        bottom_navigation = findViewById(R.id.bottom_navigation)
+        bottom_navigation.selectedItemId = R.id.navigation_recommend
+
+        // BottomNavigationView 설정
+        bottom_navigation.setOnNavigationItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.navigation_home -> {
+                    // 홈 화면으로 이동
+                    val intent = Intent(this, HomeActivity::class.java)
+                    startActivity(intent)
+                    bottom_navigation.menu.findItem(R.id.navigation_home).isChecked = true
+                    true
+                }
+                R.id.navigation_recommend -> {
+                    // 추천 화면으로 이동
+                    val intent = Intent(this, RecommendActivity::class.java)
+                    startActivity(intent)
+                    bottom_navigation.menu.findItem(R.id.navigation_recommend).isChecked = true
+                    true
+                }
+                R.id.navigation_board -> {
+                    // 게시판 화면으로 이동
+                    val intent = Intent(this, BoardActivity::class.java)
+                    startActivity(intent)
+                    bottom_navigation.menu.findItem(R.id.navigation_board).isChecked = true
+                    true
+                }
+                R.id.navigation_ranking -> {
+                    // 랭킹 화면으로 이동
+                    val intent = Intent(this, RankingActivity::class.java)
+                    startActivity(intent)
+                    bottom_navigation.menu.findItem(R.id.navigation_ranking).isChecked = true
+                    true
+                }
+                R.id.navigation_profile -> {
+                    // 마이페이지 화면으로 이동
+                    val intent = Intent(this, MyPageActivity::class.java)
+                    startActivity(intent)
+                    bottom_navigation.menu.findItem(R.id.navigation_profile).isChecked = true
+                    true
+                }
+                else -> false
+            }
+        }
+
     }
 }

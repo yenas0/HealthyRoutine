@@ -248,7 +248,6 @@ class HomeActivity : AppCompatActivity() {
         val itemDelete: LinearLayout = popupView.findViewById(R.id.item_delete)
 
         // 팝업창이 열릴 때 검정 외곽선 추가
-
         anchorView.setBackgroundResource(R.drawable.item_border_selected)
 
         // 팝업창이 닫힐 때 검정 외곽선 제거

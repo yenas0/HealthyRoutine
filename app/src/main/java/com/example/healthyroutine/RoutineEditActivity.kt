@@ -1,6 +1,8 @@
 // RoutineEditActivity.kt
 package com.example.healthyroutine
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
@@ -45,6 +47,14 @@ class RoutineEditActivity : AppCompatActivity() {
             )
 
             dbHelper.updateRoutine(updatedRoutine)
+
+            // 결과 반환
+            val resultIntent = Intent().apply {
+                putExtra("routine_id", routineId)
+                putExtra("routine_name", updatedRoutineName)
+                putExtra("notification_enabled", updatedNotificationEnabled)
+            }
+            setResult(Activity.RESULT_OK, resultIntent)
             finish()
         }
 
