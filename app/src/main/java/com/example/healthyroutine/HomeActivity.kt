@@ -5,14 +5,15 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.GestureDetector
+import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.TextStyle
@@ -21,7 +22,6 @@ import java.util.*
 
 class HomeActivity : AppCompatActivity() {
 
-    private lateinit var recyclerView: RecyclerView
     private lateinit var btnAddItem: ImageView
     private lateinit var btnPreviousWeek: ImageView
     private lateinit var btnNextWeek: ImageView
@@ -31,8 +31,8 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var toggleButton: ImageView
     private lateinit var calendarContainer: LinearLayout
     private lateinit var calendarView: CalendarView
+    private lateinit var checklistContainer: LinearLayout
 
-    private lateinit var checklistAdapter: ChecklistAdapter
     private var currentWeekStart: LocalDate = LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
     private lateinit var gestureDetector: GestureDetector
 
@@ -44,7 +44,6 @@ class HomeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
 
-        recyclerView = findViewById(R.id.recycler_view)
         btnAddItem = findViewById(R.id.btn_add_item)
         btnPreviousWeek = findViewById(R.id.btn_previous_week)
         btnNextWeek = findViewById(R.id.btn_next_week)
@@ -54,14 +53,9 @@ class HomeActivity : AppCompatActivity() {
         toggleButton = findViewById(R.id.toggle_button)
         calendarContainer = findViewById(R.id.calendar_container)
         calendarView = findViewById(R.id.calendar_view)
+        checklistContainer = findViewById(R.id.checklist_container)
 
         dbHelper = DatabaseHelper(this)
-
-        checklistAdapter = ChecklistAdapter(mutableListOf()) { item, view ->
-            showPopupMenu(item, view)
-        }
-        recyclerView.adapter = checklistAdapter
-        recyclerView.layoutManager = LinearLayoutManager(this)
 
         loadRoutinesFromDatabase()
         updateWeekDates()
@@ -207,11 +201,30 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun updateChecklistForDate(date: LocalDate) {
-        val checklistItems = routines.mapIndexed { index, routine ->
-            ChecklistItem(index, routine.name, false)
-        }
+        checklistContainer.removeAllViews()
+        routines.forEach { routine ->
+            val checklistItemView = layoutInflater.inflate(R.layout.item_checklist, checklistContainer, false)
+            val routineName: TextView = checklistItemView.findViewById(R.id.routine_name)
+            val checkBox: CheckBox = checklistItemView.findViewById(R.id.checkbox)
+            val container: View = checklistItemView.findViewById(R.id.container)
 
-        checklistAdapter.updateChecklist(checklistItems)
+            routineName.text = routine.name
+            checkBox.isChecked = false
+
+            container.setOnClickListener {
+                showPopupMenu(ChecklistItem(routine.id, routine.name, checkBox.isChecked), container)
+            }
+
+            checkBox.setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked) {
+                    container.setBackgroundResource(R.drawable.item_background_checked)
+                } else {
+                    container.setBackgroundResource(R.drawable.item_background)
+                }
+            }
+
+            checklistContainer.addView(checklistItemView)
+        }
     }
 
     private fun updateTitleDate(date: LocalDate) {
@@ -230,28 +243,33 @@ class HomeActivity : AppCompatActivity() {
         val itemEdit: LinearLayout = popupView.findViewById(R.id.item_edit)
         val itemDelete: LinearLayout = popupView.findViewById(R.id.item_delete)
 
+        // 팝업창이 열릴 때 검정 외곽선 추가
+        anchorView.setBackgroundResource(R.drawable.item_border_selected)
+
+        // 팝업창이 닫힐 때 검정 외곽선 제거
+        popupWindow.setOnDismissListener {
+            anchorView.setBackgroundResource(R.drawable.item_background)
+        }
+
         itemStatistics.setOnClickListener {
             Toast.makeText(this, "월간 통계 클릭", Toast.LENGTH_SHORT).show()
             popupWindow.dismiss()
         }
 
         itemEdit.setOnClickListener {
-            val intent = Intent(this, RoutineEditActivity::class.java)
-            intent.putExtra("routine_id", item.id)
-            intent.putExtra("routine_name", item.name)
-            intent.putExtra("notification_enabled", item.isCompleted)
+            val intent = Intent(this, RoutineEditActivity::class.java).apply {
+                putExtra("routine_id", item.id)
+                putExtra("routine_name", item.name)
+                putExtra("notification_enabled", item.isCompleted)
+            }
             startActivity(intent)
             popupWindow.dismiss()
         }
 
         itemDelete.setOnClickListener {
-            checklistAdapter.removeChecklistItem(item)
+            dbHelper.deleteRoutine(item.id)
+            loadRoutinesFromDatabase()
             popupWindow.dismiss()
-        }
-
-        // 팝업이 닫힐 때 선택 해제
-        popupWindow.setOnDismissListener {
-            checklistAdapter.clearSelection()
         }
     }
 

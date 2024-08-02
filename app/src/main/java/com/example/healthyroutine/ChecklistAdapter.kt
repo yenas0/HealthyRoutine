@@ -45,7 +45,7 @@ class ChecklistAdapter(
             } else {
                 holder.container.setBackgroundResource(R.drawable.item_background)
             }
-            // 업데이트 시점을 조정합니다.
+            // RecyclerView가 레이아웃이나 스크롤을 계산할 때 호출되지 않도록 합니다.
             holder.container.post {
                 notifyItemChanged(position)
             }
