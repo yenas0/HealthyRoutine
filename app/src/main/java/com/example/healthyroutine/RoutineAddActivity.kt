@@ -1,5 +1,7 @@
+// RoutineAddActivity.kt
 package com.example.healthyroutine
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
@@ -10,27 +12,34 @@ import androidx.appcompat.app.AppCompatActivity
 
 class RoutineAddActivity : AppCompatActivity() {
 
-    private lateinit var routineTitle: EditText
-    private lateinit var notificationSwitch: Switch
+    private lateinit var etRoutineName: EditText
+    private lateinit var switchNotification: Switch
+    private lateinit var btnSave: Button
+    private lateinit var backButton: ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_routine_add)
 
-        routineTitle = findViewById(R.id.routine_title)
-        notificationSwitch = findViewById(R.id.notification_switch)
+        etRoutineName = findViewById(R.id.routine_title)
+        switchNotification = findViewById(R.id.notification_switch)
+        btnSave = findViewById(R.id.btn_add_routine)
+        backButton = findViewById(R.id.back_button)
 
-        val backButton: ImageView = findViewById(R.id.back_button)
-        backButton.setOnClickListener {
-            onBackPressed()
+        btnSave.setOnClickListener {
+            val routineName = etRoutineName.text.toString()
+            val notificationEnabled = switchNotification.isChecked
+
+            val resultIntent = Intent().apply {
+                putExtra("routine_name", routineName)
+                putExtra("notification_enabled", notificationEnabled)
+            }
+
+            setResult(Activity.RESULT_OK, resultIntent)
+            finish()
         }
 
-        val addButton: Button = findViewById(R.id.btn_add_routine)
-        addButton.setOnClickListener {
-            val intent = Intent()
-            intent.putExtra("routine_name", routineTitle.text.toString())
-            intent.putExtra("notification_enabled", notificationSwitch.isChecked)
-            setResult(RESULT_OK, intent)
+        backButton.setOnClickListener {
             finish()
         }
     }
