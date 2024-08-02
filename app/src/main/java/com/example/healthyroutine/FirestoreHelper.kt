@@ -50,7 +50,7 @@ class FirestoreHelper {
 
     // 인기 게시글 가져오기
     fun getPopularPosts(callback: (List<Post>) -> Unit) {
-        db.collection("posts").whereGreaterThanOrEqualTo("likes", 5).orderBy("likes").get().addOnSuccessListener { result ->
+        db.collection("posts").whereGreaterThanOrEqualTo("likes", 5).orderBy("likes", Query.Direction.DESCENDING).get().addOnSuccessListener { result ->
             val posts = result.map { document ->
                 document.toObject(Post::class.java).apply { id = document.id }
             }
