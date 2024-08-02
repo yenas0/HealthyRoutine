@@ -46,7 +46,7 @@ class BoardActivity : AppCompatActivity() {
                     true
                 }
                 R.id.navigation_board -> {
-                    // 게시판 화면으로 이동
+                    // 기록장 화면으로 이동
                     val intent = Intent(this, BoardActivity::class.java)
                     startActivity(intent)
                     bottom_navigation.menu.findItem(R.id.navigation_board).isChecked = true

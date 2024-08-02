@@ -36,7 +36,7 @@
                 android:id="@+id/region_selector"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="루틴 공유 게시판"
+                android:text="오늘 하루 기록장"
                 android:textSize="18sp"
                 android:textColor="@color/black"
                 android:textStyle="bold"/>
@@ -57,25 +57,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="16dp"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp">
-
-        <TextView
-            android:id="@+id/realtime_popular_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="실시간 인기글"
-            android:textColor="@color/colorPrimary"
-            android:textSize="16sp"
-            android:textStyle="bold"/>
+        android:layout_marginTop="16dp">
 
         <TextView
             android:id="@+id/realtime_popular_subtitle"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:text="게시글을 클릭하여 루틴을 추가할 수 있어요"
+            android:gravity="center"
+            android:text="어떤 하루였는지 기록해보세요"
             android:textColor="@color/gray"
             android:textSize="12sp" />
     </LinearLayout>
@@ -89,7 +79,6 @@
         android:layout_marginTop="20dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="8dp"
-        android:background="@drawable/bg_popular_post"
         android:orientation="vertical"
         android:padding="16dp">
 
@@ -111,20 +100,11 @@
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/popular_post_likes"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:text="15"
-                android:textColor="@color/gray"
-                android:textSize="14sp" />
-
             <ImageView
                 android:id="@+id/popular_post_like_icon"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:src="@drawable/ic_like_empty" />
+                android:src="@drawable/ic_heart_empty" />
         </LinearLayout>
 
         <TextView
@@ -187,20 +167,11 @@
                             android:textStyle="bold"
                             android:textColor="@color/black"/>
 
-                        <TextView
-                            android:id="@+id/post_likes_1"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="3"
-                            android:textSize="14sp"
-                            android:textColor="@color/gray"
-                            android:layout_marginEnd="8dp"/>
-
                         <ImageView
                             android:id="@+id/post_like_icon_1"
                             android:layout_width="24dp"
                             android:layout_height="24dp"
-                            android:src="@drawable/ic_like_empty" />
+                            android:src="@drawable/ic_heart_empty" />
                     </LinearLayout>
 
                     <TextView
@@ -241,20 +212,11 @@
                             android:textStyle="bold"
                             android:textColor="@color/black"/>
 
-                        <TextView
-                            android:id="@+id/post_likes_2"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="5"
-                            android:textSize="14sp"
-                            android:textColor="@color/gray"
-                            android:layout_marginEnd="8dp"/>
-
                         <ImageView
                             android:id="@+id/post_like_icon_2"
                             android:layout_width="24dp"
                             android:layout_height="24dp"
-                            android:src="@drawable/ic_like_empty" />
+                            android:src="@drawable/ic_heart_empty" />
                     </LinearLayout>
 
                     <TextView
@@ -295,20 +257,11 @@
                             android:textStyle="bold"
                             android:textColor="@color/black"/>
 
-                        <TextView
-                            android:id="@+id/post_likes_3"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="2"
-                            android:textSize="14sp"
-                            android:textColor="@color/gray"
-                            android:layout_marginEnd="8dp"/>
-
                         <ImageView
                             android:id="@+id/post_like_icon_3"
                             android:layout_width="24dp"
                             android:layout_height="24dp"
-                            android:src="@drawable/ic_like_empty" />
+                            android:src="@drawable/ic_heart_empty" />
                     </LinearLayout>
 
                     <TextView
@@ -349,20 +302,11 @@
                             android:textStyle="bold"
                             android:textColor="@color/black"/>
 
-                        <TextView
-                            android:id="@+id/post_likes_4"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="7"
-                            android:textSize="14sp"
-                            android:textColor="@color/gray"
-                            android:layout_marginEnd="8dp"/>
-
                         <ImageView
                             android:id="@+id/post_like_icon_4"
                             android:layout_width="24dp"
                             android:layout_height="24dp"
-                            android:src="@drawable/ic_like_empty" />
+                            android:src="@drawable/ic_heart_empty" />
                     </LinearLayout>
 
                     <TextView
