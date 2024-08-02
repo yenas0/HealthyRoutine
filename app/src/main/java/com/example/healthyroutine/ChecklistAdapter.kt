@@ -1,19 +1,25 @@
 package com.example.healthyroutine
 
+import ChecklistItem
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 
-data class ChecklistItem(val title: String, var isChecked: Boolean)
+class ChecklistAdapter(
+    private val checklist: MutableList<ChecklistItem>,
+    private val onItemClicked: (ChecklistItem, View) -> Unit // View parameter 추가
+) : RecyclerView.Adapter<ChecklistAdapter.ChecklistViewHolder>() {
 
-class ChecklistAdapter(private val items: MutableList<ChecklistItem>) : RecyclerView.Adapter<ChecklistAdapter.ChecklistViewHolder>() {
+    private var selectedItem: ChecklistItem? = null
 
     class ChecklistViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val routineName: TextView = itemView.findViewById(R.id.routine_name)
         val checkBox: CheckBox = itemView.findViewById(R.id.checkbox)
-        val title: TextView = itemView.findViewById(R.id.title)
+        val container: View = itemView.findViewById(R.id.container)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChecklistViewHolder {
@@ -22,21 +28,56 @@ class ChecklistAdapter(private val items: MutableList<ChecklistItem>) : Recycler
     }
 
     override fun onBindViewHolder(holder: ChecklistViewHolder, position: Int) {
-        val item = items[position]
-        holder.title.text = item.title
-        holder.checkBox.isChecked = item.isChecked
+        val item = checklist[position]
+        holder.routineName.text = item.name
+        holder.checkBox.isChecked = item.isCompleted
+
+        holder.container.setOnClickListener {
+            onItemClicked(item, holder.container) // View를 콜백으로 전달
+            selectedItem = item
+            notifyDataSetChanged()
+        }
 
         holder.checkBox.setOnCheckedChangeListener { _, isChecked ->
-            item.isChecked = isChecked
+            item.isCompleted = isChecked
+            if (isChecked) {
+                holder.container.setBackgroundResource(R.drawable.item_background_checked)
+            } else {
+                holder.container.setBackgroundResource(R.drawable.item_background)
+            }
+            holder.checkBox.post {
+                notifyItemChanged(position)
+            }
+        }
+
+        if (item == selectedItem) {
+            holder.container.setBackgroundResource(R.drawable.item_border_selected) // 검정색 외곽선 추가
+        } else {
+            holder.container.setBackgroundResource(
+                if (item.isCompleted) R.drawable.item_background_checked
+                else R.drawable.item_background
+            )
         }
     }
 
-    override fun getItemCount(): Int {
-        return items.size
+    override fun getItemCount() = checklist.size
+
+    fun updateChecklist(newChecklist: List<ChecklistItem>) {
+        checklist.clear()
+        checklist.addAll(newChecklist)
+        notifyDataSetChanged()
     }
 
-    fun addItem(item: ChecklistItem) {
-        items.add(item)
-        notifyItemInserted(items.size - 1)
+    fun removeChecklistItem(item: ChecklistItem) {
+        val position = checklist.indexOf(item)
+        if (position >= 0) {
+            checklist.removeAt(position)
+            notifyItemRemoved(position)
+        }
+    }
+
+    fun clearSelection() {
+        selectedItem = null
+        notifyDataSetChanged()
     }
 }

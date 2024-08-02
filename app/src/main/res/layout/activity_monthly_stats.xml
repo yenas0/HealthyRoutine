@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -12,16 +13,19 @@
         android:textSize="18sp"
         android:text="Routine Name" />
 
-    <CalendarView
-        android:id="@+id/calendar_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp" />
-
-    <TextView
-        android:id="@+id/check_count_text_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Check Count: 0" />
+<!--    <com.prolificinteractive.materialcalendarview.MaterialCalendarView-->
+<!--        android:id="@+id/calendar_view"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:padding="12dp"-->
+<!--        android:layout_marginTop="16dp"-->
+<!--        android:theme="@style/CalenderViewCustom"-->
+<!--        app:mcv_dateTextAppearance="@style/CalenderViewDateCustomText"-->
+<!--        app:mcv_firstDayOfWeek="sunday"-->
+<!--        app:mcv_leftArrow="@drawable/ic_arrow_back"-->
+<!--        app:mcv_rightArrow="@drawable/ic_arrow_forward"-->
+<!--        app:mcv_selectionMode="single"-->
+<!--        app:mcv_showOtherDates="all"-->
+<!--        app:mcv_weekDayTextAppearance="@style/CalenderViewWeekCustomText"-->
+<!--        />-->
 </LinearLayout>

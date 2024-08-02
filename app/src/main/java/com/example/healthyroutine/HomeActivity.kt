@@ -1,5 +1,8 @@
 package com.example.healthyroutine
 
+import ChecklistItem
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.view.GestureDetector
 import android.view.MotionEvent
@@ -8,12 +11,12 @@ import android.widget.CalendarView
 import android.widget.HorizontalScrollView
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.PopupWindow
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import android.content.Intent
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.TextStyle
@@ -38,6 +41,7 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var gestureDetector: GestureDetector
 
     private var selectedDate: LocalDate? = LocalDate.now() // 기본 선택 날짜를 오늘로 설정
+    private val routines = mutableListOf<Routine>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,11 +58,14 @@ class HomeActivity : AppCompatActivity() {
         calendarContainer = findViewById(R.id.calendar_container)
         calendarView = findViewById(R.id.calendar_view)
 
-        checklistAdapter = ChecklistAdapter(mutableListOf())
+        checklistAdapter = ChecklistAdapter(mutableListOf()) { item, view ->
+            showPopup(view, item)
+        }
         recyclerView.adapter = checklistAdapter
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         updateWeekDates()
+        updateTitleDate(selectedDate ?: LocalDate.now())
 
         btnPreviousWeek.setOnClickListener {
             currentWeekStart = currentWeekStart.minusWeeks(1)
@@ -112,27 +119,32 @@ class HomeActivity : AppCompatActivity() {
             selectedDate = selected
             currentWeekStart = selected.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
             updateWeekDates()
-            updateTitle(selected) // 업데이트 함수 호출
-            calendarContainer.visibility = View.GONE
-            toggleButton.setImageResource(R.drawable.ic_arrow_down)
+            updateTitleDate(selected)
         }
 
         btnAddItem.setOnClickListener {
             val intent = Intent(this, RoutineAddActivity::class.java)
-            startActivity(intent)
+            startActivityForResult(intent, ADD_ROUTINE_REQUEST_CODE)
         }
-
-        updateTitle()
     }
 
-    private fun updateTitle(date: LocalDate? = selectedDate) {
-        val yearMonth = date?.let {
-            "${it.year}년 ${it.monthValue}월"
-        } ?: run {
-            val today = LocalDate.now()
-            "${today.year}년 ${today.monthValue}월"
+    override fun onResume() {
+        super.onResume()
+        updateTitleDate(selectedDate ?: LocalDate.now())
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == ADD_ROUTINE_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            data?.let {
+                val routineName = it.getStringExtra("routine_name") ?: ""
+                val notificationEnabled = it.getBooleanExtra("notification_enabled", true)
+
+                val routine = Routine(routineName, notificationEnabled)
+                routines.add(routine)
+                updateWeekDates()
+            }
         }
-        tvDate.text = yearMonth
     }
 
     private fun updateWeekDates() {
@@ -175,10 +187,64 @@ class HomeActivity : AppCompatActivity() {
             dateView.setOnClickListener {
                 selectedDate = date
                 updateWeekDates()
-                updateTitle(date) // 업데이트 함수 호출
+                updateTitleDate(date)
             }
 
             weekDatesContainer.addView(dateView)
+
+            // 루틴 체크리스트 업데이트
+            updateChecklistForDate(date)
         }
+    }
+
+    private fun updateChecklistForDate(date: LocalDate) {
+        val checklistItems = routines.map { routine ->
+            ChecklistItem(routine.name, false)
+        }
+
+        checklistAdapter.updateChecklist(checklistItems)
+    }
+
+    private fun updateTitleDate(date: LocalDate) {
+        val month = date.month.getDisplayName(TextStyle.SHORT, Locale.getDefault())
+        val year = date.year
+        tvDate.text = getString(R.string.date_format, year, month)
+    }
+
+    private fun showPopup(anchorView: View, item: ChecklistItem) {
+        val popupView = layoutInflater.inflate(R.layout.popup_menu, null)
+        val popupWindow = PopupWindow(popupView, LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+        popupWindow.isOutsideTouchable = true
+
+        popupWindow.setOnDismissListener {
+            checklistAdapter.clearSelection() // 팝업 창이 사라질 때 선택 해제
+        }
+
+        val itemStatistics: LinearLayout = popupView.findViewById(R.id.item_statistics)
+        itemStatistics.setOnClickListener {
+            // 통계 보기 클릭 이벤트 처리
+            popupWindow.dismiss()
+            // 통계 보기 액티비티로 이동하는 코드 추가 가능
+        }
+
+        val itemEdit: LinearLayout = popupView.findViewById(R.id.item_edit)
+        itemEdit.setOnClickListener {
+            // 수정하기 클릭 이벤트 처리
+            popupWindow.dismiss()
+            // 수정하기 액티비티로 이동하는 코드 추가 가능
+        }
+
+        val itemDelete: LinearLayout = popupView.findViewById(R.id.item_delete)
+        itemDelete.setOnClickListener {
+            // 삭제하기 클릭 이벤트 처리
+            popupWindow.dismiss()
+            checklistAdapter.removeChecklistItem(item)
+        }
+
+        popupWindow.showAsDropDown(anchorView, 0, 0)
+    }
+
+    companion object {
+        const val ADD_ROUTINE_REQUEST_CODE = 1
     }
 }

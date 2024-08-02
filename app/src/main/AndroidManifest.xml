@@ -45,7 +45,6 @@
         </activity>
 
         <activity android:name=".AuthCodeHandlerActivity" android:exported="true" />
-        <activity android:name=".popupActivity" android:theme="@style/DialogTheme" />
         <activity android:name=".RecommendActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -66,9 +65,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".HomeActivity"/>
+<!--        <activity android:name=".HomeActivity"/>-->
         <activity android:name=".MonthlyStatsActivity"/>
         <activity android:name=".FindAccountActivity"/>
+
+        <activity android:name=".HomeActivity" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
 
         <!-- Google Sign-In 서비스 추가 -->
         <activity

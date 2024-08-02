@@ -5,6 +5,7 @@ import android.widget.CalendarView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import java.time.LocalDate
+import java.time.DayOfWeek
 
 class MonthlyStatsActivity : AppCompatActivity() {
 
@@ -16,9 +17,8 @@ class MonthlyStatsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_monthly_stats)
 
-        calendarView = findViewById(R.id.calendar_view)
+//        calendarView = findViewById(R.id.calendar_view)
         routineNameTextView = findViewById(R.id.routine_name_text_view)
-        checkCountTextView = findViewById(R.id.check_count_text_view)
 
         val routineId = intent.getIntExtra("ROUTINE_ID", -1)
         loadRoutineData(routineId)
@@ -34,14 +34,14 @@ class MonthlyStatsActivity : AppCompatActivity() {
         checkCountTextView.text = "체크 횟수: $checkCount"
     }
 
-    private fun getRoutineById(id: Int): RoutineData? {
+    private fun getRoutineById(id: Int): Routine? {
         // 데이터베이스에서 루틴을 가져오는 로직
         val routines = listOf(
-            RoutineData(1, "Morning Stretch", LocalDate.now(), false),
-            RoutineData(2, "Evening Run", LocalDate.now(), false)
+            Routine( "Morning Stretch", false),
+            Routine( "Evening Run", false)
             // 다른 루틴들...
         )
-        return routines.find { it.id == id }
+        return routines.find { id == id }
     }
 
     private fun getCheckCountForMonth(routineId: Int): Int {
