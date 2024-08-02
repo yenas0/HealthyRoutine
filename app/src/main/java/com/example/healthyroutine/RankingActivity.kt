@@ -9,14 +9,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.firebase.database.*
 
 class RankingActivity : AppCompatActivity() {
 
     private lateinit var mRecyclerView: RecyclerView
     private lateinit var mRecyclerAdapter: RankingAdapter
     private lateinit var mRankerItems: ArrayList<RankingUserActivity>
-    private lateinit var database: DatabaseReference
+    private lateinit var databaseHelper: DatabaseHelper
 
     // 상위 3명 사용자
     private lateinit var user1Image: ImageView
@@ -29,6 +28,9 @@ class RankingActivity : AppCompatActivity() {
     private lateinit var user3Name: TextView
     private lateinit var user3Points: TextView
 
+    // 나의 포인트
+    private lateinit var myPointsTextView: TextView
+
     lateinit var bottom_navigation: BottomNavigationView
 
     @SuppressLint("MissingInflatedId")
@@ -36,8 +38,7 @@ class RankingActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_ranking)
 
-        // 파이어베이스 데이터베이스 초기화
-        database = FirebaseDatabase.getInstance().reference
+        databaseHelper = DatabaseHelper(this)  // SQLite DatabaseHelper 초기화
 
         mRecyclerView = findViewById(R.id.ranking_recyclerView)
 
@@ -58,8 +59,10 @@ class RankingActivity : AppCompatActivity() {
         user3Name = findViewById(R.id.user3_name)
         user3Points = findViewById(R.id.user3_points)
 
-        // 파이어베이스에서 데이터 가져오기
-        fetchDataFromFirebase()
+        myPointsTextView = findViewById(R.id.my_points)
+
+        // SQLite에서 데이터 가져오기
+        fetchRankingData()
 
         bottom_navigation = findViewById(R.id.bottom_navigation)
 
@@ -69,35 +72,30 @@ class RankingActivity : AppCompatActivity() {
         bottom_navigation.setOnNavigationItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.navigation_home -> {
-                    // 홈 화면으로 이동
                     val intent = Intent(this, HomeActivity::class.java)
                     startActivity(intent)
                     bottom_navigation.menu.findItem(R.id.navigation_home).isChecked = true
                     true
                 }
                 R.id.navigation_recommend -> {
-                    // 추천 화면으로 이동
                     val intent = Intent(this, RecommendActivity::class.java)
                     startActivity(intent)
                     bottom_navigation.menu.findItem(R.id.navigation_recommend).isChecked = true
                     true
                 }
                 R.id.navigation_board -> {
-                    // 게시판 화면으로 이동
                     val intent = Intent(this, BoardActivity::class.java)
                     startActivity(intent)
                     bottom_navigation.menu.findItem(R.id.navigation_board).isChecked = true
                     true
                 }
                 R.id.navigation_ranking -> {
-                    // 랭킹 화면으로 이동
                     val intent = Intent(this, RankingActivity::class.java)
                     startActivity(intent)
                     bottom_navigation.menu.findItem(R.id.navigation_ranking).isChecked = true
                     true
                 }
                 R.id.navigation_profile -> {
-                    // 마이페이지 화면으로 이동
                     val intent = Intent(this, MyPageActivity::class.java)
                     startActivity(intent)
                     bottom_navigation.menu.findItem(R.id.navigation_profile).isChecked = true
@@ -108,43 +106,34 @@ class RankingActivity : AppCompatActivity() {
         }
     }
 
-    private fun fetchDataFromFirebase() {
+    private fun fetchRankingData() {
         mRankerItems = ArrayList()
-        database.child("rankings").addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                mRankerItems.clear()
-                for (dataSnapshot in snapshot.children) {
-                    val name = dataSnapshot.child("name").getValue(String::class.java) ?: ""
-                    val points = dataSnapshot.child("points").getValue(Int::class.java) ?: 0
-                    val profilePic = R.drawable.ic_profile
-                    mRankerItems.add(RankingUserActivity(0, profilePic, name, points)) // 초기 랭킹 0으로 설정
-                }
-                // 포인트 순으로 정렬
-                mRankerItems.sortByDescending { it.points }
-                // 랭킹 할당
-                /*for (i in mRankerItems.indices) {
-                    mRankerItems[i].ranking = i + 1
-                }*/
-                //mRecyclerAdapter.setUserList(mRankerItems)
 
-                // 상위 3명 사용자 정보 업데이트
-                updateTopThreeUsers()
+        // SQLite 데이터베이스에서 모든 유저의 포인트 데이터를 가져와 랭킹을 만듭니다.
+        val rankings = databaseHelper.getRankingUsers()
 
-                // 4위 부터 사용자 정보
-                val remainingUsers = mRankerItems.drop(3)
-                mRecyclerAdapter.setUserList(ArrayList(remainingUsers))
+        mRankerItems.addAll(rankings)
 
-            }
+        // 상위 3명 사용자 정보 업데이트
+        updateTopThreeUsers()
 
-            override fun onCancelled(error: DatabaseError) {
-                // 실패 시 처리
-                // 로그 출력 또는 사용자에게 알림
-                println("Failed to read value: ${error.toException()}")
-            }
-        })
+        // 나의 포인트 가져오기
+        updateMyPoints()
+
+        // 4위부터 사용자 정보
+        val remainingUsers = mRankerItems.drop(3)
+        mRecyclerAdapter.setUserList(ArrayList(remainingUsers))
     }
 
     private fun updateTopThreeUsers() {
+        // 초기화: 사용자 정보가 없는 경우 기본값 설정
+        user1Name.text = ""
+        user1Points.text = "0p"
+        user2Name.text = ""
+        user2Points.text = "0p"
+        user3Name.text = ""
+        user3Points.text = "0p"
+
         if (mRankerItems.size >= 1) {
             val user1 = mRankerItems[0]
             user1Image.setImageResource(user1.resourceId)
@@ -163,5 +152,11 @@ class RankingActivity : AppCompatActivity() {
             user3Name.text = user3.name
             user3Points.text = "${user3.points}p"
         }
+    }
+
+    private fun updateMyPoints() {
+        val myUserId = 1 // 사용자 ID를 1로 가정 (실제 앱에서는 로그인한 사용자 ID를 사용)
+        val myPoints = databaseHelper.getPoints(myUserId)
+        myPointsTextView.text = "${myPoints}p"
     }
 }

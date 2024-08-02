@@ -219,16 +219,15 @@
                         android:text="나의 포인트"
                         android:layout_marginRight="60dp"
                         android:textSize="13sp"
-                        android:textStyle="bold">
-                    </TextView>
+                        android:textStyle="bold"/>
 
                     <TextView
+                        android:id="@+id/my_points"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="10p"
+                        android:text="0p"
                         android:textColor="@color/colorPrimary"
-                        android:textStyle="bold">
-                    </TextView>
+                        android:textStyle="bold"/>
 
                 </LinearLayout>
 

@@ -334,6 +334,28 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         return posts
     }
 
+    fun getRankingUsers(): List<RankingUserActivity> {
+        val users = mutableListOf<RankingUserActivity>()
+        val db = this.readableDatabase
+        val cursor = db.rawQuery("SELECT * FROM $TABLE_POINTS ORDER BY $COLUMN_POINTS DESC", null)
+
+        if (cursor.moveToFirst()) {
+            do {
+                val userId = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_USER_ID))
+                val points = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_POINTS))
+                val name = "User $userId"  // 예시: 사용자 이름 대신 User + ID를 사용
+                val profilePic = R.drawable.ic_profile  // 기본 프로필 이미지 사용
+
+                users.add(RankingUserActivity(userId, profilePic, name, points))
+            } while (cursor.moveToNext())
+        }
+
+        cursor.close()
+        db.close()
+        return users
+    }
+
+
     companion object {
         private const val DATABASE_VERSION = 9 // 버전 증가
         private const val DATABASE_NAME = "healthyroutine.db"
