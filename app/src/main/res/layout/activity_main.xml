@@ -1,151 +1,157 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center"
-    android:padding="25dp"
+    android:fillViewport="true"
     android:background="@color/white"
     tools:context=".MainActivity">
 
-    <!-- 로고 및 앱 이름 -->
-    <ImageView
-        android:id="@+id/logoImageView"
-        android:layout_width="wrap_content"
-        android:layout_height="204dp"
-        android:layout_marginBottom="16dp"
-        android:src="@drawable/logo" />
-
-    <!-- 로그인 폼 -->
-    <TextView
-        android:id="@+id/loginLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="로그인"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:textColor="@color/colorPrimary"
-        android:layout_gravity="left"
-        android:layout_marginBottom="8dp"/>
-
-    <EditText
-        android:id="@+id/emailEditText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="아이디 또는 이메일"
-        android:textSize="18dp"
-        android:inputType="textEmailAddress"
-        android:layout_marginBottom="8dp" />
-
-    <EditText
-        android:id="@+id/passwordEditText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="비밀번호"
-        android:textSize="18dp"
-        android:inputType="textPassword"
-        android:layout_marginBottom="8dp" />
-
-    <TextView
-        android:id="@+id/forgotPasswordTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="아이디/비밀번호를 잊으셨나요?"
-        android:textSize="12sp"
-        android:textColor="#BDBDBD"
-        android:layout_gravity="end"
-        android:layout_marginBottom="16dp" />
-
-    <Button
-        android:id="@+id/loginButton"
-        android:layout_width="match_parent"
-        android:layout_height="55dp"
-        android:layout_marginBottom="30dp"
-        android:layout_marginTop="20dp"
-        android:background="@drawable/ic_login"
-        android:text="로그인"
-        android:textColor="#FFFFFF"
-        android:textStyle="bold" />
-
-    <!-- 소셜 로그인 옵션 -->
-    <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp">
-
-        <!-- 왼쪽 선 -->
-        <View
-            android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:layout_weight="1"
-            android:background="@android:color/darker_gray"/>
-
-        <!-- 구분 텍스트 -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
-            android:text="간편 로그인"
-            android:textColor="@android:color/darker_gray"
-            android:textSize="14sp"/>
-
-        <!-- 오른쪽 선 -->
-        <View
-            android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:layout_weight="1"
-            android:background="@android:color/darker_gray"/>
-
-    </LinearLayout>
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:gravity="center"
-        android:layout_marginBottom="32dp">
+        android:padding="25dp">
 
+        <!-- 로고 및 앱 이름 -->
         <ImageView
-            android:id="@+id/kakaoLoginImageView"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:src="@drawable/kakao_logo"
-            android:layout_marginEnd="16dp" />
+            android:id="@+id/logoImageView"
+            android:layout_width="wrap_content"
+            android:layout_height="204dp"
+            android:layout_marginBottom="16dp"
+            android:src="@drawable/logo" />
 
-        <ImageView
-            android:id="@+id/googleLoginImageView"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:src="@drawable/google_logo"
-            android:layout_marginStart="16dp" />
-    </LinearLayout>
-
-    <!-- 회원가입 옵션 -->
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="계정이 없나요?  "
-        android:textSize="14sp"
-        android:textColor="@color/gray" />
-
+        <!-- 로그인 폼 -->
         <TextView
-            android:id="@+id/signUpTextView"
+            android:id="@+id/loginLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="회원가입 하기"
-            android:textSize="14sp"
-            android:textColor="@color/colorPrimary" />
+            android:text="로그인"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/colorPrimary"
+            android:layout_gravity="left"
+            android:layout_marginBottom="8dp"/>
+
+        <EditText
+            android:id="@+id/emailEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="아이디 또는 이메일"
+            android:textSize="18dp"
+            android:inputType="textEmailAddress"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/passwordEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="비밀번호"
+            android:textSize="18dp"
+            android:inputType="textPassword"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:id="@+id/forgotPasswordTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="아이디/비밀번호를 잊으셨나요?"
+            android:textSize="12sp"
+            android:textColor="#BDBDBD"
+            android:layout_gravity="end"
+            android:layout_marginBottom="16dp" />
+
+        <Button
+            android:id="@+id/loginButton"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:layout_marginBottom="30dp"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/ic_login"
+            android:text="로그인"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold" />
+
+        <!-- 소셜 로그인 옵션 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp">
+
+            <!-- 왼쪽 선 -->
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1"
+                android:background="@android:color/darker_gray"/>
+
+            <!-- 구분 텍스트 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:text="간편 로그인"
+                android:textColor="@android:color/darker_gray"
+                android:textSize="14sp"/>
+
+            <!-- 오른쪽 선 -->
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1"
+                android:background="@android:color/darker_gray"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginBottom="32dp">
+
+            <ImageView
+                android:id="@+id/kakaoLoginImageView"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/kakao_logo"
+                android:layout_marginEnd="16dp" />
+
+            <ImageView
+                android:id="@+id/googleLoginImageView"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/google_logo"
+                android:layout_marginStart="16dp" />
+        </LinearLayout>
+
+        <!-- 회원가입 옵션 -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="계정이 없나요?  "
+                android:textSize="14sp"
+                android:textColor="@color/gray" />
+
+            <TextView
+                android:id="@+id/signUpTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="회원가입 하기"
+                android:textSize="14sp"
+                android:textColor="@color/colorPrimary" />
+        </LinearLayout>
+
     </LinearLayout>
 
-
-</LinearLayout>
+</ScrollView>
