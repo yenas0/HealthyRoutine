@@ -11,12 +11,12 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.TextStyle
 import java.time.temporal.TemporalAdjusters
 import java.util.*
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class HomeActivity : AppCompatActivity() {
 
@@ -45,9 +45,6 @@ class HomeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
 
-        // 데이터베이스 헬퍼 초기화
-        dbHelper = DatabaseHelper(this)
-
         btnAddItem = findViewById(R.id.btn_add_item)
         btnPreviousWeek = findViewById(R.id.btn_previous_week)
         btnNextWeek = findViewById(R.id.btn_next_week)
@@ -58,6 +55,8 @@ class HomeActivity : AppCompatActivity() {
         calendarContainer = findViewById(R.id.calendar_container)
         calendarView = findViewById(R.id.calendar_view)
         checklistContainer = findViewById(R.id.checklist_container)
+
+        dbHelper = DatabaseHelper(this)
 
         loadRoutinesFromDatabase()
         updateWeekDates()
@@ -123,7 +122,10 @@ class HomeActivity : AppCompatActivity() {
             startActivityForResult(intent, ADD_ROUTINE_REQUEST_CODE)
         }
 
+
+
         bottom_navigation = findViewById(R.id.bottom_navigation)
+
         bottom_navigation.selectedItemId = R.id.navigation_home
 
         // BottomNavigationView 설정
@@ -292,13 +294,13 @@ class HomeActivity : AppCompatActivity() {
                 if (isChecked) {
                     container.setBackgroundResource(R.drawable.item_background_checked)
                     checkedCount++
-                    if (checkedCount == 3) {
+                    if (checkedCount < 3) {
+                        updatePoints(10)
+                        showToast("10 포인트를 얻었어요!")
+                    } else if (checkedCount == 3) {
                         updatePoints(10) // 첫 10포인트 추가
                         updatePoints(10) // 보너스 10포인트 추가
-                        showToast("3개 달성! 보너스 10 포인트 획득!", Toast.LENGTH_SHORT)
-                    } else {
-                        updatePoints(10)
-                        showToast("10 포인트를 얻었어요!", Toast.LENGTH_SHORT)
+                        showToast("3개 달성! 보너스 10 포인트 획득!")
                     }
                 } else {
                     container.setBackgroundResource(R.drawable.item_background)
@@ -354,9 +356,12 @@ class HomeActivity : AppCompatActivity() {
         }
 
         itemStatistics.setOnClickListener {
+            val intent = Intent(this, MonthlyStatsActivity::class.java)
             Toast.makeText(this, "월간 통계 클릭", Toast.LENGTH_SHORT).show()
+            startActivity(intent)
             popupWindow.dismiss()
         }
+
 
         itemEdit.setOnClickListener {
             val intent = Intent(this, RoutineEditActivity::class.java).apply {
@@ -375,8 +380,8 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
-    private fun showToast(message: String, duration: Int) {
-        Toast.makeText(this, message, duration).show()
+    private fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     companion object {
