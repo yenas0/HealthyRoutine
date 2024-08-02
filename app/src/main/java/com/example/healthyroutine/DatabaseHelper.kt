@@ -6,8 +6,6 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import java.time.LocalDate
 
-data class Post(val id: Int, var title: String, var content: String, var likes: Int, val routine: String? = null, val routineDays: String? = null)
-
 data class Routine(
     val id: Int = 0,
     val name: String,
@@ -30,12 +28,12 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 + COLUMN_LIKES + " INTEGER,"
                 + COLUMN_ROUTINE + " TEXT,"
                 + COLUMN_ROUTINE_DAYS + " TEXT,"
-                + "$COLUMN_USER_ID INTEGER)")
+                + COLUMN_USER_ID + " INTEGER)")
 
         val createLikesTable = ("CREATE TABLE " + TABLE_LIKES + "("
                 + COLUMN_LIKE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + COLUMN_POST_ID + " INTEGER,"
-                + "$COLUMN_USER_ID INTEGER)")
+                + COLUMN_USER_ID + " INTEGER)")
 
         val createRoutinesTable = ("CREATE TABLE " + TABLE_ROUTINES + "("
                 + COLUMN_ROUTINE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -77,146 +75,6 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         }
     }
 
-    fun addPost(title: String, content: String, routine: String?, routineDays: String?) {
-        val db = this.writableDatabase
-        val values = ContentValues().apply {
-            put(COLUMN_TITLE, title)
-            put(COLUMN_CONTENT, content)
-            put(COLUMN_LIKES, 0)
-            put(COLUMN_ROUTINE, routine)
-            put(COLUMN_ROUTINE_DAYS, routineDays)
-            put(COLUMN_USER_ID, 1)  // 예제 사용자 ID
-        }
-        db.insert(TABLE_POSTS, null, values)
-        db.close()
-    }
-
-    fun updatePost(post: Post) {
-        val db = this.writableDatabase
-        val values = ContentValues().apply {
-            put(COLUMN_TITLE, post.title)
-            put(COLUMN_CONTENT, post.content)
-            put(COLUMN_LIKES, post.likes)
-            put(COLUMN_ROUTINE, post.routine)
-            put(COLUMN_ROUTINE_DAYS, post.routineDays)
-        }
-        db.update(TABLE_POSTS, values, "$COLUMN_ID = ?", arrayOf(post.id.toString()))
-        db.close()
-    }
-
-    fun getAllPosts(): List<Post> {
-        val posts = mutableListOf<Post>()
-        val db = this.readableDatabase
-        val cursor = db.rawQuery("SELECT * FROM $TABLE_POSTS ORDER BY $COLUMN_ID DESC", null)
-        if (cursor.moveToFirst()) {
-            do {
-                val post = Post(
-                    id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID)),
-                    title = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TITLE)),
-                    content = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_CONTENT)),
-                    likes = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_LIKES)),
-                    routine = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ROUTINE)),
-                    routineDays = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ROUTINE_DAYS))
-                )
-                posts.add(post)
-            } while (cursor.moveToNext())
-        }
-        cursor.close()
-        db.close()
-        return posts
-    }
-
-    fun getPopularPosts(): List<Post> {
-        val popularPosts = mutableListOf<Post>()
-        val db = this.readableDatabase
-        val cursor = db.rawQuery("SELECT * FROM $TABLE_POSTS WHERE $COLUMN_LIKES >= 5 ORDER BY $COLUMN_LIKES DESC", null)
-        if (cursor.moveToFirst()) {
-            do {
-                val post = Post(
-                    id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID)),
-                    title = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TITLE)),
-                    content = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_CONTENT)),
-                    likes = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_LIKES)),
-                    routine = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ROUTINE)),
-                    routineDays = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ROUTINE_DAYS))
-                )
-                popularPosts.add(post)
-            } while (cursor.moveToNext())
-        }
-        cursor.close()
-        db.close()
-        return popularPosts
-    }
-
-    fun addLike(postId: Int) {
-        val db = this.writableDatabase
-        val values = ContentValues().apply {
-            put(COLUMN_POST_ID, postId)
-            put(COLUMN_USER_ID, 1)  // 예제 사용자 ID
-        }
-        db.insert(TABLE_LIKES, null, values)
-        db.close()
-    }
-
-    fun removeLike(postId: Int) {
-        val db = this.writableDatabase
-        db.delete(TABLE_LIKES, "$COLUMN_POST_ID = ? AND $COLUMN_USER_ID = ?", arrayOf(postId.toString(), "1"))  // 예제 사용자 ID
-        db.close()
-    }
-
-    fun isLiked(postId: Int): Boolean {
-        val db = this.readableDatabase
-        val cursor = db.rawQuery("SELECT * FROM $TABLE_LIKES WHERE $COLUMN_POST_ID = ? AND $COLUMN_USER_ID = ?", arrayOf(postId.toString(), "1"))  // 예제 사용자 ID
-        val isLiked = cursor.count > 0
-        cursor.close()
-        db.close()
-        return isLiked
-    }
-
-    fun getMyPosts(): List<Post> {
-        val posts = mutableListOf<Post>()
-        val db = this.readableDatabase
-        val cursor = db.rawQuery("SELECT * FROM $TABLE_POSTS WHERE $COLUMN_USER_ID = ? ORDER BY $COLUMN_ID DESC", arrayOf("1"))  // 예제 사용자 ID
-        if (cursor.moveToFirst()) {
-            do {
-                val post = Post(
-                    id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID)),
-                    title = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TITLE)),
-                    content = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_CONTENT)),
-                    likes = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_LIKES)),
-                    routine = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ROUTINE)),
-                    routineDays = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ROUTINE_DAYS))
-                )
-                posts.add(post)
-            } while (cursor.moveToNext())
-        }
-        cursor.close()
-        db.close()
-        return posts
-    }
-
-    fun getLikedPosts(): List<Post> {
-        val posts = mutableListOf<Post>()
-        val db = this.readableDatabase
-        val cursor = db.rawQuery("SELECT * FROM $TABLE_POSTS WHERE $COLUMN_ID IN (SELECT $COLUMN_POST_ID FROM $TABLE_LIKES WHERE $COLUMN_USER_ID = ?)", arrayOf("1"))  // 예제 사용자 ID
-        if (cursor.moveToFirst()) {
-            do {
-                val post = Post(
-                    id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID)),
-                    title = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TITLE)),
-                    content = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_CONTENT)),
-                    likes = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_LIKES)),
-                    routine = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ROUTINE)),
-                    routineDays = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ROUTINE_DAYS))
-                )
-                posts.add(post)
-            } while (cursor.moveToNext())
-        }
-        cursor.close()
-        db.close()
-        return posts
-    }
-
     fun addRoutine(routine: Routine) {
         val db = this.writableDatabase
         val values = ContentValues().apply {
@@ -237,11 +95,13 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         db.close()
     }
 
+    // 루틴 삭제
     fun deleteRoutine(routineId: Int) {
         val db = this.writableDatabase
         db.delete(TABLE_ROUTINES, "$COLUMN_ROUTINE_ID = ?", arrayOf(routineId.toString()))
         db.close()
     }
+
 
     fun getAllRoutines(): List<Routine> {
         val routines = mutableListOf<Routine>()
@@ -260,6 +120,20 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         cursor.close()
         db.close()
         return routines
+    }
+
+    fun addPost(post: Post) {
+        val db = this.writableDatabase
+        val values = ContentValues().apply {
+            put(COLUMN_TITLE, post.title)
+            put(COLUMN_CONTENT, post.content)
+            put(COLUMN_LIKES, post.likes)
+            put(COLUMN_ROUTINE, post.routine)
+            put(COLUMN_ROUTINE_DAYS, post.routineDays)
+            put(COLUMN_USER_ID, post.userId)
+        }
+        db.insert(TABLE_POSTS, null, values)
+        db.close()
     }
 
     fun addRoutineCheck(routineCheck: RoutineCheck) {
@@ -330,6 +204,136 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         return 0
     }
 
+    fun updatePost(post: Post) {
+        val db = this.writableDatabase
+        val values = ContentValues().apply {
+            put(COLUMN_TITLE, post.title)
+            put(COLUMN_CONTENT, post.content)
+            put(COLUMN_LIKES, post.likes)
+            put(COLUMN_ROUTINE, post.routine)
+            put(COLUMN_ROUTINE_DAYS, post.routineDays)
+        }
+        db.update(TABLE_POSTS, values, "$COLUMN_ID = ?", arrayOf(post.id.toString()))
+        db.close()
+    }
+
+    fun getAllPosts(): List<Post> {
+        val posts = mutableListOf<Post>()
+        val db = this.readableDatabase
+        val cursor = db.rawQuery("SELECT * FROM $TABLE_POSTS ORDER BY $COLUMN_ID DESC", null)
+        if (cursor.moveToFirst()) {
+            do {
+                val post = Post(
+                    id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID)).toString(),
+                    title = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TITLE)),
+                    content = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_CONTENT)),
+                    likes = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_LIKES)),
+                    routine = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ROUTINE)),
+                    routineDays = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ROUTINE_DAYS)),
+                    userId = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_USER_ID))
+                )
+                posts.add(post)
+            } while (cursor.moveToNext())
+        }
+        cursor.close()
+        db.close()
+        return posts
+    }
+
+    fun getPopularPosts(): List<Post> {
+        val popularPosts = mutableListOf<Post>()
+        val db = this.readableDatabase
+        val cursor = db.rawQuery("SELECT * FROM $TABLE_POSTS WHERE $COLUMN_LIKES >= 5 ORDER BY $COLUMN_LIKES DESC", null)
+        if (cursor.moveToFirst()) {
+            do {
+                val post = Post(
+                    id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID)).toString(),
+                    title = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TITLE)),
+                    content = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_CONTENT)),
+                    likes = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_LIKES)),
+                    routine = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ROUTINE)),
+                    routineDays = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ROUTINE_DAYS)),
+                    userId = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_USER_ID))
+                )
+                popularPosts.add(post)
+            } while (cursor.moveToNext())
+        }
+        cursor.close()
+        db.close()
+        return popularPosts
+    }
+
+    fun addLike(postId: String) {
+        val db = this.writableDatabase
+        val values = ContentValues().apply {
+            put(COLUMN_POST_ID, postId.toInt())
+            put(COLUMN_USER_ID, 1)
+        }
+        db.insert(TABLE_LIKES, null, values)
+        db.close()
+    }
+
+    fun removeLike(postId: String) {
+        val db = this.writableDatabase
+        db.delete(TABLE_LIKES, "$COLUMN_POST_ID = ? AND $COLUMN_USER_ID = ?", arrayOf(postId, "1"))
+        db.close()
+    }
+
+    fun isLiked(postId: String): Boolean {
+        val db = this.readableDatabase
+        val cursor = db.rawQuery("SELECT * FROM $TABLE_LIKES WHERE $COLUMN_POST_ID = ? AND $COLUMN_USER_ID = ?", arrayOf(postId, "1"))
+        val isLiked = cursor.count > 0
+        cursor.close()
+        db.close()
+        return isLiked
+    }
+
+    fun getMyPosts(): List<Post> {
+        val posts = mutableListOf<Post>()
+        val db = this.readableDatabase
+        val cursor = db.rawQuery("SELECT * FROM $TABLE_POSTS WHERE $COLUMN_USER_ID = ? ORDER BY $COLUMN_ID DESC", arrayOf("1"))
+        if (cursor.moveToFirst()) {
+            do {
+                val post = Post(
+                    id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID)).toString(),
+                    title = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TITLE)),
+                    content = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_CONTENT)),
+                    likes = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_LIKES)),
+                    routine = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ROUTINE)),
+                    routineDays = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ROUTINE_DAYS)),
+                    userId = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_USER_ID))
+                )
+                posts.add(post)
+            } while (cursor.moveToNext())
+        }
+        cursor.close()
+        db.close()
+        return posts
+    }
+
+    fun getLikedPosts(): List<Post> {
+        val posts = mutableListOf<Post>()
+        val db = this.readableDatabase
+        val cursor = db.rawQuery("SELECT * FROM $TABLE_POSTS WHERE $COLUMN_ID IN (SELECT $COLUMN_POST_ID FROM $TABLE_LIKES WHERE $COLUMN_USER_ID = ?)", arrayOf("1"))
+        if (cursor.moveToFirst()) {
+            do {
+                val post = Post(
+                    id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID)).toString(),
+                    title = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TITLE)),
+                    content = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_CONTENT)),
+                    likes = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_LIKES)),
+                    routine = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ROUTINE)),
+                    routineDays = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ROUTINE_DAYS)),
+                    userId = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_USER_ID))
+                )
+                posts.add(post)
+            } while (cursor.moveToNext())
+        }
+        cursor.close()
+        db.close()
+        return posts
+    }
+
     companion object {
         private const val DATABASE_VERSION = 9 // 버전 증가
         private const val DATABASE_NAME = "healthyroutine.db"
@@ -341,11 +345,11 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         const val COLUMN_LIKES = "likes"
         const val COLUMN_ROUTINE = "routine"
         const val COLUMN_ROUTINE_DAYS = "routine_days"
+        const val COLUMN_USER_ID = "user_id" // 여기를 추가
 
         const val TABLE_LIKES = "likes"
         const val COLUMN_LIKE_ID = "like_id"
         const val COLUMN_POST_ID = "post_id"
-        const val COLUMN_USER_ID = "user_id"
 
         const val TABLE_ROUTINES = "routines"
         const val COLUMN_ROUTINE_ID = "routine_id"

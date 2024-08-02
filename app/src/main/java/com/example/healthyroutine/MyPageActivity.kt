@@ -1,10 +1,7 @@
 package com.example.healthyroutine
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -33,7 +30,7 @@ class MyPageActivity : AppCompatActivity() {
     private lateinit var postsCountLayout: LinearLayout
     private lateinit var likedCountLayout: LinearLayout
     private lateinit var pointsCountLayout: LinearLayout
-    private lateinit var logoutButton: Button
+    private lateinit var logoutButton: ImageView
     private lateinit var settingsImageView: ImageView
 
     lateinit var bottom_navigation: BottomNavigationView
@@ -90,9 +87,6 @@ class MyPageActivity : AppCompatActivity() {
             val intent = Intent(this, SettingsActivity::class.java)
             startActivity(intent)
         }
-
-        // 포인트 업데이트
-        pointsTextView.text = "${PointsManager.getPoints()}p"
 
         bottom_navigation = findViewById(R.id.bottom_navigation)
 
@@ -167,12 +161,10 @@ class MyPageActivity : AppCompatActivity() {
 
                         updatePostCounts()
                     } else {
-                        Log.w("MyPageActivity", "No such document")
                         Toast.makeText(this, "프로필 정보를 불러올 수 없습니다.", Toast.LENGTH_SHORT).show()
                     }
                 }
-                .addOnFailureListener { exception ->
-                    Log.w("MyPageActivity", "Error getting documents: ", exception)
+                .addOnFailureListener {
                     Toast.makeText(this, "프로필 정보를 불러올 수 없습니다.", Toast.LENGTH_SHORT).show()
                 }
         } else {
@@ -181,6 +173,15 @@ class MyPageActivity : AppCompatActivity() {
     }
 
     private fun updatePostCounts() {
-        // 게시물 수 및 좋아요 수 업데이트를 위한 메소드 내용 제거
+        val userId = currentUser?.uid ?: return
+        val firestoreHelper = FirestoreHelper()
+
+        firestoreHelper.getMyPosts(userId) { myPosts ->
+            postsCountTextView.text = myPosts.size.toString()
+        }
+
+        firestoreHelper.getLikedPosts(userId) { likedPosts ->
+            likedCountTextView.text = likedPosts.size.toString()
+        }
     }
 }

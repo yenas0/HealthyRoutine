@@ -3,14 +3,10 @@ package com.example.healthyroutine
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.Switch
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 
 class PostWriteActivity : AppCompatActivity() {
 
@@ -20,6 +16,8 @@ class PostWriteActivity : AppCompatActivity() {
     private lateinit var routineContainer: LinearLayout
     private lateinit var routineNameEditText: EditText
     private lateinit var dayButtons: List<TextView>
+    private lateinit var auth: FirebaseAuth
+    private var currentUser: FirebaseUser? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,6 +37,9 @@ class PostWriteActivity : AppCompatActivity() {
             findViewById(R.id.day_sat),
             findViewById(R.id.day_sun)
         )
+
+        auth = FirebaseAuth.getInstance()
+        currentUser = auth.currentUser
 
         routineSwitch.setOnCheckedChangeListener { _, isChecked ->
             routineContainer.visibility = if (isChecked) View.VISIBLE else View.GONE
@@ -83,8 +84,24 @@ class PostWriteActivity : AppCompatActivity() {
         val routineName = if (routineSwitch.isChecked) routineNameEditText.text.toString().trim() else null
         val routineDays = if (routineSwitch.isChecked) getSelectedDays() else null
 
-        val dbHelper = DatabaseHelper(this)
-        dbHelper.addPost(title, content, routineName, routineDays)
+        // 현재 사용자 UID를 가져와서 사용
+        val userId = currentUser?.uid ?: ""
+
+        if (userId.isEmpty()) {
+            Toast.makeText(this, "사용자 정보가 없습니다.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val post = Post(
+            title = title,
+            content = content,
+            routine = routineName,
+            routineDays = routineDays,
+            userId = userId
+        )
+
+        val firestoreHelper = FirestoreHelper()
+        firestoreHelper.addPost(post)
 
         Toast.makeText(this, "게시글이 작성되었습니다.", Toast.LENGTH_SHORT).show()
         finish()

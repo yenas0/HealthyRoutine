@@ -40,7 +40,7 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var gestureDetector: GestureDetector
 
     private var selectedDate: LocalDate? = LocalDate.now()
-    private lateinit var dbHelper: DatabaseHelper
+    private val dbHelper = DatabaseHelper(this)
     private val routines = mutableListOf<Routine>()
 
     private val userId: Int = 1  // 예제 사용자 ID
@@ -59,8 +59,6 @@ class HomeActivity : AppCompatActivity() {
         calendarContainer = findViewById(R.id.calendar_container)
         calendarView = findViewById(R.id.calendar_view)
         checklistContainer = findViewById(R.id.checklist_container)
-
-        dbHelper = DatabaseHelper(this)
 
         loadRoutinesFromDatabase()
         updateWeekDates()
@@ -327,7 +325,7 @@ class HomeActivity : AppCompatActivity() {
 
         // Firebase Database에 포인트 업데이트
         val userReference = FirebaseDatabase.getInstance().reference.child("rankings").child(userId.toString())
-        userReference.child("points").addListenerForSingleValueEvent(/* listener = */ object : ValueEventListener {
+        userReference.child("points").addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val currentPoints = snapshot.getValue(Int::class.java) ?: 0
                 val newPoints = currentPoints + pointsChange
