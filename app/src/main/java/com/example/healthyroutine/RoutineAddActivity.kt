@@ -26,6 +26,11 @@ class RoutineAddActivity : AppCompatActivity() {
         btnSave = findViewById(R.id.btn_add_routine)
         backButton = findViewById(R.id.back_button)
 
+        // 루틴 추천 이름 그대로 들어가도록
+        val routineName = intent.getStringExtra("BUTTON_TEXT")
+        val healthRoutineName = findViewById<EditText>(R.id.routine_title)
+        healthRoutineName.setText(routineName)
+
         btnSave.setOnClickListener {
             val routineName = etRoutineName.text.toString()
             val notificationEnabled = switchNotification.isChecked
