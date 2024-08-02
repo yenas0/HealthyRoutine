@@ -5,20 +5,24 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.GestureDetector
-import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.CalendarView
+import android.widget.CheckBox
+import android.widget.HorizontalScrollView
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.PopupWindow
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.core.view.isVisible
-import androidx.recyclerview.widget.LinearLayoutManager
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.TextStyle
 import java.time.temporal.TemporalAdjusters
-import java.util.*
+import java.util.Locale
 
 class HomeActivity : AppCompatActivity() {
 
@@ -244,6 +248,7 @@ class HomeActivity : AppCompatActivity() {
         val itemDelete: LinearLayout = popupView.findViewById(R.id.item_delete)
 
         // 팝업창이 열릴 때 검정 외곽선 추가
+
         anchorView.setBackgroundResource(R.drawable.item_border_selected)
 
         // 팝업창이 닫힐 때 검정 외곽선 제거
