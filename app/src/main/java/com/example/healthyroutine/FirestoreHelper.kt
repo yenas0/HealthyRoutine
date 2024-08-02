@@ -26,7 +26,8 @@ class FirestoreHelper {
             "content" to post.content,
             "likes" to post.likes,
             "routine" to post.routine,
-            "routineDays" to post.routineDays
+            "routineDays" to post.routineDays,
+            "userId" to post.userId
         )
 
         db.collection("posts").document(post.id).set(postMap)

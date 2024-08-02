@@ -10,12 +10,15 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 
 class BoardActivity : AppCompatActivity() {
 
-    lateinit var bottom_navigation: BottomNavigationView
-    lateinit var btn_add_post: ImageButton
-    lateinit var firestoreHelper: FirestoreHelper
+    private lateinit var bottom_navigation: BottomNavigationView
+    private lateinit var btn_add_post: ImageButton
+    private lateinit var firestoreHelper: FirestoreHelper
+    private var currentUser: FirebaseUser? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,6 +27,7 @@ class BoardActivity : AppCompatActivity() {
         bottom_navigation = findViewById(R.id.bottom_navigation)
         btn_add_post = findViewById(R.id.btn_add_post)
         firestoreHelper = FirestoreHelper()
+        currentUser = FirebaseAuth.getInstance().currentUser
 
         bottom_navigation.selectedItemId = R.id.navigation_board
 
@@ -67,8 +71,6 @@ class BoardActivity : AppCompatActivity() {
             val intent = Intent(this, PostWriteActivity::class.java)
             startActivity(intent)
         }
-
-        // loadPosts를 onCreate가 아닌 onResume에서 호출
     }
 
     override fun onResume() {
@@ -79,11 +81,9 @@ class BoardActivity : AppCompatActivity() {
 
     private fun loadPosts() {
         val postsContainer: LinearLayout = findViewById(R.id.posts_container)
-        postsContainer.removeAllViews() // 기존 게시글 리스트 초기화
+        postsContainer.removeAllViews()
 
         firestoreHelper.getAllPosts { posts ->
-            postsContainer.removeAllViews() // 불필요한 초기화를 다시 한 번 확인
-
             for (post in posts) {
                 val postView = layoutInflater.inflate(R.layout.post_item, null)
 
@@ -96,26 +96,24 @@ class BoardActivity : AppCompatActivity() {
                 contentTextView.text = post.content
                 likesTextView.text = post.likes.toString()
 
-                var isLiked = false
-                firestoreHelper.isLiked(post.id, post.userId) { liked ->
-                    isLiked = liked
-                    likeIcon.setImageResource(if (liked) R.drawable.ic_like_filled else R.drawable.ic_like_empty)
+                firestoreHelper.isLiked(post.id, currentUser?.uid ?: "") { isLiked ->
+                    likeIcon.setImageResource(if (isLiked) R.drawable.ic_like_filled else R.drawable.ic_like_empty)
                 }
 
                 likeIcon.setOnClickListener {
-                    if (isLiked) {
-                        post.likes -= 1
-                        likeIcon.setImageResource(R.drawable.ic_like_empty)
-                        firestoreHelper.removeLike(post.id, post.userId)
-                    } else {
-                        post.likes += 1
-                        likeIcon.setImageResource(R.drawable.ic_like_filled)
-                        firestoreHelper.addLike(post.id, post.userId)
+                    firestoreHelper.isLiked(post.id, currentUser?.uid ?: "") { isLiked ->
+                        if (isLiked) {
+                            firestoreHelper.removeLike(post.id, currentUser?.uid ?: "")
+                            post.likes -= 1
+                            likeIcon.setImageResource(R.drawable.ic_like_empty)
+                        } else {
+                            firestoreHelper.addLike(post.id, currentUser?.uid ?: "")
+                            post.likes += 1
+                            likeIcon.setImageResource(R.drawable.ic_like_filled)
+                        }
+                        likesTextView.text = post.likes.toString()
+                        firestoreHelper.updatePost(post)
                     }
-                    isLiked = !isLiked
-                    firestoreHelper.updatePost(post)
-                    likesTextView.text = post.likes.toString()
-                    loadPopularPosts() // 좋아요 변경 시 실시간 인기글 업데이트
                 }
 
                 postView.setOnClickListener {
@@ -151,11 +149,9 @@ class BoardActivity : AppCompatActivity() {
 
     private fun loadPopularPosts() {
         val popularPostContainer: LinearLayout = findViewById(R.id.popular_post_container)
-        popularPostContainer.removeAllViews() // 기존 인기 게시글 리스트 초기화
+        popularPostContainer.removeAllViews()
 
         firestoreHelper.getPopularPosts { popularPosts ->
-            popularPostContainer.removeAllViews() // 불필요한 초기화를 다시 한 번 확인
-
             if (popularPosts.isEmpty()) {
                 val noPopularPostsView = layoutInflater.inflate(R.layout.no_popular_posts_item, null)
                 popularPostContainer.addView(noPopularPostsView)
@@ -172,26 +168,25 @@ class BoardActivity : AppCompatActivity() {
                     contentTextView.text = post.content
                     likesTextView.text = post.likes.toString()
 
-                    var isLiked = false
-                    firestoreHelper.isLiked(post.id, post.userId) { liked ->
-                        isLiked = liked
-                        likeIcon.setImageResource(if (liked) R.drawable.ic_like_filled else R.drawable.ic_like_empty)
+                    firestoreHelper.isLiked(post.id, currentUser?.uid ?: "") { isLiked ->
+                        likeIcon.setImageResource(if (isLiked) R.drawable.ic_like_filled else R.drawable.ic_like_empty)
                     }
 
                     likeIcon.setOnClickListener {
-                        if (isLiked) {
-                            post.likes -= 1
-                            likeIcon.setImageResource(R.drawable.ic_like_empty)
-                            firestoreHelper.removeLike(post.id, post.userId)
-                        } else {
-                            post.likes += 1
-                            likeIcon.setImageResource(R.drawable.ic_like_filled)
-                            firestoreHelper.addLike(post.id, post.userId)
+                        firestoreHelper.isLiked(post.id, currentUser?.uid ?: "") { isLiked ->
+                            if (isLiked) {
+                                firestoreHelper.removeLike(post.id, currentUser?.uid ?: "")
+                                post.likes -= 1
+                                likeIcon.setImageResource(R.drawable.ic_like_empty)
+                            } else {
+                                firestoreHelper.addLike(post.id, currentUser?.uid ?: "")
+                                post.likes += 1
+                                likeIcon.setImageResource(R.drawable.ic_like_filled)
+                            }
+                            likesTextView.text = post.likes.toString()
+                            firestoreHelper.updatePost(post)
+                            loadPopularPosts()
                         }
-                        isLiked = !isLiked
-                        firestoreHelper.updatePost(post)
-                        likesTextView.text = post.likes.toString()
-                        loadPopularPosts() // 좋아요 변경 시 실시간 인기글 업데이트
                     }
 
                     postView.setOnClickListener {

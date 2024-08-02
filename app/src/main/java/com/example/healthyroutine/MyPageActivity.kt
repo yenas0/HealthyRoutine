@@ -1,6 +1,5 @@
 package com.example.healthyroutine
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -59,25 +58,21 @@ class MyPageActivity : AppCompatActivity() {
         logoutButton = findViewById(R.id.logoutButton)
         settingsImageView = findViewById(R.id.settingsImageView)
 
-        // 내가 쓴 글 영역 클릭 이벤트 설정
         postsCountLayout.setOnClickListener {
             val intent = Intent(this, MyPostsActivity::class.java)
             startActivity(intent)
         }
 
-        // 좋아요한 글 영역 클릭 이벤트 설정
         likedCountLayout.setOnClickListener {
             val intent = Intent(this, LikedPostsActivity::class.java)
             startActivity(intent)
         }
 
-        // 나의 포인트 영역 클릭 이벤트 설정
         pointsCountLayout.setOnClickListener {
             val intent = Intent(this, RankingActivity::class.java)
             startActivity(intent)
         }
 
-        // 로그아웃 버튼 클릭 이벤트 설정
         logoutButton.setOnClickListener {
             auth.signOut()
             val intent = Intent(this, MainActivity::class.java)
@@ -85,52 +80,43 @@ class MyPageActivity : AppCompatActivity() {
             finish()
         }
 
-        // 설정 클릭 이벤트 설정
         settingsImageView.setOnClickListener {
             val intent = Intent(this, SettingsActivity::class.java)
             startActivity(intent)
         }
 
-        // 포인트 업데이트
         pointsTextView.text = "${PointsManager.getPoints()}p"
 
         bottom_navigation = findViewById(R.id.bottom_navigation)
-
         bottom_navigation.selectedItemId = R.id.navigation_profile
 
-        // BottomNavigationView 설정
         bottom_navigation.setOnNavigationItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.navigation_home -> {
-                    // 홈 화면으로 이동
                     val intent = Intent(this, HomeActivity::class.java)
                     startActivity(intent)
                     bottom_navigation.menu.findItem(R.id.navigation_home).isChecked = true
                     true
                 }
                 R.id.navigation_recommend -> {
-                    // 추천 화면으로 이동
                     val intent = Intent(this, RecommendActivity::class.java)
                     startActivity(intent)
                     bottom_navigation.menu.findItem(R.id.navigation_recommend).isChecked = true
                     true
                 }
                 R.id.navigation_board -> {
-                    // 게시판 화면으로 이동
                     val intent = Intent(this, BoardActivity::class.java)
                     startActivity(intent)
                     bottom_navigation.menu.findItem(R.id.navigation_board).isChecked = true
                     true
                 }
                 R.id.navigation_ranking -> {
-                    // 랭킹 화면으로 이동
                     val intent = Intent(this, RankingActivity::class.java)
                     startActivity(intent)
                     bottom_navigation.menu.findItem(R.id.navigation_ranking).isChecked = true
                     true
                 }
                 R.id.navigation_profile -> {
-                    // 마이페이지 화면으로 이동
                     val intent = Intent(this, MyPageActivity::class.java)
                     startActivity(intent)
                     bottom_navigation.menu.findItem(R.id.navigation_profile).isChecked = true
@@ -165,7 +151,7 @@ class MyPageActivity : AppCompatActivity() {
                                 .into(profileImageView)
                         }
 
-                        updatePostCounts()
+                        updatePostCounts(user.uid)
                     } else {
                         Log.w("MyPageActivity", "No such document")
                         Toast.makeText(this, "프로필 정보를 불러올 수 없습니다.", Toast.LENGTH_SHORT).show()
@@ -180,7 +166,17 @@ class MyPageActivity : AppCompatActivity() {
         }
     }
 
-    private fun updatePostCounts() {
-        // 게시물 수 및 좋아요 수 업데이트를 위한 메소드 내용 제거
+    private fun updatePostCounts(userId: String) {
+        firestore.collection("posts").whereEqualTo("userId", userId).get()
+            .addOnSuccessListener { result ->
+                val postsCount = result.size()
+                postsCountTextView.text = postsCount.toString()
+            }
+
+        firestore.collection("posts").whereArrayContains("likedUserIds", userId).get()
+            .addOnSuccessListener { result ->
+                val likedCount = result.size()
+                likedCountTextView.text = likedCount.toString()
+            }
     }
 }
