@@ -173,10 +173,16 @@ class MyPageActivity : AppCompatActivity() {
                 postsCountTextView.text = postsCount.toString()
             }
 
-        firestore.collection("posts").whereArrayContains("likedUserIds", userId).get()
-            .addOnSuccessListener { result ->
-                val likedCount = result.size()
-                likedCountTextView.text = likedCount.toString()
+        firestore.collection("posts").get().addOnSuccessListener { result ->
+            var likedCount = 0
+            for (document in result) {
+                document.reference.collection("likes").document(userId).get().addOnSuccessListener { likeDoc ->
+                    if (likeDoc.exists()) {
+                        likedCount++
+                        likedCountTextView.text = likedCount.toString()
+                    }
+                }
             }
+        }
     }
 }

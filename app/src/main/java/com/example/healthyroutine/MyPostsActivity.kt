@@ -3,25 +3,25 @@ package com.example.healthyroutine
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
-import androidx.appcompat.app.AppCompatActivity
 import android.widget.LinearLayout
 import android.widget.TextView
-import com.example.healthyroutine.DatabaseHelper
-import com.example.healthyroutine.R
+import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.auth.FirebaseAuth
 
 class MyPostsActivity : AppCompatActivity() {
 
-    lateinit var dbHelper: DatabaseHelper
+    private lateinit var firestoreHelper: FirestoreHelper
+    private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_my_posts)
 
-        dbHelper = DatabaseHelper(this)
+        firestoreHelper = FirestoreHelper()
+        auth = FirebaseAuth.getInstance()
 
         loadMyPosts()
 
-        // Back button
         val backButton: ImageView = findViewById(R.id.back_button)
         backButton.setOnClickListener {
             finish()
@@ -32,49 +32,55 @@ class MyPostsActivity : AppCompatActivity() {
         val postsContainer: LinearLayout = findViewById(R.id.my_posts_container)
         postsContainer.removeAllViews()
 
-        val posts = dbHelper.getMyPosts()
-        for (post in posts) {
-            val postView = layoutInflater.inflate(R.layout.post_item, null)
+        val currentUser = auth.currentUser
+        if (currentUser != null) {
+            firestoreHelper.getMyPosts(currentUser.uid) { posts ->
+                for (post in posts) {
+                    val postView = layoutInflater.inflate(R.layout.post_item, null)
 
-            val titleTextView: TextView = postView.findViewById(R.id.post_title)
-            val contentTextView: TextView = postView.findViewById(R.id.post_content)
-            val likesTextView: TextView = postView.findViewById(R.id.post_likes)
-            val likeIcon: ImageView = postView.findViewById(R.id.post_like_icon)
+                    val titleTextView: TextView = postView.findViewById(R.id.post_title)
+                    val contentTextView: TextView = postView.findViewById(R.id.post_content)
+                    val likesTextView: TextView = postView.findViewById(R.id.post_likes)
+                    val likeIcon: ImageView = postView.findViewById(R.id.post_like_icon)
 
-            titleTextView.text = post.title
-            contentTextView.text = post.content
-            likesTextView.text = post.likes.toString()
+                    titleTextView.text = post.title
+                    contentTextView.text = post.content
+                    likesTextView.text = post.likes.toString()
 
-            var isLiked = dbHelper.isLiked(post.id)
-            likeIcon.setImageResource(if (isLiked) R.drawable.ic_like_filled else R.drawable.ic_like_empty)
+                    var isLiked = false
+                    firestoreHelper.isLiked(post.id, currentUser.uid) { liked ->
+                        isLiked = liked
+                        likeIcon.setImageResource(if (liked) R.drawable.ic_like_filled else R.drawable.ic_like_empty)
+                    }
 
-            likeIcon.setOnClickListener {
-                if (isLiked) {
-                    post.likes -= 1
-                    likeIcon.setImageResource(R.drawable.ic_like_empty)
-                    dbHelper.removeLike(post.id)
-                } else {
-                    post.likes += 1
-                    likeIcon.setImageResource(R.drawable.ic_like_filled)
-                    dbHelper.addLike(post.id)
+                    likeIcon.setOnClickListener {
+                        if (isLiked) {
+                            post.likes -= 1
+                            likeIcon.setImageResource(R.drawable.ic_like_empty)
+                            firestoreHelper.removeLike(post.id, currentUser.uid)
+                        } else {
+                            post.likes += 1
+                            likeIcon.setImageResource(R.drawable.ic_like_filled)
+                            firestoreHelper.addLike(post.id, currentUser.uid)
+                        }
+                        isLiked = !isLiked
+                        firestoreHelper.updatePost(post)
+                        likesTextView.text = post.likes.toString()
+                    }
+
+                    postsContainer.addView(postView)
+
+                    val divider = View(this)
+                    divider.layoutParams = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        1
+                    ).apply {
+                        setMargins(0, 16, 0, 16)
+                    }
+                    divider.setBackgroundColor(resources.getColor(R.color.gray))
+                    postsContainer.addView(divider)
                 }
-                isLiked = !isLiked
-                dbHelper.updatePost(post)
-                likesTextView.text = post.likes.toString()
             }
-
-            postsContainer.addView(postView)
-
-            // 구분선 추가
-            val divider = View(this)
-            divider.layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                1
-            ).apply {
-                setMargins(0, 16, 0, 16)
-            }
-            divider.setBackgroundColor(resources.getColor(R.color.gray))
-            postsContainer.addView(divider)
         }
     }
 }

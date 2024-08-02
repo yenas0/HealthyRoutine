@@ -1,5 +1,6 @@
 package com.example.healthyroutine
 
+import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.FirebaseFirestore
 
 class FirestoreHelper {
@@ -83,11 +84,19 @@ class FirestoreHelper {
 
     // 좋아요 한 글 가져오기
     fun getLikedPosts(userId: String, callback: (List<Post>) -> Unit) {
-        db.collection("posts").whereArrayContains("likedUserIds", userId).get().addOnSuccessListener { result ->
-            val posts = result.map { document ->
-                document.toObject(Post::class.java).apply { id = document.id }
+        db.collection("posts").get().addOnSuccessListener { result ->
+            val likedPosts = mutableListOf<Post>()
+            val tasks = result.map { document ->
+                document.reference.collection("likes").document(userId).get().addOnSuccessListener { likeDoc ->
+                    if (likeDoc.exists()) {
+                        likedPosts.add(document.toObject(Post::class.java).apply { id = document.id })
+                    }
+                }
             }
-            callback(posts)
+
+            Tasks.whenAllSuccess<Void>(tasks).addOnSuccessListener {
+                callback(likedPosts)
+            }
         }
     }
 }
