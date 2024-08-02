@@ -1,5 +1,6 @@
 package com.example.healthyroutine
 
+import android.annotation.SuppressLint
 import android.app.TabActivity
 import android.content.Intent
 import android.os.Bundle
@@ -35,6 +36,7 @@ class RecommendActivity : TabActivity() {
     lateinit var bottom_navigation: BottomNavigationView
     lateinit var bottom_navigation2: BottomNavigationView
 
+    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_recommend)
@@ -164,11 +166,56 @@ class RecommendActivity : TabActivity() {
             startActivity(intent)
         }
 
+        // 건강 루틴 탭 - BottomNavigationView 설정
         bottom_navigation = findViewById(R.id.bottom_navigation)
         bottom_navigation.selectedItemId = R.id.navigation_recommend
 
-        // BottomNavigationView 설정
         bottom_navigation.setOnNavigationItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.navigation_home -> {
+                    // 홈 화면으로 이동
+                    val intent = Intent(this, HomeActivity::class.java)
+                    startActivity(intent)
+                    bottom_navigation.menu.findItem(R.id.navigation_home).isChecked = true
+                    true
+                }
+                R.id.navigation_recommend -> {
+                    // 추천 화면으로 이동
+                    val intent = Intent(this, RecommendActivity::class.java)
+                    startActivity(intent)
+                    bottom_navigation.menu.findItem(R.id.navigation_recommend).isChecked = true
+                    true
+                }
+                R.id.navigation_board -> {
+                    // 게시판 화면으로 이동
+                    val intent = Intent(this, BoardActivity::class.java)
+                    startActivity(intent)
+                    bottom_navigation.menu.findItem(R.id.navigation_board).isChecked = true
+                    true
+                }
+                R.id.navigation_ranking -> {
+                    // 랭킹 화면으로 이동
+                    val intent = Intent(this, RankingActivity::class.java)
+                    startActivity(intent)
+                    bottom_navigation.menu.findItem(R.id.navigation_ranking).isChecked = true
+                    true
+                }
+                R.id.navigation_profile -> {
+                    // 마이페이지 화면으로 이동
+                    val intent = Intent(this, MyPageActivity::class.java)
+                    startActivity(intent)
+                    bottom_navigation.menu.findItem(R.id.navigation_profile).isChecked = true
+                    true
+                }
+                else -> false
+            }
+        }
+
+        // 생활루틴 탭 - BottomNavigationView 설정
+        bottom_navigation2 = findViewById(R.id.bottom_navigation2)
+        bottom_navigation2.selectedItemId = R.id.navigation_recommend
+
+        bottom_navigation2.setOnNavigationItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.navigation_home -> {
                     // 홈 화면으로 이동
