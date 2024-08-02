@@ -2,6 +2,8 @@ package com.example.healthyroutine
 
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
+import java.util.*
 
 class FirestoreHelper {
     private val db = FirebaseFirestore.getInstance()
@@ -14,7 +16,8 @@ class FirestoreHelper {
             "likes" to post.likes,
             "routine" to post.routine,
             "routineDays" to post.routineDays,
-            "userId" to post.userId
+            "userId" to post.userId,
+            "createdAt" to post.createdAt
         )
 
         db.collection("posts").add(postMap)
@@ -28,7 +31,8 @@ class FirestoreHelper {
             "likes" to post.likes,
             "routine" to post.routine,
             "routineDays" to post.routineDays,
-            "userId" to post.userId
+            "userId" to post.userId,
+            "createdAt" to post.createdAt
         )
 
         db.collection("posts").document(post.id).set(postMap)
@@ -36,7 +40,7 @@ class FirestoreHelper {
 
     // 모든 게시글 가져오기
     fun getAllPosts(callback: (List<Post>) -> Unit) {
-        db.collection("posts").get().addOnSuccessListener { result ->
+        db.collection("posts").orderBy("createdAt", Query.Direction.DESCENDING).get().addOnSuccessListener { result ->
             val posts = result.map { document ->
                 document.toObject(Post::class.java).apply { id = document.id }
             }
@@ -74,7 +78,7 @@ class FirestoreHelper {
 
     // 내가 쓴 글 가져오기
     fun getMyPosts(userId: String, callback: (List<Post>) -> Unit) {
-        db.collection("posts").whereEqualTo("userId", userId).get().addOnSuccessListener { result ->
+        db.collection("posts").whereEqualTo("userId", userId).orderBy("createdAt", Query.Direction.DESCENDING).get().addOnSuccessListener { result ->
             val posts = result.map { document ->
                 document.toObject(Post::class.java).apply { id = document.id }
             }

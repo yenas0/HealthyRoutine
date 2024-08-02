@@ -12,6 +12,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
+import java.util.*
 
 class PostWriteActivity : AppCompatActivity() {
 
@@ -96,7 +97,8 @@ class PostWriteActivity : AppCompatActivity() {
                 content = content,
                 routine = routineName,
                 routineDays = routineDays,
-                userId = currentUser.uid
+                userId = currentUser.uid,
+                createdAt = Date() // 현재 시간으로 설정
             )
 
             firestoreHelper.addPost(post)

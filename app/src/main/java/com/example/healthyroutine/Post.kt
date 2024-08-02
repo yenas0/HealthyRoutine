@@ -1,5 +1,7 @@
 package com.example.healthyroutine
 
+import java.util.Date
+
 data class Post(
     var id: String = "",
     var title: String = "",
@@ -7,5 +9,6 @@ data class Post(
     var likes: Int = 0,
     var routine: String? = null,
     var routineDays: String? = null,
-    var userId: String = ""
+    var userId: String = "",
+    var createdAt: Date = Date()
 )
