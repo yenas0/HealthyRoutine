@@ -19,6 +19,7 @@ class MonthlyStatsActivity : AppCompatActivity() {
 
 //        calendarView = findViewById(R.id.calendar_view)
         routineNameTextView = findViewById(R.id.routine_name_text_view)
+        checkCountTextView = findViewById(R.id.check_count_text_view)
 
         val routineId = intent.getIntExtra("ROUTINE_ID", -1)
         loadRoutineData(routineId)
