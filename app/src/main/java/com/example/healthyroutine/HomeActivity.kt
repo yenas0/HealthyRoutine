@@ -356,9 +356,12 @@ class HomeActivity : AppCompatActivity() {
         }
 
         itemStatistics.setOnClickListener {
+            val intent = Intent(this, MonthlyStatsActivity::class.java)
             Toast.makeText(this, "월간 통계 클릭", Toast.LENGTH_SHORT).show()
+            startActivity(intent)
             popupWindow.dismiss()
         }
+
 
         itemEdit.setOnClickListener {
             val intent = Intent(this, RoutineEditActivity::class.java).apply {
