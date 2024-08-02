@@ -8,19 +8,25 @@
     android:padding="16dp"
     tools:context=".MonthlyStatsActivity">
 
+    <ImageButton
+        android:id="@+id/imageButton2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/baseline_arrow_circle_left_24" />
+
     <TextView
         android:id="@+id/routine_name_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="18sp"
-        android:text="Routine Name" />
+        android:text="Routine Name"
+        android:textSize="18sp" />
 
     <com.prolificinteractive.materialcalendarview.MaterialCalendarView
         android:id="@+id/calendar_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="12dp"
         android:layout_marginTop="16dp"
+        android:padding="12dp"
         android:theme="@style/CalenderViewCustom"
         app:mcv_dateTextAppearance="@style/CalenderViewDateCustomText"
         app:mcv_firstDayOfWeek="sunday"
@@ -29,11 +35,9 @@
         tools:ignore="MissingClass" />
 
     <TextView
-        android:id="@+id/check_count_text_view"
+        android:id="@+id/dottextview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="18sp"
-        android:text="체크 횟수: 0"
-        android:layout_marginTop="16dp" />
+        android:text="Example" />
 
 </LinearLayout>
