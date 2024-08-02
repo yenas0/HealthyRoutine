@@ -237,8 +237,9 @@ class HomeActivity : AppCompatActivity() {
 
         itemEdit.setOnClickListener {
             val intent = Intent(this, RoutineEditActivity::class.java)
+            intent.putExtra("routine_id", item.id)
             intent.putExtra("routine_name", item.name)
-            intent.putExtra("is_completed", item.isCompleted)
+            intent.putExtra("notification_enabled", item.isCompleted)
             startActivity(intent)
             popupWindow.dismiss()
         }
@@ -246,6 +247,11 @@ class HomeActivity : AppCompatActivity() {
         itemDelete.setOnClickListener {
             checklistAdapter.removeChecklistItem(item)
             popupWindow.dismiss()
+        }
+
+        // 팝업이 닫힐 때 선택 해제
+        popupWindow.setOnDismissListener {
+            checklistAdapter.clearSelection()
         }
     }
 
