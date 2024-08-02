@@ -10,7 +10,9 @@ data class Post(val id: Int, var title: String, var content: String, var likes: 
 data class Routine(
     val id: Int = 0,
     val name: String,
-    val notificationEnabled: Boolean
+    val notificationEnabled: Boolean,
+    var completed: Boolean = false,
+    var isChecked: Boolean = false
 )
 
 class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
@@ -23,21 +25,35 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 + COLUMN_LIKES + " INTEGER,"
                 + COLUMN_ROUTINE + " TEXT,"
                 + COLUMN_ROUTINE_DAYS + " TEXT,"
-                + "$COLUMN_USER_ID INTEGER)")  // 사용자 ID 컬럼 추가
+                + "$COLUMN_USER_ID INTEGER)")
 
         val createLikesTable = ("CREATE TABLE " + TABLE_LIKES + "("
                 + COLUMN_LIKE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + COLUMN_POST_ID + " INTEGER,"
-                + "$COLUMN_USER_ID INTEGER)")  // 사용자 ID 컬럼 추가
+                + "$COLUMN_USER_ID INTEGER)")
 
         val createRoutinesTable = ("CREATE TABLE " + TABLE_ROUTINES + "("
                 + COLUMN_ROUTINE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + COLUMN_ROUTINE_NAME + " TEXT,"
-                + COLUMN_NOTIFICATION_ENABLED + " INTEGER)")
+                + COLUMN_NOTIFICATION_ENABLED + " INTEGER,"
+                + COLUMN_COMPLETED + " INTEGER,"
+                + COLUMN_IS_CHECKED + " INTEGER)")
+
+        val createPointsTable = ("CREATE TABLE " + TABLE_POINTS + "("
+                + COLUMN_USER_ID + " INTEGER PRIMARY KEY,"
+                + COLUMN_POINTS + " INTEGER)")
 
         db.execSQL(createPostTable)
         db.execSQL(createLikesTable)
         db.execSQL(createRoutinesTable)
+        db.execSQL(createPointsTable)
+
+        // 포인트 초기화 예시 (userId 1번 사용자에 대해)
+        val initialPoints = ContentValues().apply {
+            put(COLUMN_USER_ID, 1)
+            put(COLUMN_POINTS, 0)
+        }
+        db.insert(TABLE_POINTS, null, initialPoints)
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
@@ -45,16 +61,10 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             db.execSQL("DROP TABLE IF EXISTS $TABLE_POSTS")
             db.execSQL("DROP TABLE IF EXISTS $TABLE_LIKES")
             db.execSQL("DROP TABLE IF EXISTS $TABLE_ROUTINES")
+            db.execSQL("DROP TABLE IF EXISTS $TABLE_POINTS")
             onCreate(db)
         }
     }
-
-    override fun onDowngrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        onUpgrade(db, oldVersion, newVersion)
-    }
-
-    // 현재 로그인한 사용자 ID를 관리할 변수
-    private var currentUserId: Int = 1  // 예시로 1로 설정, 실제로는 로그인된 사용자 ID를 설정
 
     fun addPost(title: String, content: String, routine: String?, routineDays: String?) {
         val db = this.writableDatabase
@@ -64,7 +74,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             put(COLUMN_LIKES, 0)
             put(COLUMN_ROUTINE, routine)
             put(COLUMN_ROUTINE_DAYS, routineDays)
-            put(COLUMN_USER_ID, currentUserId)  // 사용자 ID 추가
+            put(COLUMN_USER_ID, 1)  // 예제 사용자 ID
         }
         db.insert(TABLE_POSTS, null, values)
         db.close()
@@ -131,7 +141,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         val db = this.writableDatabase
         val values = ContentValues().apply {
             put(COLUMN_POST_ID, postId)
-            put(COLUMN_USER_ID, currentUserId)  // 사용자 ID 추가
+            put(COLUMN_USER_ID, 1)  // 예제 사용자 ID
         }
         db.insert(TABLE_LIKES, null, values)
         db.close()
@@ -139,13 +149,13 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
 
     fun removeLike(postId: Int) {
         val db = this.writableDatabase
-        db.delete(TABLE_LIKES, "$COLUMN_POST_ID = ? AND $COLUMN_USER_ID = ?", arrayOf(postId.toString(), currentUserId.toString()))
+        db.delete(TABLE_LIKES, "$COLUMN_POST_ID = ? AND $COLUMN_USER_ID = ?", arrayOf(postId.toString(), "1"))  // 예제 사용자 ID
         db.close()
     }
 
     fun isLiked(postId: Int): Boolean {
         val db = this.readableDatabase
-        val cursor = db.rawQuery("SELECT * FROM $TABLE_LIKES WHERE $COLUMN_POST_ID = ? AND $COLUMN_USER_ID = ?", arrayOf(postId.toString(), currentUserId.toString()))
+        val cursor = db.rawQuery("SELECT * FROM $TABLE_LIKES WHERE $COLUMN_POST_ID = ? AND $COLUMN_USER_ID = ?", arrayOf(postId.toString(), "1"))  // 예제 사용자 ID
         val isLiked = cursor.count > 0
         cursor.close()
         db.close()
@@ -155,7 +165,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
     fun getMyPosts(): List<Post> {
         val posts = mutableListOf<Post>()
         val db = this.readableDatabase
-        val cursor = db.rawQuery("SELECT * FROM $TABLE_POSTS WHERE $COLUMN_USER_ID = ? ORDER BY $COLUMN_ID DESC", arrayOf(currentUserId.toString()))
+        val cursor = db.rawQuery("SELECT * FROM $TABLE_POSTS WHERE $COLUMN_USER_ID = ? ORDER BY $COLUMN_ID DESC", arrayOf("1"))  // 예제 사용자 ID
         if (cursor.moveToFirst()) {
             do {
                 val post = Post(
@@ -177,7 +187,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
     fun getLikedPosts(): List<Post> {
         val posts = mutableListOf<Post>()
         val db = this.readableDatabase
-        val cursor = db.rawQuery("SELECT * FROM $TABLE_POSTS WHERE $COLUMN_ID IN (SELECT $COLUMN_POST_ID FROM $TABLE_LIKES WHERE $COLUMN_USER_ID = ?)", arrayOf(currentUserId.toString()))
+        val cursor = db.rawQuery("SELECT * FROM $TABLE_POSTS WHERE $COLUMN_ID IN (SELECT $COLUMN_POST_ID FROM $TABLE_LIKES WHERE $COLUMN_USER_ID = ?)", arrayOf("1"))  // 예제 사용자 ID
         if (cursor.moveToFirst()) {
             do {
                 val post = Post(
@@ -201,17 +211,20 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         val values = ContentValues().apply {
             put(COLUMN_ROUTINE_NAME, routine.name)
             put(COLUMN_NOTIFICATION_ENABLED, if (routine.notificationEnabled) 1 else 0)
+            put(COLUMN_COMPLETED, if (routine.completed) 1 else 0)
+            put(COLUMN_IS_CHECKED, if (routine.isChecked) 1 else 0)
         }
         db.insert(TABLE_ROUTINES, null, values)
         db.close()
     }
-
 
     fun updateRoutine(routine: Routine) {
         val db = this.writableDatabase
         val values = ContentValues().apply {
             put(COLUMN_ROUTINE_NAME, routine.name)
             put(COLUMN_NOTIFICATION_ENABLED, if (routine.notificationEnabled) 1 else 0)
+            put(COLUMN_COMPLETED, if (routine.completed) 1 else 0)
+            put(COLUMN_IS_CHECKED, if (routine.isChecked) 1 else 0)
         }
         db.update(TABLE_ROUTINES, values, "$COLUMN_ROUTINE_ID = ?", arrayOf(routine.id.toString()))
         db.close()
@@ -232,7 +245,9 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 val routine = Routine(
                     id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ROUTINE_ID)),
                     name = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ROUTINE_NAME)),
-                    notificationEnabled = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NOTIFICATION_ENABLED)) == 1
+                    notificationEnabled = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NOTIFICATION_ENABLED)) == 1,
+                    completed = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_COMPLETED)) == 1,
+                    isChecked = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_IS_CHECKED)) == 1
                 )
                 routines.add(routine)
             } while (cursor.moveToNext())
@@ -242,8 +257,25 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         return routines
     }
 
+    fun updatePoints(userId: Int, pointsChange: Int) {
+        val db = this.writableDatabase
+        db.execSQL("UPDATE $TABLE_POINTS SET $COLUMN_POINTS = $COLUMN_POINTS + $pointsChange WHERE $COLUMN_USER_ID = $userId")
+    }
+
+    fun getPoints(userId: Int): Int {
+        val db = this.readableDatabase
+        val cursor = db.rawQuery("SELECT $COLUMN_POINTS FROM $TABLE_POINTS WHERE $COLUMN_USER_ID = ?", arrayOf(userId.toString()))
+        if (cursor.moveToFirst()) {
+            val points = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_POINTS))
+            cursor.close()
+            return points
+        }
+        cursor.close()
+        return 0
+    }
+
     companion object {
-        private const val DATABASE_VERSION = 5
+        private const val DATABASE_VERSION = 7 // 버전 증가
         private const val DATABASE_NAME = "healthyroutine.db"
 
         const val TABLE_POSTS = "posts"
@@ -263,5 +295,10 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         const val COLUMN_ROUTINE_ID = "routine_id"
         const val COLUMN_ROUTINE_NAME = "name"
         const val COLUMN_NOTIFICATION_ENABLED = "notification_enabled"
+        const val COLUMN_COMPLETED = "completed"
+        const val COLUMN_IS_CHECKED = "is_checked"
+
+        const val TABLE_POINTS = "points"
+        const val COLUMN_POINTS = "points"
     }
 }

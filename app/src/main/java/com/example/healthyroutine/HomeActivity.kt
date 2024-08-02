@@ -5,15 +5,12 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.GestureDetector
-import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.core.view.isVisible
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -23,7 +20,7 @@ import java.util.*
 
 class HomeActivity : AppCompatActivity() {
 
-    private lateinit var btnAddItem: ImageView
+    private lateinit var btnAddItem: ImageButton
     private lateinit var btnPreviousWeek: ImageView
     private lateinit var btnNextWeek: ImageView
     private lateinit var weekDatesContainer: LinearLayout
@@ -38,9 +35,11 @@ class HomeActivity : AppCompatActivity() {
     private var currentWeekStart: LocalDate = LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
     private lateinit var gestureDetector: GestureDetector
 
-    private var selectedDate: LocalDate? = LocalDate.now() // 기본 선택 날짜를 오늘로 설정
+    private var selectedDate: LocalDate? = LocalDate.now()
     private lateinit var dbHelper: DatabaseHelper
     private val routines = mutableListOf<Routine>()
+
+    private val userId: Int = 1  // 예제 사용자 ID
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -124,39 +123,20 @@ class HomeActivity : AppCompatActivity() {
             startActivityForResult(intent, ADD_ROUTINE_REQUEST_CODE)
         }
 
-        // BottomNavigationView 설정
         bottomNavigation.setOnNavigationItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.navigation_home -> {
                     // 홈 화면으로 이동
-                    val intent = Intent(this, HomeActivity::class.java)
-                    startActivity(intent)
                     true
                 }
-                R.id.navigation_recommend -> {
-                    // 추천 화면으로 이동
-                    val intent = Intent(this, RecommendActivity::class.java)
-                    startActivity(intent)
-                    true
-                }
-                R.id.navigation_board -> {
-                    // 게시판 화면으로 이동
-                    val intent = Intent(this, BoardActivity::class.java)
-                    startActivity(intent)
-                    true
-                }
-                R.id.navigation_ranking -> {
-                    // 랭킹 화면으로 이동
-                    val intent = Intent(this, RankingActivity::class.java)
-                    startActivity(intent)
-                    true
-                }
-                R.id.navigation_profile -> {
-                    // 마이페이지 화면으로 이동
-                    val intent = Intent(this, MyPageActivity::class.java)
-                    startActivity(intent)
-                    true
-                }
+//                R.id.navigation_statistics -> {
+//                    // 통계 화면으로 이동
+//                    true
+//                }
+//                R.id.navigation_settings -> {
+//                    // 설정 화면으로 이동
+//                    true
+//                }
                 else -> false
             }
         }
@@ -165,6 +145,7 @@ class HomeActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         updateTitleDate(selectedDate ?: LocalDate.now())
+        loadRoutinesFromDatabase()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -202,6 +183,7 @@ class HomeActivity : AppCompatActivity() {
         routines.clear()
         routines.addAll(dbHelper.getAllRoutines())
         updateWeekDates()
+        updateChecklistForDate(selectedDate ?: LocalDate.now())
     }
 
     private fun updateWeekDates() {
@@ -245,12 +227,10 @@ class HomeActivity : AppCompatActivity() {
                 selectedDate = date
                 updateWeekDates()
                 updateTitleDate(date)
+                updateChecklistForDate(date)
             }
 
             weekDatesContainer.addView(dateView)
-
-            // 루틴 체크리스트 업데이트
-            updateChecklistForDate(date)
         }
     }
 
@@ -263,23 +243,38 @@ class HomeActivity : AppCompatActivity() {
             val container: View = checklistItemView.findViewById(R.id.container)
 
             routineName.text = routine.name
-            checkBox.isChecked = false
+            checkBox.isChecked = routine.isChecked
+
+            if (routine.isChecked) {
+                container.setBackgroundResource(R.drawable.item_background_checked)
+            } else {
+                container.setBackgroundResource(R.drawable.item_background)
+            }
 
             container.setOnClickListener {
                 showPopupMenu(ChecklistItem(routine.id, routine.name, checkBox.isChecked), container)
             }
 
             checkBox.setOnCheckedChangeListener { _, isChecked ->
+                routine.isChecked = isChecked
                 if (isChecked) {
-                    checklistItemView.isSelected = false
                     container.setBackgroundResource(R.drawable.item_background_checked)
+                    updatePoints(10)
                 } else {
-                    checklistItemView.isSelected = false
                     container.setBackgroundResource(R.drawable.item_background)
+                    updatePoints(-10)
                 }
+                dbHelper.updateRoutine(routine)
             }
 
             checklistContainer.addView(checklistItemView)
+        }
+    }
+
+    private fun updatePoints(pointsChange: Int) {
+        dbHelper.updatePoints(userId, pointsChange)
+        if (pointsChange > 0) {
+            Toast.makeText(this, "$pointsChange 포인트를 얻었어요!", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -299,12 +294,18 @@ class HomeActivity : AppCompatActivity() {
         val itemEdit: LinearLayout = popupView.findViewById(R.id.item_edit)
         val itemDelete: LinearLayout = popupView.findViewById(R.id.item_delete)
 
-        // 팝업창이 열릴 때 검정 외곽선 추가
-        anchorView.setBackgroundResource(R.drawable.item_border_selected)
+        if (item.isCompleted) {
+            anchorView.setBackgroundResource(R.drawable.item_background_checked_selected)
+        } else {
+            anchorView.setBackgroundResource(R.drawable.item_border_selected)
+        }
 
-        // 팝업창이 닫힐 때 검정 외곽선 제거
         popupWindow.setOnDismissListener {
-            anchorView.setBackgroundResource(if (item.isCompleted) R.drawable.item_background_checked else R.drawable.item_background)
+            if (item.isCompleted) {
+                anchorView.setBackgroundResource(R.drawable.item_background_checked)
+            } else {
+                anchorView.setBackgroundResource(R.drawable.item_background)
+            }
         }
 
         itemStatistics.setOnClickListener {
