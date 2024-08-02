@@ -30,7 +30,8 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var calendarContainer: LinearLayout
     private lateinit var calendarView: CalendarView
     private lateinit var checklistContainer: LinearLayout
-    private lateinit var bottomNavigation: BottomNavigationView
+
+    lateinit var bottom_navigation: BottomNavigationView
 
     private var currentWeekStart: LocalDate = LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
     private lateinit var gestureDetector: GestureDetector
@@ -55,7 +56,6 @@ class HomeActivity : AppCompatActivity() {
         calendarContainer = findViewById(R.id.calendar_container)
         calendarView = findViewById(R.id.calendar_view)
         checklistContainer = findViewById(R.id.checklist_container)
-        bottomNavigation = findViewById(R.id.bottom_navigation)
 
         dbHelper = DatabaseHelper(this)
 
@@ -123,20 +123,48 @@ class HomeActivity : AppCompatActivity() {
             startActivityForResult(intent, ADD_ROUTINE_REQUEST_CODE)
         }
 
-        bottomNavigation.setOnNavigationItemSelectedListener { item ->
+        bottom_navigation = findViewById(R.id.bottom_navigation)
+
+        bottom_navigation.selectedItemId = R.id.navigation_home
+
+        // BottomNavigationView 설정
+        bottom_navigation.setOnNavigationItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.navigation_home -> {
                     // 홈 화면으로 이동
+                    val intent = Intent(this, HomeActivity::class.java)
+                    startActivity(intent)
+                    bottom_navigation.menu.findItem(R.id.navigation_home).isChecked = true
                     true
                 }
-//                R.id.navigation_statistics -> {
-//                    // 통계 화면으로 이동
-//                    true
-//                }
-//                R.id.navigation_settings -> {
-//                    // 설정 화면으로 이동
-//                    true
-//                }
+                R.id.navigation_recommend -> {
+                    // 추천 화면으로 이동
+                    val intent = Intent(this, RecommendActivity::class.java)
+                    startActivity(intent)
+                    bottom_navigation.menu.findItem(R.id.navigation_recommend).isChecked = true
+                    true
+                }
+                R.id.navigation_board -> {
+                    // 게시판 화면으로 이동
+                    val intent = Intent(this, BoardActivity::class.java)
+                    startActivity(intent)
+                    bottom_navigation.menu.findItem(R.id.navigation_board).isChecked = true
+                    true
+                }
+                R.id.navigation_ranking -> {
+                    // 랭킹 화면으로 이동
+                    val intent = Intent(this, RankingActivity::class.java)
+                    startActivity(intent)
+                    bottom_navigation.menu.findItem(R.id.navigation_ranking).isChecked = true
+                    true
+                }
+                R.id.navigation_profile -> {
+                    // 마이페이지 화면으로 이동
+                    val intent = Intent(this, MyPageActivity::class.java)
+                    startActivity(intent)
+                    bottom_navigation.menu.findItem(R.id.navigation_profile).isChecked = true
+                    true
+                }
                 else -> false
             }
         }
