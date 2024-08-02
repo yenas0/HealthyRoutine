@@ -123,6 +123,7 @@ class HomeActivity : AppCompatActivity() {
         }
 
 
+
         bottom_navigation = findViewById(R.id.bottom_navigation)
 
         bottom_navigation.selectedItemId = R.id.navigation_home
