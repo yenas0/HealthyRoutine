@@ -48,6 +48,8 @@ class BoardActivity : AppCompatActivity() {
                 }
                 R.id.navigation_ranking -> {
                     // 랭킹 화면으로 이동
+                    val intent = Intent(this, RankingActivity::class.java)
+                    startActivity(intent)
                     true
                 }
                 R.id.navigation_profile -> {
@@ -59,6 +61,9 @@ class BoardActivity : AppCompatActivity() {
                 else -> false
             }
         }
+
+        // 현재 액티비티에 맞는 아이템 선택 설정
+        //bottom_navigation.selectedItemId = R.id.navigation_board
 
         // 글 작성 버튼 클릭 시 PostWriteActivity로 이동
         btn_add_post.setOnClickListener {

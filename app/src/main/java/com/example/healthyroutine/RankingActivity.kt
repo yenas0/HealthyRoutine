@@ -1,12 +1,14 @@
 package com.example.healthyroutine
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.database.*
 
 class RankingActivity : AppCompatActivity() {
@@ -26,6 +28,8 @@ class RankingActivity : AppCompatActivity() {
     private lateinit var user3Image: ImageView
     private lateinit var user3Name: TextView
     private lateinit var user3Points: TextView
+
+    lateinit var bottom_navigation: BottomNavigationView
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,6 +60,45 @@ class RankingActivity : AppCompatActivity() {
 
         // 파이어베이스에서 데이터 가져오기
         fetchDataFromFirebase()
+
+        bottom_navigation = findViewById(R.id.bottom_navigation)
+
+        // BottomNavigationView 설정
+        bottom_navigation.setOnNavigationItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.navigation_home -> {
+                    // 홈 화면으로 이동
+                    val intent = Intent(this, HomeActivity::class.java)
+                    startActivity(intent)
+                    true
+                }
+                R.id.navigation_recommend -> {
+                    // 추천 화면으로 이동
+                    val intent = Intent(this, RecommendActivity::class.java)
+                    startActivity(intent)
+                    true
+                }
+                R.id.navigation_board -> {
+                    // 게시판 화면으로 이동
+                    val intent = Intent(this, BoardActivity::class.java)
+                    startActivity(intent)
+                    true
+                }
+                R.id.navigation_ranking -> {
+                    // 랭킹 화면으로 이동
+                    val intent = Intent(this, RankingActivity::class.java)
+                    startActivity(intent)
+                    true
+                }
+                R.id.navigation_profile -> {
+                    // 마이페이지 화면으로 이동
+                    val intent = Intent(this, MyPageActivity::class.java)
+                    startActivity(intent)
+                    true
+                }
+                else -> false
+            }
+        }
     }
 
     private fun fetchDataFromFirebase() {

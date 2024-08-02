@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <TabHost xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@android:id/tabhost"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -65,7 +66,7 @@
         <FrameLayout
             android:id="@android:id/tabcontent"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content">
 
             <!--건강 루틴 탭-->
             <LinearLayout
@@ -87,26 +88,26 @@
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:gravity="center"
                             android:layout_marginTop="40dp"
                             android:layout_marginBottom="40dp"
-                            android:text="클릭하면 루틴을 추가할 수 있어요"/>
+                            android:gravity="center"
+                            android:text="클릭하면 루틴을 추가할 수 있어요" />
 
                         <Button
                             android:id="@+id/btnH1"
                             android:layout_width="300dp"
                             android:layout_height="75dp"
-                            android:text="아침에 물 한잔"
                             android:layout_gravity="center"
-                            android:background="@drawable/bg_recommend2"/>
+                            android:background="@drawable/bg_recommend2"
+                            android:text="아침에 물 한잔" />
 
                         <Button
                             android:id="@+id/btnH2"
-                            android:text="영양제 챙겨 먹기"
                             android:layout_width="300dp"
                             android:layout_height="75dp"
                             android:layout_gravity="center"
-                            android:background="@drawable/bg_recommend2"/>
+                            android:background="@drawable/bg_recommend2"
+                            android:text="영양제 챙겨 먹기" />
 
                         <Button
                             android:id="@+id/btnH3"
@@ -159,6 +160,7 @@
                     </LinearLayout>
                 </ScrollView>
 
+
             </LinearLayout>
 
             <!--생활 루틴 탭-->
@@ -181,10 +183,10 @@
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:gravity="center"
                             android:layout_marginTop="40dp"
                             android:layout_marginBottom="40dp"
-                            android:text="클릭하면 루틴을 추가할 수 있어요"/>
+                            android:gravity="center"
+                            android:text="클릭하면 루틴을 추가할 수 있어요" />
 
                         <Button
                             android:id="@+id/btnL1"
@@ -256,6 +258,6 @@
             </LinearLayout>
 
         </FrameLayout>
-    </LinearLayout>
 
+    </LinearLayout>
 </TabHost>
