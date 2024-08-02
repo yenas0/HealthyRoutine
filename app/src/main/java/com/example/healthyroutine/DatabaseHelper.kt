@@ -367,7 +367,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         const val COLUMN_LIKES = "likes"
         const val COLUMN_ROUTINE = "routine"
         const val COLUMN_ROUTINE_DAYS = "routine_days"
-        const val COLUMN_USER_ID = "user_id" // 여기를 추가
+        const val COLUMN_USER_ID = "user_id"
 
         const val TABLE_LIKES = "likes"
         const val COLUMN_LIKE_ID = "like_id"
