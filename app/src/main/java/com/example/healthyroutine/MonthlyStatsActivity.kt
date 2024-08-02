@@ -1,51 +1,142 @@
 package com.example.healthyroutine
 
+import android.graphics.Color
 import android.os.Bundle
-import android.widget.CalendarView
+import android.os.Parcel
+import android.os.Parcelable
+import android.text.style.ForegroundColorSpan
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import java.time.LocalDate
-import java.time.DayOfWeek
+import com.prolificinteractive.materialcalendarview.CalendarDay
+import com.prolificinteractive.materialcalendarview.DayViewDecorator
+import com.prolificinteractive.materialcalendarview.DayViewFacade
+import com.prolificinteractive.materialcalendarview.MaterialCalendarView
+import com.prolificinteractive.materialcalendarview.format.ArrayWeekDayFormatter
+import com.prolificinteractive.materialcalendarview.format.MonthArrayTitleFormatter
+import com.prolificinteractive.materialcalendarview.spans.DotSpan
+import java.util.Calendar
+import java.util.Date
 
 class MonthlyStatsActivity : AppCompatActivity() {
 
-    private lateinit var calendarView: CalendarView
+    private lateinit var calendarView: MaterialCalendarView
     private lateinit var routineNameTextView: TextView
-    private lateinit var checkCountTextView: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_monthly_stats)
 
-//        calendarView = findViewById(R.id.calendar_view)
         routineNameTextView = findViewById(R.id.routine_name_text_view)
+        calendarView = findViewById(R.id.calendar_view)
 
-        val routineId = intent.getIntExtra("ROUTINE_ID", -1)
-        loadRoutineData(routineId)
-    }
+        val routineDays = getRoutineDaysFromDB()
 
-    private fun loadRoutineData(routineId: Int) {
-        // 루틴 이름과 체크 횟수를 불러오는 로직
-        val routine = getRoutineById(routineId)
-        routineNameTextView.text = routine?.name ?: "Unknown"
+        val routineEventDates = HashSet<CalendarDay>()
+        val nonRoutineEventDates = HashSet<CalendarDay>()
 
-        // 예시로 체크 횟수를 5로 설정 (실제로는 DB에서 가져와야 함)
-        val checkCount = getCheckCountForMonth(routineId)
-        checkCountTextView.text = "체크 횟수: $checkCount"
-    }
+        // Populate routine and non-routine dates
+        routineDays.forEach {
+            routineEventDates.add(CalendarDay.from(it))
+        }
 
-    private fun getRoutineById(id: Int): Routine? {
-        // 데이터베이스에서 루틴을 가져오는 로직
-        val routines = listOf(
-            Routine(1, "Morning Stretch", false),
-            Routine(2, "Evening Run", false)
-            // 다른 루틴들...
+        // For demonstration, let's assume we have all dates in the current month for non-routine days
+        val calendar = Calendar.getInstance()
+        val month = calendar.get(Calendar.MONTH)
+        while (calendar.get(Calendar.MONTH) == month) {
+            val day = CalendarDay.from(calendar)
+            if (!routineEventDates.contains(day)) {
+                nonRoutineEventDates.add(day)
+            }
+            calendar.add(Calendar.DAY_OF_MONTH, 1)
+        }
+
+        calendarView.setTitleFormatter(
+            MonthArrayTitleFormatter(resources.getTextArray(R.array.custom_months))
         )
-        return routines.find { id == id }
+        calendarView.setWeekDayFormatter(ArrayWeekDayFormatter(resources.getTextArray(R.array.custom_weekdays)))
+        calendarView.setSelectedDate(CalendarDay.today())
+
+        calendarView.addDecorators(
+            RoutineEventDecorator(Color.GREEN, routineEventDates),
+            NonRoutineEventDecorator(Color.GRAY, nonRoutineEventDates),
+            TodayDecorator()
+        )
     }
 
-    private fun getCheckCountForMonth(routineId: Int): Int {
-        // 월간 체크 횟수를 계산하는 로직
-        return 5
+    private fun getRoutineDaysFromDB(): List<Date> {
+        val dates = mutableListOf<Date>()
+        // Fetch actual routine days from database
+        // Sample data:
+        val calendar = Calendar.getInstance()
+        calendar.set(2024, 7, 1)
+        dates.add(calendar.time)
+        calendar.set(2024, 7, 3)
+        dates.add(calendar.time)
+        // Add more sample data as needed
+        return dates
     }
+
+    class RoutineEventDecorator(private val color: Int, dates: Collection<CalendarDay>) : DayViewDecorator {
+        private val dates: HashSet<CalendarDay> = HashSet(dates)
+
+        override fun shouldDecorate(day: CalendarDay?): Boolean {
+            return dates.contains(day)
+        }
+
+        override fun decorate(view: DayViewFacade?) {
+            view?.addSpan(DotSpan(10F, color))
+        }
+    }
+
+    class NonRoutineEventDecorator(private val color: Int, dates: Collection<CalendarDay>) : DayViewDecorator {
+        private val dates: HashSet<CalendarDay> = HashSet(dates)
+
+        override fun shouldDecorate(day: CalendarDay?): Boolean {
+            return dates.contains(day)
+        }
+
+        override fun decorate(view: DayViewFacade?) {
+            view?.addSpan(DotSpan(10F, color))
+        }
+    }
+
+    class TodayDecorator : DayViewDecorator {
+        private val today = CalendarDay.today()
+
+        override fun shouldDecorate(day: CalendarDay?): Boolean {
+            return day == today
+        }
+
+        override fun decorate(view: DayViewFacade?) {
+            view?.addSpan(RoundBackgroundSpan(Color.CYAN, 20f))
+            view?.addSpan(ForegroundColorSpan(Color.BLUE))
+        }
+    }
+}
+
+class RoundBackgroundSpan(cyan: Int, fl: Float) : Parcelable {
+    constructor(parcel: Parcel) : this(
+        TODO("cyan"),
+        TODO("fl")
+    ) {
+    }
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+
+    }
+
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    companion object CREATOR : Parcelable.Creator<RoundBackgroundSpan> {
+        override fun createFromParcel(parcel: Parcel): RoundBackgroundSpan {
+            return RoundBackgroundSpan(parcel)
+        }
+
+        override fun newArray(size: Int): Array<RoundBackgroundSpan?> {
+            return arrayOfNulls(size)
+        }
+    }
+
 }
