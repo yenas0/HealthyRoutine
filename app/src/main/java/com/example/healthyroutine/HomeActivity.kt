@@ -17,6 +17,10 @@ import java.time.format.TextStyle
 import java.time.temporal.TemporalAdjusters
 import java.util.*
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 
 class HomeActivity : AppCompatActivity() {
 
@@ -323,7 +327,23 @@ class HomeActivity : AppCompatActivity() {
 
     private fun updatePoints(pointsChange: Int) {
         dbHelper.updatePoints(userId, pointsChange)
+
+        // Firebase Database에 포인트 업데이트
+        val userReference = FirebaseDatabase.getInstance().reference.child("rankings").child(userId.toString())
+        userReference.child("points").addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val currentPoints = snapshot.getValue(Int::class.java) ?: 0
+                val newPoints = currentPoints + pointsChange
+                userReference.child("points").setValue(newPoints)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                // 실패 시 처리
+                println("Failed to update points: ${error.toException()}")
+            }
+        })
     }
+
 
     private fun updateTitleDate(date: LocalDate) {
         val month = date.month.getDisplayName(TextStyle.SHORT, Locale.getDefault())

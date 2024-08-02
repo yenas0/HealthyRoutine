@@ -81,6 +81,7 @@ dependencies {
     implementation("com.prolificinteractive:material-calendarview:1.4.3")
     implementation ("com.google.firebase:firebase-database-ktx")
     implementation ("com.google.firebase:firebase-analytics-ktx")
+    implementation ("com.google.firebase:firebase-firestore:24.3.2")
 }
 
 
