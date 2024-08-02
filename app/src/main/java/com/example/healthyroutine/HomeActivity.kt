@@ -1,3 +1,4 @@
+// HomeActivity.kt
 package com.example.healthyroutine
 
 import android.app.Activity
@@ -141,6 +142,20 @@ class HomeActivity : AppCompatActivity() {
                 dbHelper.addRoutine(routine)
                 loadRoutinesFromDatabase()
             }
+        } else if (requestCode == EDIT_ROUTINE_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            data?.let {
+                val routineId = it.getIntExtra("routine_id", 0)
+                val routineName = it.getStringExtra("routine_name") ?: ""
+                val notificationEnabled = it.getBooleanExtra("notification_enabled", true)
+
+                Log.d("HomeActivity", "Updated Routine ID: $routineId")
+                Log.d("HomeActivity", "Updated Routine Name: $routineName")
+                Log.d("HomeActivity", "Updated Notification Enabled: $notificationEnabled")
+
+                val updatedRoutine = Routine(id = routineId, name = routineName, notificationEnabled = notificationEnabled)
+                dbHelper.updateRoutine(updatedRoutine)
+                loadRoutinesFromDatabase()
+            }
         }
     }
 
@@ -217,8 +232,10 @@ class HomeActivity : AppCompatActivity() {
 
             checkBox.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
+                    checklistItemView.isSelected = false
                     container.setBackgroundResource(R.drawable.item_background_checked)
                 } else {
+                    checklistItemView.isSelected = false
                     container.setBackgroundResource(R.drawable.item_background)
                 }
             }
@@ -248,7 +265,7 @@ class HomeActivity : AppCompatActivity() {
 
         // 팝업창이 닫힐 때 검정 외곽선 제거
         popupWindow.setOnDismissListener {
-            anchorView.setBackgroundResource(R.drawable.item_background)
+            anchorView.setBackgroundResource(if (item.isCompleted) R.drawable.item_background_checked else R.drawable.item_background)
         }
 
         itemStatistics.setOnClickListener {
@@ -262,7 +279,7 @@ class HomeActivity : AppCompatActivity() {
                 putExtra("routine_name", item.name)
                 putExtra("notification_enabled", item.isCompleted)
             }
-            startActivity(intent)
+            startActivityForResult(intent, EDIT_ROUTINE_REQUEST_CODE)
             popupWindow.dismiss()
         }
 
@@ -275,5 +292,6 @@ class HomeActivity : AppCompatActivity() {
 
     companion object {
         const val ADD_ROUTINE_REQUEST_CODE = 1
+        const val EDIT_ROUTINE_REQUEST_CODE = 2
     }
 }
