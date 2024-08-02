@@ -26,49 +26,12 @@ class SignUpActivity : ComponentActivity() {
         val etPassword = findViewById<EditText>(R.id.et_password)
         val etPasswordConfirm = findViewById<EditText>(R.id.et_password_confirm)
         val etNickname = findViewById<EditText>(R.id.et_nickname)
-        val btnCheck = findViewById<Button>(R.id.btn_check)
         val btnSignUp = findViewById<Button>(R.id.btn_signup)
         val cbAllAgree = findViewById<CheckBox>(R.id.cb_all_agree)
         val cbTermsAgree = findViewById<CheckBox>(R.id.cb_terms_agree)
         val cbPrivacyAgree = findViewById<CheckBox>(R.id.cb_privacy_agree)
         val cbMarketingAgree = findViewById<CheckBox>(R.id.cb_marketing_agree)
 
-        btnCheck.setOnClickListener {
-            val email = etId.text.toString()
-
-            if (email.isEmpty()) {
-                etId.error = "이메일을 입력해주세요"
-            } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                etId.error = "올바른 이메일 형식을 입력해주세요"
-            } else {
-                try {
-                    auth.fetchSignInMethodsForEmail(email).addOnCompleteListener { task ->
-                        if (task.isSuccessful) {
-                            val signInMethods = task.result?.signInMethods ?: emptyList()
-                            if (signInMethods.isNotEmpty()) {
-                                etId.error = "이미 사용중인 이메일입니다"
-                            } else {
-                                etId.error = null
-                                Toast.makeText(this, "사용 가능한 이메일입니다", Toast.LENGTH_SHORT).show()
-                            }
-                        } else {
-                            throw task.exception ?: Exception("이메일 중복 확인 중 오류 발생")
-                        }
-                    }
-                } catch (e: FirebaseAuthException) {
-                    when (e.errorCode) {
-                        "email-already-in-use" -> {
-                            etId.error = "이미 사용중인 이메일입니다"
-                        }
-                        else -> {
-                            etId.error = "이메일 확인 중 오류 발생: ${e.message}"
-                        }
-                    }
-                } catch (e: Exception) {
-                    etId.error = "이메일 확인 중 오류 발생: ${e.message}"
-                }
-            }
-        }
 
 
         cbAllAgree.setOnCheckedChangeListener { _, isChecked ->
