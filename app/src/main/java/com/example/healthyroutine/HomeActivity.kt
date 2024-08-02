@@ -18,6 +18,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.TextStyle
@@ -36,6 +37,7 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var calendarContainer: LinearLayout
     private lateinit var calendarView: CalendarView
     private lateinit var checklistContainer: LinearLayout
+    lateinit var bottom_navigation: BottomNavigationView
 
     private var currentWeekStart: LocalDate = LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
     private lateinit var gestureDetector: GestureDetector
@@ -123,6 +125,52 @@ class HomeActivity : AppCompatActivity() {
         btnAddItem.setOnClickListener {
             val intent = Intent(this, RoutineAddActivity::class.java)
             startActivityForResult(intent, ADD_ROUTINE_REQUEST_CODE)
+        }
+
+        bottom_navigation = findViewById(R.id.bottom_navigation)
+
+        bottom_navigation.selectedItemId = R.id.navigation_home
+
+        // BottomNavigationView 설정
+        bottom_navigation.setOnNavigationItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.navigation_home -> {
+                    // 홈 화면으로 이동
+                    val intent = Intent(this, HomeActivity::class.java)
+                    startActivity(intent)
+                    bottom_navigation.menu.findItem(R.id.navigation_home).isChecked = true
+                    true
+                }
+                R.id.navigation_recommend -> {
+                    // 추천 화면으로 이동
+                    val intent = Intent(this, RecommendActivity::class.java)
+                    startActivity(intent)
+                    bottom_navigation.menu.findItem(R.id.navigation_recommend).isChecked = true
+                    true
+                }
+                R.id.navigation_board -> {
+                    // 게시판 화면으로 이동
+                    val intent = Intent(this, BoardActivity::class.java)
+                    startActivity(intent)
+                    bottom_navigation.menu.findItem(R.id.navigation_board).isChecked = true
+                    true
+                }
+                R.id.navigation_ranking -> {
+                    // 랭킹 화면으로 이동
+                    val intent = Intent(this, RankingActivity::class.java)
+                    startActivity(intent)
+                    bottom_navigation.menu.findItem(R.id.navigation_ranking).isChecked = true
+                    true
+                }
+                R.id.navigation_profile -> {
+                    // 마이페이지 화면으로 이동
+                    val intent = Intent(this, MyPageActivity::class.java)
+                    startActivity(intent)
+                    bottom_navigation.menu.findItem(R.id.navigation_profile).isChecked = true
+                    true
+                }
+                else -> false
+            }
         }
     }
 
