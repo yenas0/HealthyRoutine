@@ -6,6 +6,7 @@ import android.util.Patterns
 import android.widget.*
 import androidx.activity.ComponentActivity
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.firestore.FirebaseFirestore
 
 class SignUpActivity : ComponentActivity() {
@@ -40,16 +41,35 @@ class SignUpActivity : ComponentActivity() {
             } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
                 etId.error = "올바른 이메일 형식을 입력해주세요"
             } else {
-                checkEmailExists(email) { exists ->
-                    if (exists) {
-                        etId.error = "이미 사용중인 이메일입니다"
-                    } else {
-                        etId.error = null
-                        Toast.makeText(this, "사용 가능한 이메일입니다", Toast.LENGTH_SHORT).show()
+                try {
+                    auth.fetchSignInMethodsForEmail(email).addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            val signInMethods = task.result?.signInMethods ?: emptyList()
+                            if (signInMethods.isNotEmpty()) {
+                                etId.error = "이미 사용중인 이메일입니다"
+                            } else {
+                                etId.error = null
+                                Toast.makeText(this, "사용 가능한 이메일입니다", Toast.LENGTH_SHORT).show()
+                            }
+                        } else {
+                            throw task.exception ?: Exception("이메일 중복 확인 중 오류 발생")
+                        }
                     }
+                } catch (e: FirebaseAuthException) {
+                    when (e.errorCode) {
+                        "email-already-in-use" -> {
+                            etId.error = "이미 사용중인 이메일입니다"
+                        }
+                        else -> {
+                            etId.error = "이메일 확인 중 오류 발생: ${e.message}"
+                        }
+                    }
+                } catch (e: Exception) {
+                    etId.error = "이메일 확인 중 오류 발생: ${e.message}"
                 }
             }
         }
+
 
         cbAllAgree.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
@@ -115,7 +135,7 @@ class SignUpActivity : ComponentActivity() {
                 if (usernameExists) {
                     etUsername.error = "이미 사용중인 아이디입니다"
                 } else {
-                    checkEmailExists(email) { emailExists ->
+                    checkEmailExists(email) { emailExists, _ ->
                         if (emailExists) {
                             etId.error = "이미 사용중인 이메일입니다"
                         } else {
@@ -132,15 +152,13 @@ class SignUpActivity : ComponentActivity() {
         return password.matches(passwordPattern.toRegex())
     }
 
-
-    private fun checkEmailExists(email: String, callback: (Boolean) -> Unit) {
+    private fun checkEmailExists(email: String, callback: (Boolean, String?) -> Unit) {
         auth.fetchSignInMethodsForEmail(email).addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 val signInMethods = task.result?.signInMethods ?: emptyList()
-                callback(signInMethods.isNotEmpty())
+                callback(signInMethods.isNotEmpty(), null)
             } else {
-                Toast.makeText(this, "이메일 중복 확인 중 오류 발생: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
-                callback(false)
+                callback(false, "이메일 중복 확인 중 오류 발생: ${task.exception?.message}")
             }
         }
     }

@@ -127,14 +127,22 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...)
         if (requestCode == RC_SIGN_IN) {
             val task = GoogleSignIn.getSignedInAccountFromIntent(data)
-            handleSignInResult(task.result)
+            try {
+                val account = task.result
+                if (account != null) {
+                    handleSignInResult(account)
+                } else {
+                    Toast.makeText(this, "Google sign-in failed", Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                Toast.makeText(this, "Google sign-in failed: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
-    private fun handleSignInResult(account: GoogleSignInAccount?) {
+    private fun handleSignInResult(account: GoogleSignInAccount) {
         try {
             if (account != null) {
                 firebaseAuthWithGoogle(account)
@@ -156,6 +164,9 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     Toast.makeText(this, "Google sign-in failed", Toast.LENGTH_SHORT).show()
                 }
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Firebase authentication failed: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
 
