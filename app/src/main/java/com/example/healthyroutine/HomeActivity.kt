@@ -1,4 +1,3 @@
-// HomeActivity.kt
 package com.example.healthyroutine
 
 import android.app.Activity
@@ -15,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.TextStyle
@@ -33,6 +33,7 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var calendarContainer: LinearLayout
     private lateinit var calendarView: CalendarView
     private lateinit var checklistContainer: LinearLayout
+    private lateinit var bottomNavigation: BottomNavigationView
 
     private var currentWeekStart: LocalDate = LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
     private lateinit var gestureDetector: GestureDetector
@@ -55,6 +56,7 @@ class HomeActivity : AppCompatActivity() {
         calendarContainer = findViewById(R.id.calendar_container)
         calendarView = findViewById(R.id.calendar_view)
         checklistContainer = findViewById(R.id.checklist_container)
+        bottomNavigation = findViewById(R.id.bottom_navigation)
 
         dbHelper = DatabaseHelper(this)
 
@@ -120,6 +122,43 @@ class HomeActivity : AppCompatActivity() {
         btnAddItem.setOnClickListener {
             val intent = Intent(this, RoutineAddActivity::class.java)
             startActivityForResult(intent, ADD_ROUTINE_REQUEST_CODE)
+        }
+
+        // BottomNavigationView 설정
+        bottomNavigation.setOnNavigationItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.navigation_home -> {
+                    // 홈 화면으로 이동
+                    val intent = Intent(this, HomeActivity::class.java)
+                    startActivity(intent)
+                    true
+                }
+                R.id.navigation_recommend -> {
+                    // 추천 화면으로 이동
+                    val intent = Intent(this, RecommendActivity::class.java)
+                    startActivity(intent)
+                    true
+                }
+                R.id.navigation_board -> {
+                    // 게시판 화면으로 이동
+                    val intent = Intent(this, BoardActivity::class.java)
+                    startActivity(intent)
+                    true
+                }
+                R.id.navigation_ranking -> {
+                    // 랭킹 화면으로 이동
+                    val intent = Intent(this, RankingActivity::class.java)
+                    startActivity(intent)
+                    true
+                }
+                R.id.navigation_profile -> {
+                    // 마이페이지 화면으로 이동
+                    val intent = Intent(this, MyPageActivity::class.java)
+                    startActivity(intent)
+                    true
+                }
+                else -> false
+            }
         }
     }
 
