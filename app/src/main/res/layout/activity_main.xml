@@ -111,24 +111,18 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:layout_height="47dp"
+            android:layout_marginBottom="32dp"
             android:gravity="center"
-            android:layout_marginBottom="32dp">
-
-            <ImageView
-                android:id="@+id/kakaoLoginImageView"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:src="@drawable/kakao_logo"
-                android:layout_marginEnd="16dp" />
+            android:orientation="horizontal">
 
             <ImageView
                 android:id="@+id/googleLoginImageView"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:src="@drawable/google_logo"
-                android:layout_marginStart="16dp" />
+                android:layout_gravity="center"
+                android:layout_margin="16dp"
+                android:src="@drawable/google_logo" />
         </LinearLayout>
 
         <!-- 회원가입 옵션 -->

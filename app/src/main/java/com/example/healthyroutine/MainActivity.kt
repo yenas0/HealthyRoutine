@@ -16,8 +16,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
-import com.kakao.sdk.auth.model.OAuthToken
-import com.kakao.sdk.user.UserApiClient
 
 class MainActivity : AppCompatActivity() {
 
@@ -45,7 +43,6 @@ class MainActivity : AppCompatActivity() {
         val emailEditText = findViewById<EditText>(R.id.emailEditText)
         val passwordEditText = findViewById<EditText>(R.id.passwordEditText)
         val loginButton = findViewById<Button>(R.id.loginButton)
-        val kakaoLoginImageView = findViewById<ImageView>(R.id.kakaoLoginImageView)
         val signUpTextView = findViewById<TextView>(R.id.signUpTextView)
         val forgotPasswordTextView = findViewById<TextView>(R.id.forgotPasswordTextView)
 
@@ -87,23 +84,6 @@ class MainActivity : AppCompatActivity() {
         // Set up the Google login button click listener
         googleLoginImageView.setOnClickListener {
             signInWithGoogle()
-        }
-
-        // Set up the Kakao login button click listener
-        kakaoLoginImageView.setOnClickListener {
-            UserApiClient.instance.loginWithKakaoTalk(this) { token, error ->
-                if (error != null) {
-                    if (UserApiClient.instance.isKakaoTalkLoginAvailable(this)) {
-                        UserApiClient.instance.loginWithKakaoTalk(this, callback = mCallback)
-                    } else {
-                        UserApiClient.instance.loginWithKakaoAccount(this, callback = mCallback)
-                    }
-                } else if (token != null) {
-                    val intent = Intent(this, HomeActivity::class.java)
-                    startActivity(intent)
-                    finish()
-                }
-            }
         }
 
         // Set up the sign-up text view click listener
@@ -168,27 +148,6 @@ class MainActivity : AppCompatActivity() {
             .addOnFailureListener { e ->
                 Toast.makeText(this, "Firebase authentication failed: ${e.message}", Toast.LENGTH_SHORT).show()
             }
-    }
-
-    private val mCallback: (OAuthToken?, Throwable?) -> Unit = { token, error ->
-        if (error != null) {
-            Toast.makeText(this, "카카오 로그인 실패", Toast.LENGTH_SHORT).show()
-        } else if (token != null) {
-            Toast.makeText(this, "카카오 로그인 성공", Toast.LENGTH_SHORT).show()
-            // Authenticate with Firebase
-            val credential = KakaoAuthProvider.getCredential(token.accessToken)
-            auth.signInWithCredential(credential)
-                .addOnCompleteListener(this) { task ->
-                    if (task.isSuccessful) {
-                        Toast.makeText(this, "Firebase 인증 성공", Toast.LENGTH_SHORT).show()
-                        val intent = Intent(this, HomeActivity::class.java)
-                        startActivity(intent)
-                        finish()
-                    } else {
-                        Toast.makeText(this, "Firebase 인증 실패", Toast.LENGTH_SHORT).show()
-                    }
-                }
-        }
     }
 
     private fun loginWithEmail(email: String, password: String) {
