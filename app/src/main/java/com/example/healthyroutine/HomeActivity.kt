@@ -8,22 +8,14 @@ import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CalendarView
-import android.widget.CheckBox
-import android.widget.HorizontalScrollView
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.PopupWindow
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.TextStyle
 import java.time.temporal.TemporalAdjusters
-import java.util.Locale
+import java.util.*
 
 class HomeActivity : AppCompatActivity() {
 
@@ -37,14 +29,15 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var calendarContainer: LinearLayout
     private lateinit var calendarView: CalendarView
     private lateinit var checklistContainer: LinearLayout
-    lateinit var bottom_navigation: BottomNavigationView
 
     private var currentWeekStart: LocalDate = LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
     private lateinit var gestureDetector: GestureDetector
 
-    private var selectedDate: LocalDate? = LocalDate.now() // 기본 선택 날짜를 오늘로 설정
+    private var selectedDate: LocalDate? = LocalDate.now()
     private lateinit var dbHelper: DatabaseHelper
     private val routines = mutableListOf<Routine>()
+
+    private val userId: Int = 1  // 예제 사용자 ID
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -126,57 +119,12 @@ class HomeActivity : AppCompatActivity() {
             val intent = Intent(this, RoutineAddActivity::class.java)
             startActivityForResult(intent, ADD_ROUTINE_REQUEST_CODE)
         }
-
-        bottom_navigation = findViewById(R.id.bottom_navigation)
-
-        bottom_navigation.selectedItemId = R.id.navigation_home
-
-        // BottomNavigationView 설정
-        bottom_navigation.setOnNavigationItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.navigation_home -> {
-                    // 홈 화면으로 이동
-                    val intent = Intent(this, HomeActivity::class.java)
-                    startActivity(intent)
-                    bottom_navigation.menu.findItem(R.id.navigation_home).isChecked = true
-                    true
-                }
-                R.id.navigation_recommend -> {
-                    // 추천 화면으로 이동
-                    val intent = Intent(this, RecommendActivity::class.java)
-                    startActivity(intent)
-                    bottom_navigation.menu.findItem(R.id.navigation_recommend).isChecked = true
-                    true
-                }
-                R.id.navigation_board -> {
-                    // 게시판 화면으로 이동
-                    val intent = Intent(this, BoardActivity::class.java)
-                    startActivity(intent)
-                    bottom_navigation.menu.findItem(R.id.navigation_board).isChecked = true
-                    true
-                }
-                R.id.navigation_ranking -> {
-                    // 랭킹 화면으로 이동
-                    val intent = Intent(this, RankingActivity::class.java)
-                    startActivity(intent)
-                    bottom_navigation.menu.findItem(R.id.navigation_ranking).isChecked = true
-                    true
-                }
-                R.id.navigation_profile -> {
-                    // 마이페이지 화면으로 이동
-                    val intent = Intent(this, MyPageActivity::class.java)
-                    startActivity(intent)
-                    bottom_navigation.menu.findItem(R.id.navigation_profile).isChecked = true
-                    true
-                }
-                else -> false
-            }
-        }
     }
 
     override fun onResume() {
         super.onResume()
         updateTitleDate(selectedDate ?: LocalDate.now())
+        loadRoutinesFromDatabase()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -193,6 +141,20 @@ class HomeActivity : AppCompatActivity() {
                 dbHelper.addRoutine(routine)
                 loadRoutinesFromDatabase()
             }
+        } else if (requestCode == EDIT_ROUTINE_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            data?.let {
+                val routineId = it.getIntExtra("routine_id", 0)
+                val routineName = it.getStringExtra("routine_name") ?: ""
+                val notificationEnabled = it.getBooleanExtra("notification_enabled", true)
+
+                Log.d("HomeActivity", "Updated Routine ID: $routineId")
+                Log.d("HomeActivity", "Updated Routine Name: $routineName")
+                Log.d("HomeActivity", "Updated Notification Enabled: $notificationEnabled")
+
+                val updatedRoutine = Routine(id = routineId, name = routineName, notificationEnabled = notificationEnabled)
+                dbHelper.updateRoutine(updatedRoutine)
+                loadRoutinesFromDatabase()
+            }
         }
     }
 
@@ -200,6 +162,7 @@ class HomeActivity : AppCompatActivity() {
         routines.clear()
         routines.addAll(dbHelper.getAllRoutines())
         updateWeekDates()
+        updateChecklistForDate(selectedDate ?: LocalDate.now())
     }
 
     private fun updateWeekDates() {
@@ -225,11 +188,13 @@ class HomeActivity : AppCompatActivity() {
                     tvDayOfWeek.setTextColor(ContextCompat.getColor(this, R.color.gray))
                     tvDate.setTextColor(ContextCompat.getColor(this, R.color.white))
                 }
-                date.isBefore(today) -> {
-                    circleBackground.setBackgroundResource(R.drawable.circle_past_background)
-                }
-                date.isAfter(today) -> {
-                    circleBackground.setBackgroundResource(R.drawable.circle_future_background)
+                else -> {
+                    val checkCount = dbHelper.getCheckCountForDate(date)
+                    if (checkCount >= 3) {
+                        circleBackground.setBackgroundResource(R.drawable.circle_past_background)
+                    } else {
+                        circleBackground.setBackgroundResource(R.drawable.circle_future_background)
+                    }
                 }
             }
 
@@ -243,17 +208,16 @@ class HomeActivity : AppCompatActivity() {
                 selectedDate = date
                 updateWeekDates()
                 updateTitleDate(date)
+                updateChecklistForDate(date)
             }
 
             weekDatesContainer.addView(dateView)
-
-            // 루틴 체크리스트 업데이트
-            updateChecklistForDate(date)
         }
     }
 
     private fun updateChecklistForDate(date: LocalDate) {
         checklistContainer.removeAllViews()
+        var checkedCount = dbHelper.getCheckCountForDate(date)
         routines.forEach { routine ->
             val checklistItemView = layoutInflater.inflate(R.layout.item_checklist, checklistContainer, false)
             val routineName: TextView = checklistItemView.findViewById(R.id.routine_name)
@@ -261,22 +225,54 @@ class HomeActivity : AppCompatActivity() {
             val container: View = checklistItemView.findViewById(R.id.container)
 
             routineName.text = routine.name
-            checkBox.isChecked = false
+            val routineCheck = dbHelper.getRoutineCheck(routine.id, date.toString())
+            checkBox.isChecked = routineCheck?.isChecked ?: false
+
+            if (checkBox.isChecked) {
+                container.setBackgroundResource(R.drawable.item_background_checked)
+            } else {
+                container.setBackgroundResource(R.drawable.item_background)
+            }
 
             container.setOnClickListener {
                 showPopupMenu(ChecklistItem(routine.id, routine.name, checkBox.isChecked), container)
             }
 
             checkBox.setOnCheckedChangeListener { _, isChecked ->
+                routineCheck?.isChecked = isChecked
+
                 if (isChecked) {
                     container.setBackgroundResource(R.drawable.item_background_checked)
+                    checkedCount++
+                    if (checkedCount < 3) {
+                        updatePoints(10)
+                        showToast("10 포인트를 얻었어요!")
+                    } else if (checkedCount == 3) {
+                        updatePoints(10) // 첫 10포인트 추가
+                        updatePoints(10) // 보너스 10포인트 추가
+                        showToast("3개 달성! 보너스 10 포인트 획득!")
+                    }
                 } else {
                     container.setBackgroundResource(R.drawable.item_background)
+                    checkedCount--
+                    updatePoints(-10)
                 }
+
+                if (routineCheck == null) {
+                    dbHelper.addRoutineCheck(RoutineCheck(routine.id, date.toString(), isChecked))
+                } else {
+                    dbHelper.updateRoutineCheck(routineCheck)
+                }
+
+                updateWeekDates()
             }
 
             checklistContainer.addView(checklistItemView)
         }
+    }
+
+    private fun updatePoints(pointsChange: Int) {
+        dbHelper.updatePoints(userId, pointsChange)
     }
 
     private fun updateTitleDate(date: LocalDate) {
@@ -295,12 +291,18 @@ class HomeActivity : AppCompatActivity() {
         val itemEdit: LinearLayout = popupView.findViewById(R.id.item_edit)
         val itemDelete: LinearLayout = popupView.findViewById(R.id.item_delete)
 
-        // 팝업창이 열릴 때 검정 외곽선 추가
-        anchorView.setBackgroundResource(R.drawable.item_border_selected)
+        if (item.isCompleted) {
+            anchorView.setBackgroundResource(R.drawable.item_background_checked_selected)
+        } else {
+            anchorView.setBackgroundResource(R.drawable.item_border_selected)
+        }
 
-        // 팝업창이 닫힐 때 검정 외곽선 제거
         popupWindow.setOnDismissListener {
-            anchorView.setBackgroundResource(R.drawable.item_background)
+            if (item.isCompleted) {
+                anchorView.setBackgroundResource(R.drawable.item_background_checked)
+            } else {
+                anchorView.setBackgroundResource(R.drawable.item_background)
+            }
         }
 
         itemStatistics.setOnClickListener {
@@ -314,7 +316,7 @@ class HomeActivity : AppCompatActivity() {
                 putExtra("routine_name", item.name)
                 putExtra("notification_enabled", item.isCompleted)
             }
-            startActivity(intent)
+            startActivityForResult(intent, EDIT_ROUTINE_REQUEST_CODE)
             popupWindow.dismiss()
         }
 
@@ -325,7 +327,12 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
+    private fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
+
     companion object {
         const val ADD_ROUTINE_REQUEST_CODE = 1
+        const val EDIT_ROUTINE_REQUEST_CODE = 2
     }
 }

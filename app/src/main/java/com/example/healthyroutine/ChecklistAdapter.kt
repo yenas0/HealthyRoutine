@@ -1,11 +1,11 @@
 package com.example.healthyroutine
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 
 class ChecklistAdapter(
@@ -31,7 +31,11 @@ class ChecklistAdapter(
         holder.routineName.text = item.name
         holder.checkBox.isChecked = item.isCompleted
 
-        updateContainerBackground(holder, item)
+        if (item.isCompleted) {
+            holder.container.setBackgroundResource(R.drawable.item_background_checked)
+        } else {
+            holder.container.setBackgroundResource(R.drawable.item_background)
+        }
 
         holder.container.setOnClickListener {
             selectedItem = item
@@ -42,8 +46,24 @@ class ChecklistAdapter(
         holder.checkBox.setOnCheckedChangeListener(null)
         holder.checkBox.setOnCheckedChangeListener { _, isChecked ->
             item.isCompleted = isChecked
-            updateContainerBackground(holder, item)
-            updateRoutineCompletion(item, holder.container.context)
+            if (isChecked) {
+                holder.container.setBackgroundResource(R.drawable.item_background_checked)
+            } else {
+                holder.container.setBackgroundResource(R.drawable.item_background)
+            }
+            holder.container.post {
+                notifyItemChanged(position)
+            }
+        }
+
+        if (item == selectedItem) {
+            holder.container.setBackgroundResource(R.drawable.item_border_selected)
+        } else {
+            if (item.isCompleted) {
+                holder.container.setBackgroundResource(R.drawable.item_background_checked)
+            } else {
+                holder.container.setBackgroundResource(R.drawable.item_background)
+            }
         }
     }
 
@@ -66,24 +86,5 @@ class ChecklistAdapter(
     fun clearSelection() {
         selectedItem = null
         notifyDataSetChanged()
-    }
-
-    private fun updateRoutineCompletion(item: ChecklistItem, context: Context) {
-        val dbHelper = DatabaseHelper(context)
-        val routine = Routine(id = item.id, name = item.name, notificationEnabled = false, completed = item.isCompleted, isChecked = item.isCompleted)
-        dbHelper.updateRoutine(routine)
-        notifyDataSetChanged()
-    }
-
-    private fun updateContainerBackground(holder: ChecklistViewHolder, item: ChecklistItem) {
-        if (item == selectedItem) {
-            holder.container.setBackgroundResource(R.drawable.item_border_selected)
-        } else {
-            if (item.isCompleted) {
-                holder.container.setBackgroundResource(R.drawable.item_background_checked)
-            } else {
-                holder.container.setBackgroundResource(R.drawable.item_background)
-            }
-        }
     }
 }

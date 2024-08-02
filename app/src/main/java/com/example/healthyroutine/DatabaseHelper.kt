@@ -4,15 +4,20 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import java.time.LocalDate
 
 data class Post(val id: Int, var title: String, var content: String, var likes: Int, val routine: String? = null, val routineDays: String? = null)
 
 data class Routine(
     val id: Int = 0,
     val name: String,
-    val notificationEnabled: Boolean,
-    var completed: Boolean = false,
-    var isChecked: Boolean = false
+    val notificationEnabled: Boolean
+)
+
+data class RoutineCheck(
+    val routineId: Int,
+    val date: String,
+    var isChecked: Boolean
 )
 
 class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
@@ -35,9 +40,13 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         val createRoutinesTable = ("CREATE TABLE " + TABLE_ROUTINES + "("
                 + COLUMN_ROUTINE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + COLUMN_ROUTINE_NAME + " TEXT,"
-                + COLUMN_NOTIFICATION_ENABLED + " INTEGER,"
-                + COLUMN_COMPLETED + " INTEGER,"
-                + COLUMN_IS_CHECKED + " INTEGER)")
+                + COLUMN_NOTIFICATION_ENABLED + " INTEGER)")
+
+        val createRoutineChecksTable = ("CREATE TABLE " + TABLE_ROUTINE_CHECKS + "("
+                + COLUMN_ROUTINE_ID + " INTEGER,"
+                + COLUMN_DATE + " TEXT,"
+                + COLUMN_IS_CHECKED + " INTEGER,"
+                + "PRIMARY KEY($COLUMN_ROUTINE_ID, $COLUMN_DATE))")
 
         val createPointsTable = ("CREATE TABLE " + TABLE_POINTS + "("
                 + COLUMN_USER_ID + " INTEGER PRIMARY KEY,"
@@ -46,6 +55,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         db.execSQL(createPostTable)
         db.execSQL(createLikesTable)
         db.execSQL(createRoutinesTable)
+        db.execSQL(createRoutineChecksTable)
         db.execSQL(createPointsTable)
 
         // 포인트 초기화 예시 (userId 1번 사용자에 대해)
@@ -61,6 +71,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             db.execSQL("DROP TABLE IF EXISTS $TABLE_POSTS")
             db.execSQL("DROP TABLE IF EXISTS $TABLE_LIKES")
             db.execSQL("DROP TABLE IF EXISTS $TABLE_ROUTINES")
+            db.execSQL("DROP TABLE IF EXISTS $TABLE_ROUTINE_CHECKS")
             db.execSQL("DROP TABLE IF EXISTS $TABLE_POINTS")
             onCreate(db)
         }
@@ -211,8 +222,6 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         val values = ContentValues().apply {
             put(COLUMN_ROUTINE_NAME, routine.name)
             put(COLUMN_NOTIFICATION_ENABLED, if (routine.notificationEnabled) 1 else 0)
-            put(COLUMN_COMPLETED, if (routine.completed) 1 else 0)
-            put(COLUMN_IS_CHECKED, if (routine.isChecked) 1 else 0)
         }
         db.insert(TABLE_ROUTINES, null, values)
         db.close()
@@ -223,8 +232,6 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         val values = ContentValues().apply {
             put(COLUMN_ROUTINE_NAME, routine.name)
             put(COLUMN_NOTIFICATION_ENABLED, if (routine.notificationEnabled) 1 else 0)
-            put(COLUMN_COMPLETED, if (routine.completed) 1 else 0)
-            put(COLUMN_IS_CHECKED, if (routine.isChecked) 1 else 0)
         }
         db.update(TABLE_ROUTINES, values, "$COLUMN_ROUTINE_ID = ?", arrayOf(routine.id.toString()))
         db.close()
@@ -245,9 +252,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 val routine = Routine(
                     id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ROUTINE_ID)),
                     name = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ROUTINE_NAME)),
-                    notificationEnabled = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NOTIFICATION_ENABLED)) == 1,
-                    completed = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_COMPLETED)) == 1,
-                    isChecked = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_IS_CHECKED)) == 1
+                    notificationEnabled = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NOTIFICATION_ENABLED)) == 1
                 )
                 routines.add(routine)
             } while (cursor.moveToNext())
@@ -255,6 +260,57 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         cursor.close()
         db.close()
         return routines
+    }
+
+    fun addRoutineCheck(routineCheck: RoutineCheck) {
+        val db = this.writableDatabase
+        val values = ContentValues().apply {
+            put(COLUMN_ROUTINE_ID, routineCheck.routineId)
+            put(COLUMN_DATE, routineCheck.date)
+            put(COLUMN_IS_CHECKED, if (routineCheck.isChecked) 1 else 0)
+        }
+        db.insert(TABLE_ROUTINE_CHECKS, null, values)
+        db.close()
+    }
+
+    fun updateRoutineCheck(routineCheck: RoutineCheck) {
+        val db = this.writableDatabase
+        val values = ContentValues().apply {
+            put(COLUMN_IS_CHECKED, if (routineCheck.isChecked) 1 else 0)
+        }
+        db.update(TABLE_ROUTINE_CHECKS, values, "$COLUMN_ROUTINE_ID = ? AND $COLUMN_DATE = ?", arrayOf(routineCheck.routineId.toString(), routineCheck.date))
+        db.close()
+    }
+
+    fun getRoutineCheck(routineId: Int, date: String): RoutineCheck? {
+        val db = this.readableDatabase
+        val cursor = db.rawQuery("SELECT * FROM $TABLE_ROUTINE_CHECKS WHERE $COLUMN_ROUTINE_ID = ? AND $COLUMN_DATE = ?", arrayOf(routineId.toString(), date))
+        var routineCheck: RoutineCheck? = null
+        if (cursor.moveToFirst()) {
+            routineCheck = RoutineCheck(
+                routineId = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ROUTINE_ID)),
+                date = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DATE)),
+                isChecked = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_IS_CHECKED)) == 1
+            )
+        }
+        cursor.close()
+        db.close()
+        return routineCheck
+    }
+
+    fun getCheckCountForDate(date: LocalDate): Int {
+        val db = this.readableDatabase
+        val cursor = db.rawQuery(
+            "SELECT COUNT(*) FROM $TABLE_ROUTINE_CHECKS WHERE $COLUMN_IS_CHECKED = 1 AND $COLUMN_DATE = ?",
+            arrayOf(date.toString())
+        )
+        var count = 0
+        if (cursor.moveToFirst()) {
+            count = cursor.getInt(0)
+        }
+        cursor.close()
+        db.close()
+        return count
     }
 
     fun updatePoints(userId: Int, pointsChange: Int) {
@@ -275,7 +331,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
     }
 
     companion object {
-        private const val DATABASE_VERSION = 7 // 버전 증가
+        private const val DATABASE_VERSION = 9 // 버전 증가
         private const val DATABASE_NAME = "healthyroutine.db"
 
         const val TABLE_POSTS = "posts"
@@ -295,7 +351,9 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         const val COLUMN_ROUTINE_ID = "routine_id"
         const val COLUMN_ROUTINE_NAME = "name"
         const val COLUMN_NOTIFICATION_ENABLED = "notification_enabled"
-        const val COLUMN_COMPLETED = "completed"
+
+        const val TABLE_ROUTINE_CHECKS = "routine_checks"
+        const val COLUMN_DATE = "date"
         const val COLUMN_IS_CHECKED = "is_checked"
 
         const val TABLE_POINTS = "points"
