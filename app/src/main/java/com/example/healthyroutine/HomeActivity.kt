@@ -1,18 +1,14 @@
 package com.example.healthyroutine
 
-import ChecklistItem
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
-import android.widget.CalendarView
-import android.widget.HorizontalScrollView
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.PopupWindow
-import android.widget.TextView
+import android.view.ViewGroup
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -21,7 +17,7 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.TextStyle
 import java.time.temporal.TemporalAdjusters
-import java.util.Locale
+import java.util.*
 
 class HomeActivity : AppCompatActivity() {
 
@@ -41,6 +37,7 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var gestureDetector: GestureDetector
 
     private var selectedDate: LocalDate? = LocalDate.now() // 기본 선택 날짜를 오늘로 설정
+    private lateinit var dbHelper: DatabaseHelper
     private val routines = mutableListOf<Routine>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,12 +55,15 @@ class HomeActivity : AppCompatActivity() {
         calendarContainer = findViewById(R.id.calendar_container)
         calendarView = findViewById(R.id.calendar_view)
 
+        dbHelper = DatabaseHelper(this)
+
         checklistAdapter = ChecklistAdapter(mutableListOf()) { item, view ->
-            showPopup(view, item)
+            showPopupMenu(item, view)
         }
         recyclerView.adapter = checklistAdapter
         recyclerView.layoutManager = LinearLayoutManager(this)
 
+        loadRoutinesFromDatabase()
         updateWeekDates()
         updateTitleDate(selectedDate ?: LocalDate.now())
 
@@ -140,11 +140,20 @@ class HomeActivity : AppCompatActivity() {
                 val routineName = it.getStringExtra("routine_name") ?: ""
                 val notificationEnabled = it.getBooleanExtra("notification_enabled", true)
 
-                val routine = Routine(routineName, notificationEnabled)
-                routines.add(routine)
-                updateWeekDates()
+                Log.d("HomeActivity", "Routine Name: $routineName")
+                Log.d("HomeActivity", "Notification Enabled: $notificationEnabled")
+
+                val routine = Routine(id = 0, name = routineName, notificationEnabled = notificationEnabled)
+                dbHelper.addRoutine(routine)
+                loadRoutinesFromDatabase()
             }
         }
+    }
+
+    private fun loadRoutinesFromDatabase() {
+        routines.clear()
+        routines.addAll(dbHelper.getAllRoutines())
+        updateWeekDates()
     }
 
     private fun updateWeekDates() {
@@ -198,8 +207,8 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun updateChecklistForDate(date: LocalDate) {
-        val checklistItems = routines.map { routine ->
-            ChecklistItem(routine.name, false)
+        val checklistItems = routines.mapIndexed { index, routine ->
+            ChecklistItem(index, routine.name, false)
         }
 
         checklistAdapter.updateChecklist(checklistItems)
@@ -211,37 +220,33 @@ class HomeActivity : AppCompatActivity() {
         tvDate.text = getString(R.string.date_format, year, month)
     }
 
-    private fun showPopup(anchorView: View, item: ChecklistItem) {
+    private fun showPopupMenu(item: ChecklistItem, anchorView: View) {
         val popupView = layoutInflater.inflate(R.layout.popup_menu, null)
-        val popupWindow = PopupWindow(popupView, LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
-        popupWindow.isOutsideTouchable = true
+        val popupWindow = PopupWindow(popupView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true)
 
-        popupWindow.setOnDismissListener {
-            checklistAdapter.clearSelection() // 팝업 창이 사라질 때 선택 해제
-        }
+        popupWindow.showAsDropDown(anchorView)
 
         val itemStatistics: LinearLayout = popupView.findViewById(R.id.item_statistics)
-        itemStatistics.setOnClickListener {
-            // 통계 보기 클릭 이벤트 처리
-            popupWindow.dismiss()
-            // 통계 보기 액티비티로 이동하는 코드 추가 가능
-        }
-
         val itemEdit: LinearLayout = popupView.findViewById(R.id.item_edit)
-        itemEdit.setOnClickListener {
-            // 수정하기 클릭 이벤트 처리
-            popupWindow.dismiss()
-            // 수정하기 액티비티로 이동하는 코드 추가 가능
-        }
-
         val itemDelete: LinearLayout = popupView.findViewById(R.id.item_delete)
-        itemDelete.setOnClickListener {
-            // 삭제하기 클릭 이벤트 처리
+
+        itemStatistics.setOnClickListener {
+            Toast.makeText(this, "월간 통계 클릭", Toast.LENGTH_SHORT).show()
             popupWindow.dismiss()
-            checklistAdapter.removeChecklistItem(item)
         }
 
-        popupWindow.showAsDropDown(anchorView, 0, 0)
+        itemEdit.setOnClickListener {
+            val intent = Intent(this, RoutineEditActivity::class.java)
+            intent.putExtra("routine_name", item.name)
+            intent.putExtra("is_completed", item.isCompleted)
+            startActivity(intent)
+            popupWindow.dismiss()
+        }
+
+        itemDelete.setOnClickListener {
+            checklistAdapter.removeChecklistItem(item)
+            popupWindow.dismiss()
+        }
     }
 
     companion object {

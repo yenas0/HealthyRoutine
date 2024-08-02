@@ -25,10 +25,10 @@ class RoutineDecoratorActivity : AppCompatActivity() {
 //        calendarView = findViewById(R.id.calendarView)
 
         // Dummy data for testing
-        routineList.add(Routine("name1", true))
-        routineList.add(Routine("name2", false))
-        routineList.add(Routine("name3", true))
-        routineList.add(Routine("name4", false))
+        routineList.add(Routine(1, "name1", true))
+        routineList.add(Routine(2, "name2", false))
+        routineList.add(Routine(3, "name3", true))
+        routineList.add(Routine(4, "name4", false))
 
 //        val completedDates = routineList.filter { it.isCompleted }.map { CalendarDay.from(it.date.toDate()) }.toSet()
 //        val notCompletedDates = routineList.filter { !it.isCompleted }.map { CalendarDay.from(it.date.toDate()) }.toSet()

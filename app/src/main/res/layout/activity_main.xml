@@ -33,7 +33,7 @@
         android:id="@+id/emailEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="아이디"
+        android:hint="아이디 또는 이메일"
         android:textSize="18dp"
         android:inputType="textEmailAddress"
         android:layout_marginBottom="8dp" />

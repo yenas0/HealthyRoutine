@@ -37,8 +37,8 @@ class MonthlyStatsActivity : AppCompatActivity() {
     private fun getRoutineById(id: Int): Routine? {
         // 데이터베이스에서 루틴을 가져오는 로직
         val routines = listOf(
-            Routine( "Morning Stretch", false),
-            Routine( "Evening Run", false)
+            Routine(1, "Morning Stretch", false),
+            Routine(2, "Evening Run", false)
             // 다른 루틴들...
         )
         return routines.find { id == id }

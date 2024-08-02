@@ -1,6 +1,5 @@
 package com.example.healthyroutine
 
-import ChecklistItem
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 
 class ChecklistAdapter(
     private val checklist: MutableList<ChecklistItem>,
-    private val onItemClicked: (ChecklistItem, View) -> Unit // View parameter 추가
+    private val onItemClicked: (ChecklistItem, View) -> Unit
 ) : RecyclerView.Adapter<ChecklistAdapter.ChecklistViewHolder>() {
 
     private var selectedItem: ChecklistItem? = null
@@ -33,11 +32,12 @@ class ChecklistAdapter(
         holder.checkBox.isChecked = item.isCompleted
 
         holder.container.setOnClickListener {
-            onItemClicked(item, holder.container) // View를 콜백으로 전달
             selectedItem = item
+            onItemClicked(item, holder.container)
             notifyDataSetChanged()
         }
 
+        holder.checkBox.setOnCheckedChangeListener(null)
         holder.checkBox.setOnCheckedChangeListener { _, isChecked ->
             item.isCompleted = isChecked
             if (isChecked) {
@@ -45,18 +45,20 @@ class ChecklistAdapter(
             } else {
                 holder.container.setBackgroundResource(R.drawable.item_background)
             }
-            holder.checkBox.post {
+            // 업데이트 시점을 조정합니다.
+            holder.container.post {
                 notifyItemChanged(position)
             }
         }
 
         if (item == selectedItem) {
-            holder.container.setBackgroundResource(R.drawable.item_border_selected) // 검정색 외곽선 추가
+            holder.container.setBackgroundResource(R.drawable.item_border_selected)
         } else {
-            holder.container.setBackgroundResource(
-                if (item.isCompleted) R.drawable.item_background_checked
-                else R.drawable.item_background
-            )
+            if (item.isCompleted) {
+                holder.container.setBackgroundResource(R.drawable.item_background_checked)
+            } else {
+                holder.container.setBackgroundResource(R.drawable.item_background)
+            }
         }
     }
 
