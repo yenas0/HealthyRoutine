@@ -27,6 +27,12 @@
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowBackground">@color/white</item>
     </style>
+
+    <style name="CalenderViewCustom"></style>
+
+    <style name="CalenderViewDateCustomText"></style>
+
+    <style name="CalenderViewWeekCustomText"></style>
 </resources>
 
 
