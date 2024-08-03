@@ -57,6 +57,7 @@ class MonthlyStatsActivity : AppCompatActivity() {
         calendarView.addDecorator(EventDecorator(colorPrimary, eventDates))
 
         val completedCount = completedDates.size
-        dotTextView.text = "이번 달 달성 횟수: $completedCount"
+        dotTextView.text = "이번 달엔 ${completedCount}번 달성했어요!"
+
     }
 }
