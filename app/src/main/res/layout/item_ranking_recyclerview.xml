@@ -31,9 +31,10 @@
         <!--이름-->
         <TextView
             android:id="@+id/name"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
+            android:layout_weight="1"
             android:text="User_000"
             android:textSize="16sp"
             android:textColor="#000"/>
@@ -43,7 +44,6 @@
             android:id="@+id/point"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="150dp"
             android:text="90"
             android:textSize="16sp"
             android:textStyle="bold"
