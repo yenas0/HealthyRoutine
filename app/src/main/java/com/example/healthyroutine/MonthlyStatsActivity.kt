@@ -5,11 +5,10 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import com.prolificinteractive.materialcalendarview.MaterialCalendarView
 import com.prolificinteractive.materialcalendarview.CalendarDay
+import com.prolificinteractive.materialcalendarview.MaterialCalendarView
 import java.time.LocalDate
 import java.time.YearMonth
-import java.util.*
 
 class MonthlyStatsActivity : AppCompatActivity() {
 
@@ -50,7 +49,7 @@ class MonthlyStatsActivity : AppCompatActivity() {
 
         val eventDates = HashSet<CalendarDay>()
         completedDates.forEach { date ->
-            eventDates.add(CalendarDay.from(date.year, date.monthValue, date.dayOfMonth))
+            eventDates.add(CalendarDay.from(date.year, date.monthValue-1, date.dayOfMonth))
         }
 
         val colorPrimary = ContextCompat.getColor(this, R.color.colorPrimary)
