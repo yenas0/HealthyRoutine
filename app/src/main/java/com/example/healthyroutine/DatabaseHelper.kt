@@ -187,6 +187,37 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         return count
     }
 
+    fun getRoutineChecksForMonth(routineId: Int, startOfMonth: LocalDate, endOfMonth: LocalDate): List<RoutineCheck> {
+        val db = this.readableDatabase
+        val cursor = db.rawQuery(
+            "SELECT routine_id, date, is_checked FROM routine_checks WHERE routine_id = ? AND date BETWEEN ? AND ?",
+            arrayOf(routineId.toString(), startOfMonth.toString(), endOfMonth.toString())
+        )
+        val routineChecks = mutableListOf<RoutineCheck>()
+
+        if (cursor.moveToFirst()) {
+            do {
+                val routineIdIndex = cursor.getColumnIndex("routine_id")
+                val dateIndex = cursor.getColumnIndex("date")
+                val isCheckedIndex = cursor.getColumnIndex("is_checked")
+
+                if (routineIdIndex != -1 && dateIndex != -1 && isCheckedIndex != -1) {
+                    val routineId = cursor.getInt(routineIdIndex)
+                    val date = cursor.getString(dateIndex)
+                    val isChecked = cursor.getInt(isCheckedIndex) == 1
+                    routineChecks.add(RoutineCheck(routineId, date, isChecked))
+                }
+            } while (cursor.moveToNext())
+        }
+
+        cursor.close()
+        return routineChecks
+    }
+
+
+
+
+
     fun updatePoints(userId: Int, pointsChange: Int) {
         val db = this.writableDatabase
         db.execSQL("UPDATE $TABLE_POINTS SET $COLUMN_POINTS = $COLUMN_POINTS + $pointsChange WHERE $COLUMN_USER_ID = $userId")
