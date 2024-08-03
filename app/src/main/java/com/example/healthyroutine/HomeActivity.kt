@@ -12,10 +12,8 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.TextStyle
@@ -41,13 +39,17 @@ class HomeActivity : AppCompatActivity() {
 
     private var selectedDate: LocalDate? = LocalDate.now()
     private val dbHelper = DatabaseHelper(this)
+    private val firestoreHelper = FirestoreHelper()
+    private lateinit var auth: FirebaseAuth
+    private var currentUser: FirebaseUser? = null
     private val routines = mutableListOf<Routine>()
-
-    private val userId: Int = 1  // 예제 사용자 ID
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
+
+        auth = FirebaseAuth.getInstance()
+        currentUser = auth.currentUser
 
         btnAddItem = findViewById(R.id.btn_add_item)
         btnPreviousWeek = findViewById(R.id.btn_previous_week)
@@ -321,24 +323,17 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun updatePoints(pointsChange: Int) {
-        dbHelper.updatePoints(userId, pointsChange)
-
-        // Firebase Database에 포인트 업데이트
-        val userReference = FirebaseDatabase.getInstance().reference.child("rankings").child(userId.toString())
-        userReference.child("points").addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val currentPoints = snapshot.getValue(Int::class.java) ?: 0
-                val newPoints = currentPoints + pointsChange
-                userReference.child("points").setValue(newPoints)
+        currentUser?.let { user ->
+            val userId = user.uid
+            firestoreHelper.updateUserPoints(userId, pointsChange) { success ->
+                if (success) {
+                    println("Points updated successfully")
+                } else {
+                    println("Failed to update points")
+                }
             }
-
-            override fun onCancelled(error: DatabaseError) {
-                // 실패 시 처리
-                println("Failed to update points: ${error.toException()}")
-            }
-        })
+        }
     }
-
 
     private fun updateTitleDate(date: LocalDate) {
         val month = date.month.getDisplayName(TextStyle.SHORT, Locale.getDefault())
@@ -350,7 +345,17 @@ class HomeActivity : AppCompatActivity() {
         val popupView = layoutInflater.inflate(R.layout.popup_menu, null)
         val popupWindow = PopupWindow(popupView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true)
 
-        popupWindow.showAsDropDown(anchorView)
+        val width = resources.getDimensionPixelSize(R.dimen.popup_width)  // dimen에서 값을 불러옴
+        popupWindow.width = width
+
+        // anchorView의 위치
+        val location = IntArray(2)
+        anchorView.getLocationOnScreen(location)
+        val x = location[0] + anchorView.width
+        val y = location[1] + anchorView.height
+
+        // 팝업 창을 화면의 특정 위치에 표시
+        popupWindow.showAtLocation(anchorView, 0, x, y)
 
         val itemStatistics: LinearLayout = popupView.findViewById(R.id.item_statistics)
         val itemEdit: LinearLayout = popupView.findViewById(R.id.item_edit)
@@ -376,7 +381,6 @@ class HomeActivity : AppCompatActivity() {
             startActivity(intent)
             popupWindow.dismiss()
         }
-
 
         itemEdit.setOnClickListener {
             val intent = Intent(this, RoutineEditActivity::class.java).apply {

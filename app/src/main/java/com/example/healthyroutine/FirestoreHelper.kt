@@ -1,9 +1,9 @@
 package com.example.healthyroutine
 
+import android.util.Log
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
-import java.util.*
 
 class FirestoreHelper {
     private val db = FirebaseFirestore.getInstance()
@@ -78,7 +78,7 @@ class FirestoreHelper {
 
     // 내가 쓴 글 가져오기
     fun getMyPosts(userId: String, callback: (List<Post>) -> Unit) {
-        db.collection("posts").whereEqualTo("userId", userId).orderBy("createdAt", Query.Direction.DESCENDING).get().addOnSuccessListener { result ->
+        db.collection("posts").whereEqualTo("userId", userId).get().addOnSuccessListener { result ->
             val posts = result.map { document ->
                 document.toObject(Post::class.java).apply { id = document.id }
             }
@@ -102,5 +102,52 @@ class FirestoreHelper {
                 callback(likedPosts)
             }
         }
+    }
+
+    // 사용자 포인트 업데이트
+    fun updateUserPoints(userId: String, pointsChange: Int, callback: (Boolean) -> Unit) {
+        val userRef = db.collection("users").document(userId)
+
+        db.runTransaction { transaction ->
+            val snapshot = transaction.get(userRef)
+            val currentPoints = snapshot.getLong("points") ?: 0
+            val newPoints = currentPoints + pointsChange
+            transaction.update(userRef, "points", newPoints)
+        }.addOnSuccessListener {
+            callback(true)
+        }.addOnFailureListener {
+            callback(false)
+        }
+    }
+
+    // 사용자 포인트 가져오기
+    fun getUserPoints(userId: String, callback: (Int) -> Unit) {
+        val userRef = db.collection("users").document(userId)
+        userRef.get().addOnSuccessListener { document ->
+            if (document != null && document.exists()) {
+                val points = document.getLong("points")?.toInt() ?: 0
+                callback(points)
+            } else {
+                callback(0)
+            }
+        }.addOnFailureListener {
+            callback(0)
+        }
+    }
+
+    fun getRoutineById(routineId: String, callback: (Routine?) -> Unit) {
+        db.collection("routines").document(routineId).get()
+            .addOnSuccessListener { document ->
+                if (document != null && document.exists()) {
+                    val routine = document.toObject(Routine::class.java)
+                    callback(routine)
+                } else {
+                    callback(null)
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.w("FirestoreHelper", "Error getting routine", exception)
+                callback(null)
+            }
     }
 }

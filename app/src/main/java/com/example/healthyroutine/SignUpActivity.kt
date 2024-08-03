@@ -32,8 +32,6 @@ class SignUpActivity : ComponentActivity() {
         val cbPrivacyAgree = findViewById<CheckBox>(R.id.cb_privacy_agree)
         val cbMarketingAgree = findViewById<CheckBox>(R.id.cb_marketing_agree)
 
-
-
         cbAllAgree.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
                 cbTermsAgree.isChecked = true
@@ -152,7 +150,8 @@ class SignUpActivity : ComponentActivity() {
                         val userMap = hashMapOf(
                             "email" to email,
                             "username" to username,
-                            "nickname" to nickname
+                            "nickname" to nickname,
+                            "points" to 0  // 포인트 필드 추가
                         )
 
                         db.collection("users").document(userId).set(userMap)
