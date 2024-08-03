@@ -12,6 +12,8 @@ import com.bumptech.glide.Glide
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.load.resource.bitmap.CircleCrop
 
 class RankingActivity : AppCompatActivity() {
 
@@ -151,6 +153,7 @@ class RankingActivity : AppCompatActivity() {
             val user1 = userList[0]
             Glide.with(this)
                 .load(user1.profileImageUrl)
+                .apply(RequestOptions.bitmapTransform(CircleCrop()))
                 .placeholder(defaultProfileImage)  // 기본 프로필 이미지 설정
                 .into(user1Image)
             user1Name.text = user1.nickname
@@ -160,6 +163,7 @@ class RankingActivity : AppCompatActivity() {
             val user2 = userList[1]
             Glide.with(this)
                 .load(user2.profileImageUrl)
+                .apply(RequestOptions.bitmapTransform(CircleCrop()))
                 .placeholder(defaultProfileImage)  // 기본 프로필 이미지 설정
                 .into(user2Image)
             user2Name.text = user2.nickname
@@ -169,6 +173,7 @@ class RankingActivity : AppCompatActivity() {
             val user3 = userList[2]
             Glide.with(this)
                 .load(user3.profileImageUrl)
+                .apply(RequestOptions.bitmapTransform(CircleCrop()))
                 .placeholder(defaultProfileImage)  // 기본 프로필 이미지 설정
                 .into(user3Image)
             user3Name.text = user3.nickname
