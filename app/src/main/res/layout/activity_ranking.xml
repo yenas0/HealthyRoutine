@@ -227,7 +227,7 @@
                         android:layout_height="wrap_content"
                         android:text="0p"
                         android:textColor="@color/colorPrimary"
-                        android:textStyle="bold"/>
+                        android:textStyle="bold" />
 
                 </LinearLayout>
 

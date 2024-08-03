@@ -62,17 +62,21 @@ class MainActivity : AppCompatActivity() {
                     db.collection("users").whereEqualTo("username", input)
                         .get()
                         .addOnCompleteListener { task ->
-                            if (task.isSuccessful && task.result != null && task.result?.documents?.isNotEmpty() == true) {
-                                val document = task.result?.documents?.first()
-                                val email = document?.getString("email")
-                                if (email != null) {
-                                    // Proceed with login using the retrieved email
-                                    loginWithEmail(email, password)
+                            if (task.isSuccessful) {
+                                val documents = task.result?.documents
+                                if (documents != null && documents.isNotEmpty()) {
+                                    val document = documents.first()
+                                    val email = document.getString("email")
+                                    if (email != null) {
+                                        loginWithEmail(email, password)
+                                    } else {
+                                        Toast.makeText(this, "아이디에 해당하는 이메일을 찾을 수 없습니다", Toast.LENGTH_SHORT).show()
+                                    }
                                 } else {
-                                    Toast.makeText(this, "아이디에 해당하는 이메일을 찾을 수 없습니다", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(this, "아이디가 잘못되었습니다", Toast.LENGTH_SHORT).show()
                                 }
                             } else {
-                                Toast.makeText(this, "아이디가 잘못되었습니다", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(this, "쿼리가 실패하였습니다: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                             }
                         }
                 }
