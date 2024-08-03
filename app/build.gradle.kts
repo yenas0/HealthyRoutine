@@ -61,7 +61,7 @@ dependencies {
     implementation("androidx.compose.material3:material3:1.1.1")
     implementation(platform("com.google.firebase:firebase-bom:33.1.2"))
     implementation("com.google.firebase:firebase-analytics")
-    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-auth:23.0.0")
     implementation("androidx.recyclerview:recyclerview:1.3.2")
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("com.google.firebase:firebase-firestore-ktx:25.0.0")
@@ -77,11 +77,11 @@ dependencies {
     implementation("com.google.android.material:material:1.9.0")
     implementation("androidx.viewpager2:viewpager2:1.0.0")
     implementation("com.github.bumptech.glide:glide:4.12.0")
-    implementation("com.google.android.gms:play-services-auth:19.2.0")
+    implementation("com.google.android.gms:play-services-auth:20.7.0")
     implementation("com.prolificinteractive:material-calendarview:1.4.3")
     implementation ("com.google.firebase:firebase-database-ktx")
     implementation ("com.google.firebase:firebase-analytics-ktx")
-    implementation ("com.google.firebase:firebase-firestore:24.3.2")
+    implementation ("com.google.firebase:firebase-firestore:25.0.0")
 }
 
 
