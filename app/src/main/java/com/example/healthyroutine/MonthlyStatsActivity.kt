@@ -5,10 +5,11 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import com.prolificinteractive.materialcalendarview.CalendarDay
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView
+import com.prolificinteractive.materialcalendarview.CalendarDay
 import java.time.LocalDate
 import java.time.YearMonth
+import java.util.*
 
 class MonthlyStatsActivity : AppCompatActivity() {
 
@@ -21,8 +22,6 @@ class MonthlyStatsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_monthly_stats)
-
-
 
         calendarView = findViewById(R.id.calendar_view)
         routineNameTextView = findViewById(R.id.routine_name_text_view)
@@ -48,22 +47,15 @@ class MonthlyStatsActivity : AppCompatActivity() {
 
         val routineChecks = dbHelper.getRoutineChecksForMonth(routineId, startOfMonth, endOfMonth)
         val completedDates = routineChecks.filter { it.isChecked }.map { LocalDate.parse(it.date) }
-        val allDates=startOfMonth.datesUntil(endOfMonth.plusDays(1)).toList()
 
         val eventDates = HashSet<CalendarDay>()
-        val notCompletedEventDates = HashSet<CalendarDay>()
-
         completedDates.forEach { date ->
             eventDates.add(CalendarDay.from(date.year, date.monthValue-1, date.dayOfMonth))
         }
-        allDates.filter {!completedDates.contains(it)}.forEach {date ->
-            notCompletedEventDates.add(CalendarDay.from(date.year,date.monthValue-1,date.dayOfMonth))}
 
         val colorPrimary = ContextCompat.getColor(this, R.color.colorPrimary)
         calendarView.addDecorator(EventDecorator(colorPrimary, eventDates))
 
-        val gray=ContextCompat.getColor(this,R.color.gray)
-        calendarView.addDecorator(EventDecorator(gray,notCompletedEventDates))
         val completedCount = completedDates.size
         dotTextView.text = "이번 달 달성 횟수: $completedCount"
     }
