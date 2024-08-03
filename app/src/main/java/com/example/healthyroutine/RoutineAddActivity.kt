@@ -21,10 +21,13 @@ class RoutineAddActivity : AppCompatActivity() {
     private lateinit var dayButtons: List<TextView>
     private lateinit var btnSave: Button
     private lateinit var backButton: ImageView
+    private lateinit var dbHelper: DatabaseHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_routine_add)
+
+        dbHelper = DatabaseHelper(this)
 
         etRoutineName = findViewById(R.id.routine_title)
         switchNotification = findViewById(R.id.notification_switch)
@@ -72,6 +75,14 @@ class RoutineAddActivity : AppCompatActivity() {
             val notificationEnabled = switchNotification.isChecked
             val selectedDays = dayButtons.filter { it.tag == "active" }.joinToString(",") { it.text.toString() }
 
+            val newRoutine = Routine(
+                name = routineName,
+                notificationEnabled = notificationEnabled,
+                days = selectedDays
+            )
+
+            dbHelper.addRoutine(newRoutine)
+
             val resultIntent = Intent().apply {
                 putExtra("routine_name", routineName)
                 putExtra("notification_enabled", notificationEnabled)
@@ -79,12 +90,6 @@ class RoutineAddActivity : AppCompatActivity() {
             }
 
             setResult(Activity.RESULT_OK, resultIntent)
-
-            // 홈 액티비티로 이동하고 루틴을 업데이트합니다.
-            val homeIntent = Intent(this, HomeActivity::class.java)
-            homeIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
-            startActivity(homeIntent)
-
             finish()
         }
 
