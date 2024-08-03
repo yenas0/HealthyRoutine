@@ -46,15 +46,22 @@ class MonthlyStatsActivity : AppCompatActivity() {
 
         val routineChecks = dbHelper.getRoutineChecksForMonth(routineId, startOfMonth, endOfMonth)
         val completedDates = routineChecks.filter { it.isChecked }.map { LocalDate.parse(it.date) }
+        val allDates=startOfMonth.datesUntil(endOfMonth.plusDays(1)).toList()
 
         val eventDates = HashSet<CalendarDay>()
+        val notCompletedEventDates = HashSet<CalendarDay>()
+
         completedDates.forEach { date ->
             eventDates.add(CalendarDay.from(date.year, date.monthValue-1, date.dayOfMonth))
         }
+        allDates.filter {!completedDates.contains(it)}.forEach {date ->
+            notCompletedEventDates.add(CalendarDay.from(date.year,date.monthValue-1,date.dayOfMonth))}
 
         val colorPrimary = ContextCompat.getColor(this, R.color.colorPrimary)
         calendarView.addDecorator(EventDecorator(colorPrimary, eventDates))
 
+        val gray=ContextCompat.getColor(this,R.color.gray)
+        calendarView.addDecorator(EventDecorator(gray,notCompletedEventDates))
         val completedCount = completedDates.size
         dotTextView.text = "이번 달 달성 횟수: $completedCount"
     }
