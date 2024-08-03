@@ -5,20 +5,46 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp"
     tools:context=".MonthlyStatsActivity">
 
-    <ImageButton
-        android:id="@+id/imageButton2"
-        android:layout_width="wrap_content"
+    <!-- 상단바 -->
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:srcCompat="@drawable/baseline_arrow_circle_left_24" />
+        android:padding="16dp"
+        android:background="@color/white"
+        android:elevation="4dp">
+
+        <ImageView
+            android:id="@+id/back_button"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_back_arrow"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="8dp"
+            android:clickable="true"
+            android:focusable="true"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="월간 통계"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+    </RelativeLayout>
+
 
     <TextView
         android:id="@+id/routine_name_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Routine Name"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="25dp"
+        android:textStyle="bold"
         android:textSize="18sp" />
 
     <com.prolificinteractive.materialcalendarview.MaterialCalendarView
@@ -31,6 +57,8 @@
         app:mcv_dateTextAppearance="@style/CalenderViewDateCustomText"
         app:mcv_firstDayOfWeek="sunday"
         app:mcv_showOtherDates="all"
+        android:layout_marginLeft="25dp"
+        android:layout_marginRight="25dp"
         app:mcv_weekDayTextAppearance="@style/CalenderViewWeekCustomText"
         tools:ignore="MissingClass" />
 
@@ -38,6 +66,8 @@
         android:id="@+id/dottextview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="25dp"
         android:text="Example" />
 
 </LinearLayout>

@@ -376,8 +376,10 @@ class HomeActivity : AppCompatActivity() {
         }
 
         itemStatistics.setOnClickListener {
-            val intent = Intent(this, MonthlyStatsActivity::class.java)
-            Toast.makeText(this, "월간 통계 클릭", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, MonthlyStatsActivity::class.java).apply {
+                putExtra("routine_id", item.id)
+                putExtra("routine_name", item.name)
+            }
             startActivity(intent)
             popupWindow.dismiss()
         }
@@ -398,6 +400,7 @@ class HomeActivity : AppCompatActivity() {
             popupWindow.dismiss()
         }
     }
+
 
     private fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
