@@ -10,6 +10,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 
 class RankingActivity : AppCompatActivity() {
 
@@ -32,6 +34,10 @@ class RankingActivity : AppCompatActivity() {
     // 나의 포인트
     private lateinit var myPointsTextView: TextView
 
+    // FirebaseAuth
+    private lateinit var auth: FirebaseAuth
+    private var currentUser: FirebaseUser? = null
+
     lateinit var bottom_navigation: BottomNavigationView
 
     @SuppressLint("MissingInflatedId")
@@ -39,6 +45,8 @@ class RankingActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_ranking)
 
+        auth = FirebaseAuth.getInstance()
+        currentUser = auth.currentUser
         firestoreHelper = FirestoreHelper()  // FirestoreHelper 초기화
 
         mRecyclerView = findViewById(R.id.ranking_recyclerView)
@@ -111,6 +119,9 @@ class RankingActivity : AppCompatActivity() {
             // 상위 3명 사용자 정보 업데이트
             updateTopThreeUsers()
 
+            // 나의 포인트 업데이트
+            updateMyPoints()
+
             // 4위부터 사용자 정보
             val remainingUsers = userList.drop(3).mapIndexed { index, user ->
                 RankingUserActivity(
@@ -123,7 +134,6 @@ class RankingActivity : AppCompatActivity() {
             mRecyclerAdapter.setUserList(ArrayList(remainingUsers))
         }
     }
-
 
     private fun updateTopThreeUsers() {
         // 기본 이미지 리소스 설정
@@ -167,9 +177,13 @@ class RankingActivity : AppCompatActivity() {
     }
 
     private fun updateMyPoints() {
-        val myUserId = "your_user_id"  // 실제 로그인된 사용자 ID를 사용
-        firestoreHelper.getUserPoints(myUserId) { points ->
-            myPointsTextView.text = "${points}p"
+        val user = currentUser
+        if (user != null) {
+            firestoreHelper.getUserPoints(user.uid) { points ->
+                myPointsTextView.text = "${points}p"
+            }
+        } else {
+            myPointsTextView.text = "0p"
         }
     }
 }
