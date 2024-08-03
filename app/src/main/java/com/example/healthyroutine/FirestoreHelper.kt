@@ -135,6 +135,25 @@ class FirestoreHelper {
         }
     }
 
+    // 포인트 순으로 유저 정렬
+    fun getUsersOrderedByPoints(callback: (List<com.example.healthyroutine.User>) -> Unit) { // 올바른 User 클래스 사용
+        db.collection("users")
+            .orderBy("points", Query.Direction.DESCENDING)
+            .get()
+            .addOnSuccessListener { result ->
+                val users = result.map { document ->
+                    document.toObject(com.example.healthyroutine.User::class.java).apply {
+                        id = document.id  // Firestore 문서 ID를 User 객체의 id로 설정
+                    }
+                }
+                callback(users)
+            }
+            .addOnFailureListener { exception ->
+                Log.w("FirestoreHelper", "Error getting users: ", exception)
+                callback(emptyList())
+            }
+    }
+
     fun getRoutineById(routineId: String, callback: (Routine?) -> Unit) {
         db.collection("routines").document(routineId).get()
             .addOnSuccessListener { document ->

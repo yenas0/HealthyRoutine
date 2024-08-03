@@ -8,14 +8,15 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class RankingActivity : AppCompatActivity() {
 
     private lateinit var mRecyclerView: RecyclerView
     private lateinit var mRecyclerAdapter: RankingAdapter
-    private lateinit var mRankerItems: ArrayList<RankingUserActivity>
-    private lateinit var databaseHelper: DatabaseHelper
+    private lateinit var firestoreHelper: FirestoreHelper
+    private lateinit var userList: ArrayList<User>
 
     // 상위 3명 사용자
     private lateinit var user1Image: ImageView
@@ -38,7 +39,7 @@ class RankingActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_ranking)
 
-        databaseHelper = DatabaseHelper(this)  // SQLite DatabaseHelper 초기화
+        firestoreHelper = FirestoreHelper()  // FirestoreHelper 초기화
 
         mRecyclerView = findViewById(R.id.ranking_recyclerView)
 
@@ -61,11 +62,10 @@ class RankingActivity : AppCompatActivity() {
 
         myPointsTextView = findViewById(R.id.my_points)
 
-        // SQLite에서 데이터 가져오기
+        // Firestore에서 데이터 가져오기
         fetchRankingData()
 
         bottom_navigation = findViewById(R.id.bottom_navigation)
-
         bottom_navigation.selectedItemId = R.id.navigation_ranking
 
         // BottomNavigationView 설정
@@ -90,9 +90,7 @@ class RankingActivity : AppCompatActivity() {
                     true
                 }
                 R.id.navigation_ranking -> {
-                    val intent = Intent(this, RankingActivity::class.java)
-                    startActivity(intent)
-                    bottom_navigation.menu.findItem(R.id.navigation_ranking).isChecked = true
+                    // 현재 액티비티와 동일하므로 추가적인 동작 없음
                     true
                 }
                 R.id.navigation_profile -> {
@@ -107,22 +105,22 @@ class RankingActivity : AppCompatActivity() {
     }
 
     private fun fetchRankingData() {
-        mRankerItems = ArrayList()
+        firestoreHelper.getUsersOrderedByPoints { users ->
+            userList = ArrayList(users)
 
-        // SQLite 데이터베이스에서 모든 유저의 포인트 데이터를 가져와 랭킹을 만듭니다.
-        val rankings = databaseHelper.getRankingUsers()
+            // 상위 3명 사용자 정보 업데이트
+            updateTopThreeUsers()
 
-        mRankerItems.addAll(rankings)
-
-        // 상위 3명 사용자 정보 업데이트
-        updateTopThreeUsers()
-
-        // 나의 포인트 가져오기
-        updateMyPoints()
-
-        // 4위부터 사용자 정보
-        val remainingUsers = mRankerItems.drop(3)
-        mRecyclerAdapter.setUserList(ArrayList(remainingUsers))
+            // 4위부터 사용자 정보
+            val remainingUsers = userList.drop(3).mapIndexed { index, user ->
+                RankingUserActivity(
+                    ranking = index + 4, // 4위부터 시작
+                    name = user.name,
+                    points = user.points
+                )
+            }
+            mRecyclerAdapter.setUserList(ArrayList(remainingUsers))
+        }
     }
 
     private fun updateTopThreeUsers() {
@@ -134,29 +132,36 @@ class RankingActivity : AppCompatActivity() {
         user3Name.text = ""
         user3Points.text = "0p"
 
-        if (mRankerItems.size >= 1) {
-            val user1 = mRankerItems[0]
-            user1Image.setImageResource(user1.resourceId)
+        if (userList.size >= 1) {
+            val user1 = userList[0]
+            Glide.with(this)
+                .load(user1.profileImageUrl)
+                .into(user1Image)
             user1Name.text = user1.name
             user1Points.text = "${user1.points}p"
         }
-        if (mRankerItems.size >= 2) {
-            val user2 = mRankerItems[1]
-            user2Image.setImageResource(user2.resourceId)
+        if (userList.size >= 2) {
+            val user2 = userList[1]
+            Glide.with(this)
+                .load(user2.profileImageUrl)
+                .into(user2Image)
             user2Name.text = user2.name
             user2Points.text = "${user2.points}p"
         }
-        if (mRankerItems.size >= 3) {
-            val user3 = mRankerItems[2]
-            user3Image.setImageResource(user3.resourceId)
+        if (userList.size >= 3) {
+            val user3 = userList[2]
+            Glide.with(this)
+                .load(user3.profileImageUrl)
+                .into(user3Image)
             user3Name.text = user3.name
             user3Points.text = "${user3.points}p"
         }
     }
 
     private fun updateMyPoints() {
-        val myUserId = 1 // 사용자 ID를 1로 가정 (실제 앱에서는 로그인한 사용자 ID를 사용)
-        val myPoints = databaseHelper.getPoints(myUserId)
-        myPointsTextView.text = "${myPoints}p"
+        val myUserId = "your_user_id"  // 실제 로그인된 사용자 ID를 사용
+        firestoreHelper.getUserPoints(myUserId) { points ->
+            myPointsTextView.text = "${points}p"
+        }
     }
 }
