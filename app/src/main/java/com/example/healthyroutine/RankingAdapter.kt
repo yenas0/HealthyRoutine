@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 
 class RankingAdapter : RecyclerView.Adapter<RankingAdapter.ViewHolder>() {
 
@@ -39,9 +40,13 @@ class RankingAdapter : RecyclerView.Adapter<RankingAdapter.ViewHolder>() {
 
         fun onBind(item: RankingUserActivity, rank: Int) {
             ranking.text = rank.toString() // 4위부터 순위 설정
-            profile.setImageResource(item.resourceId)
             name.text = item.name
             points.text = "${item.points}p"
+
+            // Glide를 사용하여 프로필 이미지 로드
+            Glide.with(itemView.context)
+                .load(item.profileImageUrl)
+                .into(profile)
         }
     }
 }
