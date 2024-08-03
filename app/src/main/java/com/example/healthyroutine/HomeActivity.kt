@@ -345,7 +345,7 @@ class HomeActivity : AppCompatActivity() {
         val popupView = layoutInflater.inflate(R.layout.popup_menu, null)
         val popupWindow = PopupWindow(popupView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true)
 
-        val width = resources.getDimensionPixelSize(R.dimen.popup_width)  // dimen 리소스에서 값을 불러옴
+        val width = resources.getDimensionPixelSize(R.dimen.popup_width)  // dimen에서 값을 불러옴
         popupWindow.width = width
 
         // anchorView의 위치
