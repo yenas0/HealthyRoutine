@@ -9,6 +9,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -441,9 +442,21 @@ class HomeActivity : AppCompatActivity() {
         }
 
         itemDelete.setOnClickListener {
-            dbHelper.deleteRoutine(item.id)
-            loadRoutinesFromDatabase()
-            popupWindow.dismiss()
+            // 삭제 확인 대화상자 생성
+            AlertDialog.Builder(this).apply {
+                setTitle("루틴 삭제")
+                setMessage("정말 삭제하시겠습니까?")
+                setPositiveButton("삭제") { _, _ ->
+                    dbHelper.deleteRoutine(item.id)
+                    loadRoutinesFromDatabase()
+                    popupWindow.dismiss()
+                }
+                setNegativeButton("취소") { dialog, _ ->
+                    dialog.dismiss()
+                }
+                create()
+                show()
+            }
         }
     }
 
