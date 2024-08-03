@@ -5,7 +5,7 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.os.Bundle
 import android.text.style.ReplacementSpan
-import android.widget.Button
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.prolificinteractive.materialcalendarview.CalendarDay
@@ -19,7 +19,7 @@ class MonthlyStatsActivity : AppCompatActivity() {
     private lateinit var calendarView: MaterialCalendarView
     private lateinit var routineNameTextView: TextView
     private lateinit var checkCountTextView: TextView
-    private lateinit var backButton: Button
+    private lateinit var backButton: ImageButton
     private val eventDates = mutableListOf<LocalDate>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,9 +37,9 @@ class MonthlyStatsActivity : AppCompatActivity() {
         calendarView.setOnDateChangedListener { _, date, _ ->
             val selectedDate = LocalDate.of(date.year, date.month + 1, date.day)
             if (eventDates.contains(selectedDate)) {
-                checkCountTextView.text = "Event on this day!"
+                checkCountTextView.text = "Good"
             } else {
-                checkCountTextView.text = "No events on this day."
+                checkCountTextView.text = "No  on this day."
             }
         }
 
@@ -65,8 +65,7 @@ class MonthlyStatsActivity : AppCompatActivity() {
 
     private fun getCheckedDatesFromDatabase(): List<String> {
         // 데이터베이스에서 체크된 날짜를 가져오는 로직
-        // 여기서는 예시로 몇 가지 날짜를 반환
-        return listOf("2024-08-10", "2024-08-15", "2024-08-20")
+        return emptyList()
     }
 
     class CustomDotSpan(private val radius: Float, private val color: Int) : ReplacementSpan() {
