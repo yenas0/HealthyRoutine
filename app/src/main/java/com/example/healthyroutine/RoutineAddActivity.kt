@@ -1,10 +1,10 @@
-// RoutineAddActivity.kt
 package com.example.healthyroutine
 
 import android.app.Activity
 import android.app.DatePickerDialog
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
@@ -51,18 +51,31 @@ class RoutineAddActivity : AppCompatActivity() {
             }
         }
 
-        // 루틴 추천 이름 그대로 들어가도록
-        val routineName = intent.getStringExtra("BUTTON_TEXT")
-        val healthRoutineName = findViewById<EditText>(R.id.routine_title)
-        healthRoutineName.setText(routineName)
+        val source = intent.getStringExtra("SOURCE")
+        Log.d("RoutineAddActivity", "Source: $source")
+
+        if (source == "BOARD") {
+            val routineNameFromPost = intent.getStringExtra("routine_name")
+            val routineDaysFromPost = intent.getStringExtra("routine_days")
+            Log.d("RoutineAddActivity", "Routine Name from Post: $routineNameFromPost")
+            Log.d("RoutineAddActivity", "Routine Days from Post: $routineDaysFromPost")
+            etRoutineName.setText(routineNameFromPost)
+            setSelectedDays(routineDaysFromPost ?: "")
+        } else if (source == "RECOMMEND") {
+            val routineNameFromButton = intent.getStringExtra("BUTTON_TEXT")
+            Log.d("RoutineAddActivity", "Routine Name from Button: $routineNameFromButton")
+            etRoutineName.setText(routineNameFromButton)
+        }
 
         btnSave.setOnClickListener {
             val routineName = etRoutineName.text.toString()
             val notificationEnabled = switchNotification.isChecked
+            val selectedDays = dayButtons.filter { it.tag == "active" }.joinToString(",") { it.text.toString() }
 
             val resultIntent = Intent().apply {
                 putExtra("routine_name", routineName)
                 putExtra("notification_enabled", notificationEnabled)
+                putExtra("routine_days", selectedDays)
             }
 
             setResult(Activity.RESULT_OK, resultIntent)

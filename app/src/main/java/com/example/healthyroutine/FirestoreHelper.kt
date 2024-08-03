@@ -134,4 +134,20 @@ class FirestoreHelper {
             callback(0)
         }
     }
+
+    fun getRoutineById(routineId: String, callback: (Routine?) -> Unit) {
+        db.collection("routines").document(routineId).get()
+            .addOnSuccessListener { document ->
+                if (document != null && document.exists()) {
+                    val routine = document.toObject(Routine::class.java)
+                    callback(routine)
+                } else {
+                    callback(null)
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.w("FirestoreHelper", "Error getting routine", exception)
+                callback(null)
+            }
+    }
 }

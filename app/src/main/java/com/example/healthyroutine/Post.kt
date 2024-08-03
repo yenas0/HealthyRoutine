@@ -8,6 +8,7 @@ data class Post(
     var content: String = "",
     var likes: Int = 0,
     var routine: String? = null,
+    val startDate: String = "",
     var routineDays: String? = null,
     var userId: String = "",
     var createdAt: Date = Date()

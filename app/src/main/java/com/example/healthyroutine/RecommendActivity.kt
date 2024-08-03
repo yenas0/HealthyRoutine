@@ -57,6 +57,7 @@ class RecommendActivity : TabActivity() {
         btnH1 = findViewById<Button>(R.id.btnH1)
         btnH1.setOnClickListener {
             var intent = Intent(this, RoutineAddActivity::class.java)
+            intent.putExtra("SOURCE", "RECOMMEND")
             intent.putExtra("BUTTON_TEXT", btnH1.text.toString())
             startActivity(intent)
         }
@@ -64,6 +65,7 @@ class RecommendActivity : TabActivity() {
         btnH2 = findViewById<Button>(R.id.btnH2)
         btnH2.setOnClickListener {
             var intent = Intent(this, RoutineAddActivity::class.java)
+            intent.putExtra("SOURCE", "RECOMMEND")
             intent.putExtra("BUTTON_TEXT", btnH2.text.toString())
             startActivity(intent)
         }
@@ -71,6 +73,7 @@ class RecommendActivity : TabActivity() {
         btnH3 = findViewById<Button>(R.id.btnH3)
         btnH3.setOnClickListener {
             var intent = Intent(this, RoutineAddActivity::class.java)
+            intent.putExtra("SOURCE", "RECOMMEND")
             intent.putExtra("BUTTON_TEXT", btnH3.text.toString())
             startActivity(intent)
         }
@@ -78,6 +81,7 @@ class RecommendActivity : TabActivity() {
         btnH4 = findViewById<Button>(R.id.btnH4)
         btnH4.setOnClickListener {
             var intent = Intent(this, RoutineAddActivity::class.java)
+            intent.putExtra("SOURCE", "RECOMMEND")
             intent.putExtra("BUTTON_TEXT", btnH4.text.toString())
             startActivity(intent)
         }
@@ -85,6 +89,7 @@ class RecommendActivity : TabActivity() {
         btnH5 = findViewById<Button>(R.id.btnH5)
         btnH5.setOnClickListener {
             var intent = Intent(this, RoutineAddActivity::class.java)
+            intent.putExtra("SOURCE", "RECOMMEND")
             intent.putExtra("BUTTON_TEXT", btnH5.text.toString())
             startActivity(intent)
         }
@@ -92,6 +97,7 @@ class RecommendActivity : TabActivity() {
         btnH6 = findViewById<Button>(R.id.btnH6)
         btnH6.setOnClickListener {
             var intent = Intent(this, RoutineAddActivity::class.java)
+            intent.putExtra("SOURCE", "RECOMMEND")
             intent.putExtra("BUTTON_TEXT", btnH6.text.toString())
             startActivity(intent)
         }
@@ -99,6 +105,7 @@ class RecommendActivity : TabActivity() {
         btnH7 = findViewById<Button>(R.id.btnH7)
         btnH7.setOnClickListener {
             var intent = Intent(this, RoutineAddActivity::class.java)
+            intent.putExtra("SOURCE", "RECOMMEND")
             intent.putExtra("BUTTON_TEXT", btnH7.text.toString())
             startActivity(intent)
         }
@@ -106,6 +113,7 @@ class RecommendActivity : TabActivity() {
         btnH8 = findViewById<Button>(R.id.btnH8)
         btnH8.setOnClickListener {
             var intent = Intent(this, RoutineAddActivity::class.java)
+            intent.putExtra("SOURCE", "RECOMMEND")
             intent.putExtra("BUTTON_TEXT", btnH8.text.toString())
             startActivity(intent)
         }
@@ -113,6 +121,7 @@ class RecommendActivity : TabActivity() {
         btnL1 = findViewById<Button>(R.id.btnL1)
         btnL1.setOnClickListener {
             var intent = Intent(this, RoutineAddActivity::class.java)
+            intent.putExtra("SOURCE", "RECOMMEND")
             intent.putExtra("BUTTON_TEXT", btnL1.text.toString())
             startActivity(intent)
         }
@@ -120,6 +129,7 @@ class RecommendActivity : TabActivity() {
         btnL2 = findViewById<Button>(R.id.btnL2)
         btnL2.setOnClickListener {
             var intent = Intent(this, RoutineAddActivity::class.java)
+            intent.putExtra("SOURCE", "RECOMMEND")
             intent.putExtra("BUTTON_TEXT", btnL2.text.toString())
             startActivity(intent)
         }
@@ -127,6 +137,7 @@ class RecommendActivity : TabActivity() {
         btnL3 = findViewById<Button>(R.id.btnL3)
         btnL3.setOnClickListener {
             var intent = Intent(this, RoutineAddActivity::class.java)
+            intent.putExtra("SOURCE", "RECOMMEND")
             intent.putExtra("BUTTON_TEXT", btnL3.text.toString())
             startActivity(intent)
         }
@@ -134,6 +145,7 @@ class RecommendActivity : TabActivity() {
         btnL4 = findViewById<Button>(R.id.btnL4)
         btnL4.setOnClickListener {
             var intent = Intent(this, RoutineAddActivity::class.java)
+            intent.putExtra("SOURCE", "RECOMMEND")
             intent.putExtra("BUTTON_TEXT", btnL4.text.toString())
             startActivity(intent)
         }
@@ -141,6 +153,7 @@ class RecommendActivity : TabActivity() {
         btnL5 = findViewById<Button>(R.id.btnL5)
         btnL5.setOnClickListener {
             var intent = Intent(this, RoutineAddActivity::class.java)
+            intent.putExtra("SOURCE", "RECOMMEND")
             intent.putExtra("BUTTON_TEXT", btnL5.text.toString())
             startActivity(intent)
         }
@@ -148,6 +161,7 @@ class RecommendActivity : TabActivity() {
         btnL6 = findViewById<Button>(R.id.btnL6)
         btnL6.setOnClickListener {
             var intent = Intent(this, RoutineAddActivity::class.java)
+            intent.putExtra("SOURCE", "RECOMMEND")
             intent.putExtra("BUTTON_TEXT", btnL6.text.toString())
             startActivity(intent)
         }
@@ -155,6 +169,7 @@ class RecommendActivity : TabActivity() {
         btnL7 = findViewById<Button>(R.id.btnL7)
         btnL7.setOnClickListener {
             var intent = Intent(this, RoutineAddActivity::class.java)
+            intent.putExtra("SOURCE", "RECOMMEND")
             intent.putExtra("BUTTON_TEXT", btnL7.text.toString())
             startActivity(intent)
         }
@@ -162,6 +177,7 @@ class RecommendActivity : TabActivity() {
         btnL8 = findViewById<Button>(R.id.btnL8)
         btnL8.setOnClickListener {
             var intent = Intent(this, RoutineAddActivity::class.java)
+            intent.putExtra("SOURCE", "RECOMMEND")
             intent.putExtra("BUTTON_TEXT", btnL8.text.toString())
             startActivity(intent)
         }

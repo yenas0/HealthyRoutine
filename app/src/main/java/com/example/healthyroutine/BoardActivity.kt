@@ -120,16 +120,18 @@ class BoardActivity : AppCompatActivity() {
                 }
 
                 postView.setOnClickListener {
-                    val intent = Intent(this, RoutineAddActivity::class.java)
-                    intent.putExtra("post_id", post.id)
-                    intent.putExtra("title", post.title)
-                    intent.putExtra("content", post.content)
-                    if (post.routine != null) {
-                        intent.putExtra("routine", post.routine)
-                        intent.putExtra("routine_days", post.routineDays)
-                        Toast.makeText(this, "게시글에 설정된 루틴이 있습니다.", Toast.LENGTH_SHORT).show()
-                    } else {
-                        Toast.makeText(this, "기본 루틴 추가 창입니다.", Toast.LENGTH_SHORT).show()
+                    val intent = Intent(this, RoutineAddActivity::class.java).apply {
+                        putExtra("post_id", post.id)
+                        putExtra("title", post.title)
+                        putExtra("content", post.content)
+                        putExtra("SOURCE", "BOARD")  // SOURCE 추가
+                        if (post.routine != null) {
+                            putExtra("routine_name", post.routine)
+                            putExtra("routine_days", post.routineDays)
+                            Toast.makeText(this@BoardActivity, "게시글에 설정된 루틴이 있습니다.", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(this@BoardActivity, "기본 루틴 추가 창입니다.", Toast.LENGTH_SHORT).show()
+                        }
                     }
                     startActivity(intent)
                 }
@@ -193,16 +195,10 @@ class BoardActivity : AppCompatActivity() {
                     }
 
                     postView.setOnClickListener {
-                        val intent = Intent(this, RoutineAddActivity::class.java)
-                        intent.putExtra("post_id", post.id)
-                        intent.putExtra("title", post.title)
-                        intent.putExtra("content", post.content)
-                        if (post.routine != null) {
-                            intent.putExtra("routine", post.routine)
-                            intent.putExtra("routine_days", post.routineDays)
-                            Toast.makeText(this, "게시글에 설정된 루틴이 있습니다.", Toast.LENGTH_SHORT).show()
-                        } else {
-                            Toast.makeText(this, "기본 루틴 추가 창입니다.", Toast.LENGTH_SHORT).show()
+                        val intent = Intent(this, RoutineAddActivity::class.java).apply {
+                            putExtra("SOURCE", "BOARD")
+                            putExtra("routine_name", post.routine)
+                            putExtra("routine_days", post.routineDays)
                         }
                         startActivity(intent)
                     }
