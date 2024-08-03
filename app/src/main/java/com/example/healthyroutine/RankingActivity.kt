@@ -115,7 +115,7 @@ class RankingActivity : AppCompatActivity() {
             val remainingUsers = userList.drop(3).mapIndexed { index, user ->
                 RankingUserActivity(
                     ranking = index + 4, // 4위부터 시작
-                    name = user.name,
+                    name = user.nickname,
                     points = user.points,
                     profileImageUrl = user.profileImageUrl // 프로필 이미지 URL 설정
                 )
@@ -139,7 +139,7 @@ class RankingActivity : AppCompatActivity() {
             Glide.with(this)
                 .load(user1.profileImageUrl)
                 .into(user1Image)
-            user1Name.text = user1.name
+            user1Name.text = user1.nickname
             user1Points.text = "${user1.points}p"
         }
         if (userList.size >= 2) {
@@ -147,7 +147,7 @@ class RankingActivity : AppCompatActivity() {
             Glide.with(this)
                 .load(user2.profileImageUrl)
                 .into(user2Image)
-            user2Name.text = user2.name
+            user2Name.text = user2.nickname
             user2Points.text = "${user2.points}p"
         }
         if (userList.size >= 3) {
@@ -155,7 +155,7 @@ class RankingActivity : AppCompatActivity() {
             Glide.with(this)
                 .load(user3.profileImageUrl)
                 .into(user3Image)
-            user3Name.text = user3.name
+            user3Name.text = user3.nickname
             user3Points.text = "${user3.points}p"
         }
     }
