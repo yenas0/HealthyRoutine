@@ -67,7 +67,8 @@
         android:layout_marginLeft="25dp"
         android:layout_marginRight="25dp"
         app:mcv_weekDayTextAppearance="@style/CalenderViewWeekCustomText"
-        tools:ignore="MissingClass" />
+        tools:ignore="MissingClass"
+        />
 
     <TextView
         android:id="@+id/dottextview"

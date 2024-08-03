@@ -1,5 +1,6 @@
 package com.example.healthyroutine
 
+import android.app.Notification.DecoratedCustomViewStyle
 import android.os.Bundle
 import android.widget.ImageView
 import android.widget.TextView
@@ -7,8 +8,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.prolificinteractive.materialcalendarview.CalendarDay
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView
+import com.prolificinteractive.materialcalendarview.format.TitleFormatter
+import com.prolificinteractive.materialcalendarview.format.WeekDayFormatter
+import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.YearMonth
+import java.util.Calendar
+import java.util.Locale
 
 class MonthlyStatsActivity : AppCompatActivity() {
 
@@ -18,10 +24,10 @@ class MonthlyStatsActivity : AppCompatActivity() {
     private lateinit var backButton: ImageView
     private val dbHelper = DatabaseHelper(this)
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_monthly_stats)
-
 
         calendarView = findViewById(R.id.calendar_view)
         routineNameTextView = findViewById(R.id.routine_name_text_view)
@@ -36,6 +42,26 @@ class MonthlyStatsActivity : AppCompatActivity() {
         backButton.setOnClickListener {
             finish()  // 현재 액티비티를 종료하고 이전 화면으로 돌아갑니다.
         }
+
+        // 캘린더의 월 이름을 한국어로 설정
+        calendarView.setTitleFormatter(TitleFormatter { day ->
+            val dateFormat = SimpleDateFormat("yyyy년 MMMM", Locale("ko", "KR"))
+            dateFormat.format(day.date)
+        })
+
+        // 캘린더의 요일 이름을 한국어로 설정
+        calendarView.setWeekDayFormatter(WeekDayFormatter { dayOfWeek ->
+            when (dayOfWeek) {
+                Calendar.SUNDAY -> "일"
+                Calendar.MONDAY -> "월"
+                Calendar.TUESDAY -> "화"
+                Calendar.WEDNESDAY -> "수"
+                Calendar.THURSDAY -> "목"
+                Calendar.FRIDAY -> "금"
+                Calendar.SATURDAY -> "토"
+                else -> ""
+            }
+        })
 
         loadRoutineStats(routineId)
     }
