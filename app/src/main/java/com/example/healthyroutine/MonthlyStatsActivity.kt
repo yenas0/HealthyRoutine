@@ -22,6 +22,8 @@ class MonthlyStatsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_monthly_stats)
 
+
+
         calendarView = findViewById(R.id.calendar_view)
         routineNameTextView = findViewById(R.id.routine_name_text_view)
         dotTextView = findViewById(R.id.dottextview)
