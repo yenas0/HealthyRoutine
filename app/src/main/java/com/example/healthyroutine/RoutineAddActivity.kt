@@ -21,10 +21,13 @@ class RoutineAddActivity : AppCompatActivity() {
     private lateinit var dayButtons: List<TextView>
     private lateinit var btnSave: Button
     private lateinit var backButton: ImageView
+    private lateinit var dbHelper: DatabaseHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_routine_add)
+
+        dbHelper = DatabaseHelper(this)
 
         etRoutineName = findViewById(R.id.routine_title)
         switchNotification = findViewById(R.id.notification_switch)
@@ -71,6 +74,14 @@ class RoutineAddActivity : AppCompatActivity() {
             val routineName = etRoutineName.text.toString()
             val notificationEnabled = switchNotification.isChecked
             val selectedDays = dayButtons.filter { it.tag == "active" }.joinToString(",") { it.text.toString() }
+
+            val newRoutine = Routine(
+                name = routineName,
+                notificationEnabled = notificationEnabled,
+                days = selectedDays
+            )
+
+            dbHelper.addRoutine(newRoutine)
 
             val resultIntent = Intent().apply {
                 putExtra("routine_name", routineName)

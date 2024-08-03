@@ -9,6 +9,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -38,15 +39,27 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var gestureDetector: GestureDetector
 
     private var selectedDate: LocalDate? = LocalDate.now()
-    private val dbHelper = DatabaseHelper(this)
     private val firestoreHelper = FirestoreHelper()
     private lateinit var auth: FirebaseAuth
     private var currentUser: FirebaseUser? = null
-    private val routines = mutableListOf<Routine>()
+    private lateinit var dbHelper: DatabaseHelper
+    private lateinit var routines: MutableList<Routine>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
+
+        dbHelper = DatabaseHelper(this)
+        routines = mutableListOf()
+
+        // View 초기화
+        weekDatesContainer = findViewById(R.id.week_dates_container)
+        checklistContainer = findViewById(R.id.checklist_container) // checklistContainer 초기화
+
+        // 인텐트로 받은 루틴 추가
+        handleIncomingIntent()
+
+        loadRoutinesFromDatabase()
 
         auth = FirebaseAuth.getInstance()
         currentUser = auth.currentUser
@@ -175,7 +188,7 @@ class HomeActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         updateTitleDate(selectedDate ?: LocalDate.now())
-        loadRoutinesFromDatabase()
+        loadRoutinesFromDatabase() // 홈 액티비티가 다시 활성화될 때 루틴을 업데이트
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -184,11 +197,11 @@ class HomeActivity : AppCompatActivity() {
             data?.let {
                 val routineName = it.getStringExtra("routine_name") ?: ""
                 val notificationEnabled = it.getBooleanExtra("notification_enabled", true)
+                val routineDays = it.getStringExtra("routine_days") ?: ""
 
-                Log.d("HomeActivity", "Routine Name: $routineName")
-                Log.d("HomeActivity", "Notification Enabled: $notificationEnabled")
+                Log.d("HomeActivity", "Routine added: Name: $routineName, Notification: $notificationEnabled, Days: $routineDays")
 
-                val routine = Routine(id = 0, name = routineName, notificationEnabled = notificationEnabled)
+                val routine = Routine(id = 0, name = routineName, notificationEnabled = notificationEnabled, days = routineDays)
                 dbHelper.addRoutine(routine)
                 loadRoutinesFromDatabase()
             }
@@ -197,14 +210,35 @@ class HomeActivity : AppCompatActivity() {
                 val routineId = it.getIntExtra("routine_id", 0)
                 val routineName = it.getStringExtra("routine_name") ?: ""
                 val notificationEnabled = it.getBooleanExtra("notification_enabled", true)
+                val routineDays = it.getStringExtra("routine_days") ?: ""
 
-                Log.d("HomeActivity", "Updated Routine ID: $routineId")
-                Log.d("HomeActivity", "Updated Routine Name: $routineName")
-                Log.d("HomeActivity", "Updated Notification Enabled: $notificationEnabled")
+                Log.d("HomeActivity", "Routine updated: ID: $routineId, Name: $routineName, Notification: $notificationEnabled, Days: $routineDays")
 
-                val updatedRoutine = Routine(id = routineId, name = routineName, notificationEnabled = notificationEnabled)
+                val updatedRoutine = Routine(id = routineId, name = routineName, notificationEnabled = notificationEnabled, days = routineDays)
                 dbHelper.updateRoutine(updatedRoutine)
                 loadRoutinesFromDatabase()
+            }
+        }
+    }
+
+    private fun handleIncomingIntent() {
+        intent?.let {
+            val routineName = it.getStringExtra("routine_name")
+            val notificationEnabled = it.getBooleanExtra("notification_enabled", false)
+            val routineDays = it.getStringExtra("routine_days")
+
+            if (routineName != null && routineDays != null) {
+                val newRoutine = Routine(
+                    name = routineName,
+                    days = routineDays,
+                    notificationEnabled = notificationEnabled
+                )
+
+                // 루틴 리스트에 추가
+                routines.add(newRoutine)
+
+                // 데이터베이스에 저장
+                dbHelper.insertRoutine(newRoutine)
             }
         }
     }
@@ -212,9 +246,14 @@ class HomeActivity : AppCompatActivity() {
     private fun loadRoutinesFromDatabase() {
         routines.clear()
         routines.addAll(dbHelper.getAllRoutines())
+        Log.d("HomeActivity", "Routines loaded from database: ${routines.size}")
+        routines.forEach {
+            Log.d("HomeActivity", "Routine: ${it.name}, Days: ${it.days}, Notification: ${it.notificationEnabled}")
+        }
         updateWeekDates()
         updateChecklistForDate(selectedDate ?: LocalDate.now())
     }
+
 
     private fun updateWeekDates() {
         weekDatesContainer.removeAllViews()
@@ -267,6 +306,13 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun updateChecklistForDate(date: LocalDate) {
+
+        val todayRoutines = routines.filter { it.days.contains(date.dayOfWeek.name.substring(0, 1)) }
+        Log.d("HomeActivity", "Today's routines: ${todayRoutines.size}")
+        todayRoutines.forEach {
+            Log.d("HomeActivity", "Routine for today: ${it.name}")
+        }
+
         checklistContainer.removeAllViews()
         var checkedCount = dbHelper.getCheckCountForDate(date)
         routines.forEach { routine ->
@@ -389,18 +435,36 @@ class HomeActivity : AppCompatActivity() {
                 putExtra("routine_id", item.id)
                 putExtra("routine_name", item.name)
                 putExtra("notification_enabled", item.isCompleted)
+                putExtra("routine_days", getRoutineDays(item.id)) // 루틴 반복 주기 전달
             }
             startActivityForResult(intent, EDIT_ROUTINE_REQUEST_CODE)
             popupWindow.dismiss()
         }
 
         itemDelete.setOnClickListener {
-            dbHelper.deleteRoutine(item.id)
-            loadRoutinesFromDatabase()
-            popupWindow.dismiss()
+            // 삭제 확인 대화상자 생성
+            AlertDialog.Builder(this).apply {
+                setTitle("루틴 삭제")
+                setMessage("정말 삭제하시겠습니까?")
+                setPositiveButton("삭제") { _, _ ->
+                    dbHelper.deleteRoutine(item.id)
+                    loadRoutinesFromDatabase()
+                    popupWindow.dismiss()
+                }
+                setNegativeButton("취소") { dialog, _ ->
+                    dialog.dismiss()
+                }
+                create()
+                show()
+            }
         }
     }
 
+    private fun getRoutineDays(routineId: Int): String {
+        // 루틴 ID로 반복 주기를 가져오는 로직 구현
+        val routine = routines.find { it.id == routineId }
+        return routine?.days ?: ""
+    }
 
     private fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
