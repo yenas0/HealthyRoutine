@@ -151,7 +151,7 @@ class SignUpActivity : ComponentActivity() {
                             "email" to email,
                             "username" to username,
                             "nickname" to nickname,
-                            "points" to 0  // 포인트 필드 추가
+                            "points" to 0
                         )
 
                         db.collection("users").document(userId).set(userMap)
