@@ -1,5 +1,6 @@
 package com.example.healthyroutine
 
+import android.util.Log
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
@@ -77,7 +78,7 @@ class FirestoreHelper {
 
     // 내가 쓴 글 가져오기
     fun getMyPosts(userId: String, callback: (List<Post>) -> Unit) {
-        db.collection("posts").whereEqualTo("userId", userId).orderBy("createdAt", Query.Direction.DESCENDING).get().addOnSuccessListener { result ->
+        db.collection("posts").whereEqualTo("userId", userId).get().addOnSuccessListener { result ->
             val posts = result.map { document ->
                 document.toObject(Post::class.java).apply { id = document.id }
             }
