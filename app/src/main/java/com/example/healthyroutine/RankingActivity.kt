@@ -126,6 +126,9 @@ class RankingActivity : AppCompatActivity() {
 
 
     private fun updateTopThreeUsers() {
+        // 기본 이미지 리소스 설정
+        val defaultProfileImage = R.drawable.ic_profile  // 기본 프로필 이미지 리소스 ID 설정
+
         // 초기화: 사용자 정보가 없는 경우 기본값 설정
         user1Name.text = ""
         user1Points.text = "0p"
@@ -138,6 +141,7 @@ class RankingActivity : AppCompatActivity() {
             val user1 = userList[0]
             Glide.with(this)
                 .load(user1.profileImageUrl)
+                .placeholder(defaultProfileImage)  // 기본 프로필 이미지 설정
                 .into(user1Image)
             user1Name.text = user1.nickname
             user1Points.text = "${user1.points}p"
@@ -146,6 +150,7 @@ class RankingActivity : AppCompatActivity() {
             val user2 = userList[1]
             Glide.with(this)
                 .load(user2.profileImageUrl)
+                .placeholder(defaultProfileImage)  // 기본 프로필 이미지 설정
                 .into(user2Image)
             user2Name.text = user2.nickname
             user2Points.text = "${user2.points}p"
@@ -154,6 +159,7 @@ class RankingActivity : AppCompatActivity() {
             val user3 = userList[2]
             Glide.with(this)
                 .load(user3.profileImageUrl)
+                .placeholder(defaultProfileImage)  // 기본 프로필 이미지 설정
                 .into(user3Image)
             user3Name.text = user3.nickname
             user3Points.text = "${user3.points}p"
