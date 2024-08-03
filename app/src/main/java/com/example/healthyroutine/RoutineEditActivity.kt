@@ -21,6 +21,7 @@ class RoutineEditActivity : AppCompatActivity() {
     private lateinit var dayButtons: List<TextView>
     private lateinit var btnSave: Button
     private lateinit var backButton: ImageView
+    private lateinit var dbHelper: DatabaseHelper
 
     private var routineId: Int = 0
 
@@ -44,6 +45,8 @@ class RoutineEditActivity : AppCompatActivity() {
             findViewById(R.id.day_sun)
         )
 
+        dbHelper = DatabaseHelper(this) // dbHelper 초기화
+
         startDateTextView.setOnClickListener {
             showDatePickerDialog()
         }
@@ -57,29 +60,35 @@ class RoutineEditActivity : AppCompatActivity() {
         routineId = intent.getIntExtra("routine_id", 0)
         val routineName = intent.getStringExtra("routine_name") ?: ""
         val notificationEnabled = intent.getBooleanExtra("notification_enabled", true)
+        val routineDays = intent.getStringExtra("routine_days")
 
         etRoutineName.setText(routineName)
         switchNotification.isChecked = notificationEnabled
+        setSelectedDays(routineDays ?: "")
 
         btnSave.setOnClickListener {
             val updatedRoutineName = etRoutineName.text.toString()
             val updatedNotificationEnabled = switchNotification.isChecked
+            val updatedDays = dayButtons.filter { it.tag == "active" }.joinToString(",") { it.text.toString() }
 
-            val dbHelper = DatabaseHelper(this)
             val updatedRoutine = Routine(
-                id = routineId,
+                id = routineId, // 기존 루틴의 ID를 사용
                 name = updatedRoutineName,
+                days = updatedDays, // days 매개변수를 추가
                 notificationEnabled = updatedNotificationEnabled
             )
 
+            // 데이터베이스에 업데이트
             dbHelper.updateRoutine(updatedRoutine)
 
-            // 결과 반환
+            // 결과 전달 및 액티비티 종료
             val resultIntent = Intent().apply {
                 putExtra("routine_id", routineId)
                 putExtra("routine_name", updatedRoutineName)
                 putExtra("notification_enabled", updatedNotificationEnabled)
+                putExtra("routine_days", updatedDays)
             }
+
             setResult(Activity.RESULT_OK, resultIntent)
             finish()
         }
