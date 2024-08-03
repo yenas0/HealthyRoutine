@@ -2,23 +2,20 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
-      <entry key="MonthlyStatsActivity (1)">
-        <State />
-      </entry>
       <entry key="app">
         <State>
-          <multipleDevicesSelectedInDropDown value="true" />
-          <runningDeviceTargetsSelectedWithDialog>
+          <targetSelectedWithDropDown>
             <Target>
-              <type value="RUNNING_DEVICE_TARGET" />
+              <type value="QUICK_BOOT_TARGET" />
               <deviceKey>
                 <Key>
                   <type value="VIRTUAL_DEVICE_PATH" />
-                  <value value="C:\Users\jh052\.android\avd\Pixel_3_XL_API_34.avd" />
+                  <value value="C:\Users\dlwld\.android\avd\Pixel_2_API_34.avd" />
                 </Key>
               </deviceKey>
             </Target>
-          </runningDeviceTargetsSelectedWithDialog>
+          </targetSelectedWithDropDown>
+          <timeTargetWasSelectedWithDropDown value="2024-08-03T15:25:33.980978100Z" />
         </State>
       </entry>
     </value>
