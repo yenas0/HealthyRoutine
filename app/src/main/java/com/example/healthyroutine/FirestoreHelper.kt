@@ -3,7 +3,6 @@ package com.example.healthyroutine
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
-import java.util.*
 
 class FirestoreHelper {
     private val db = FirebaseFirestore.getInstance()
@@ -101,6 +100,37 @@ class FirestoreHelper {
             Tasks.whenAllSuccess<Void>(tasks).addOnSuccessListener {
                 callback(likedPosts)
             }
+        }
+    }
+
+    // 사용자 포인트 업데이트
+    fun updateUserPoints(userId: String, pointsChange: Int, callback: (Boolean) -> Unit) {
+        val userRef = db.collection("users").document(userId)
+
+        db.runTransaction { transaction ->
+            val snapshot = transaction.get(userRef)
+            val currentPoints = snapshot.getLong("points") ?: 0
+            val newPoints = currentPoints + pointsChange
+            transaction.update(userRef, "points", newPoints)
+        }.addOnSuccessListener {
+            callback(true)
+        }.addOnFailureListener {
+            callback(false)
+        }
+    }
+
+    // 사용자 포인트 가져오기
+    fun getUserPoints(userId: String, callback: (Int) -> Unit) {
+        val userRef = db.collection("users").document(userId)
+        userRef.get().addOnSuccessListener { document ->
+            if (document != null && document.exists()) {
+                val points = document.getLong("points")?.toInt() ?: 0
+                callback(points)
+            } else {
+                callback(0)
+            }
+        }.addOnFailureListener {
+            callback(0)
         }
     }
 }

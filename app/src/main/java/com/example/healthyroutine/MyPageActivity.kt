@@ -20,6 +20,7 @@ class MyPageActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
     private lateinit var firestore: FirebaseFirestore
+    private lateinit var firestoreHelper: FirestoreHelper
     private var currentUser: FirebaseUser? = null
 
     private lateinit var profileImageView: ImageView
@@ -43,6 +44,7 @@ class MyPageActivity : AppCompatActivity() {
 
         auth = FirebaseAuth.getInstance()
         firestore = FirebaseFirestore.getInstance()
+        firestoreHelper = FirestoreHelper()
         currentUser = auth.currentUser
 
         profileImageView = findViewById(R.id.profileImageView)
@@ -84,8 +86,6 @@ class MyPageActivity : AppCompatActivity() {
             val intent = Intent(this, SettingsActivity::class.java)
             startActivity(intent)
         }
-
-        pointsTextView.text = "${PointsManager.getPoints()}p"
 
         bottom_navigation = findViewById(R.id.bottom_navigation)
         bottom_navigation.selectedItemId = R.id.navigation_profile
@@ -130,6 +130,7 @@ class MyPageActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         loadUserProfile()
+        updatePoints()
     }
 
     private fun loadUserProfile() {
@@ -183,6 +184,17 @@ class MyPageActivity : AppCompatActivity() {
                     }
                 }
             }
+        }
+    }
+
+    private fun updatePoints() {
+        val user = currentUser
+        if (user != null) {
+            firestoreHelper.getUserPoints(user.uid) { points ->
+                pointsTextView.text = "${points}p"
+            }
+        } else {
+            pointsTextView.text = "0p"
         }
     }
 }
