@@ -345,7 +345,17 @@ class HomeActivity : AppCompatActivity() {
         val popupView = layoutInflater.inflate(R.layout.popup_menu, null)
         val popupWindow = PopupWindow(popupView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true)
 
-        popupWindow.showAsDropDown(anchorView)
+        val width = resources.getDimensionPixelSize(R.dimen.popup_width)  // dimen 리소스에서 값을 불러옴
+        popupWindow.width = width
+
+        // anchorView의 위치
+        val location = IntArray(2)
+        anchorView.getLocationOnScreen(location)
+        val x = location[0] + anchorView.width
+        val y = location[1] + anchorView.height
+
+        // 팝업 창을 화면의 특정 위치에 표시
+        popupWindow.showAtLocation(anchorView, 0, x, y)
 
         val itemStatistics: LinearLayout = popupView.findViewById(R.id.item_statistics)
         val itemEdit: LinearLayout = popupView.findViewById(R.id.item_edit)
