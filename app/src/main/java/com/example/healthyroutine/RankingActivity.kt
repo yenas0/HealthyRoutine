@@ -116,12 +116,14 @@ class RankingActivity : AppCompatActivity() {
                 RankingUserActivity(
                     ranking = index + 4, // 4위부터 시작
                     name = user.name,
-                    points = user.points
+                    points = user.points,
+                    profileImageUrl = user.profileImageUrl // 프로필 이미지 URL 설정
                 )
             }
             mRecyclerAdapter.setUserList(ArrayList(remainingUsers))
         }
     }
+
 
     private fun updateTopThreeUsers() {
         // 초기화: 사용자 정보가 없는 경우 기본값 설정
