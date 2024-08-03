@@ -79,6 +79,12 @@ class RoutineAddActivity : AppCompatActivity() {
             }
 
             setResult(Activity.RESULT_OK, resultIntent)
+
+            // 홈 액티비티로 이동하고 루틴을 업데이트합니다.
+            val homeIntent = Intent(this, HomeActivity::class.java)
+            homeIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+            startActivity(homeIntent)
+
             finish()
         }
 
