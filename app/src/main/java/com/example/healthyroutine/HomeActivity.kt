@@ -1,6 +1,9 @@
 package com.example.healthyroutine
 
 import android.app.Activity
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -17,6 +20,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.LocalTime
+import java.time.ZoneId
 import java.time.format.TextStyle
 import java.time.temporal.TemporalAdjusters
 import java.util.*
@@ -242,10 +247,16 @@ class HomeActivity : AppCompatActivity() {
         Log.d("HomeActivity", "Routines loaded from database: ${routines.size}")
         routines.forEach {
             Log.d("HomeActivity", "Routine: ${it.name}, Days: ${it.days}, Notification: ${it.notificationEnabled}")
+            if (it.notificationEnabled) {
+                setAlarm(it)
+            } else {
+                cancelAlarm(it)
+            }
         }
         updateWeekDates()
         updateChecklistForDate(selectedDate ?: LocalDate.now())
     }
+
 
 
     private fun updateWeekDates() {
@@ -465,6 +476,33 @@ class HomeActivity : AppCompatActivity() {
     private fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
+
+    private fun setAlarm(routine: Routine) {
+        if (!routine.notificationEnabled) {
+            cancelAlarm(routine)
+            return
+        }
+
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(this, AlarmReceiver::class.java).apply {
+            putExtra("routine_name", routine.name)
+        }
+        val pendingIntent = PendingIntent.getBroadcast(this, routine.id, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+
+        // 알람 시간을 설정
+        val alarmTime = LocalTime.of(9, 0).atDate(LocalDate.now()).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP, alarmTime, pendingIntent)
+    }
+
+
+    private fun cancelAlarm(routine: Routine) {
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(this, AlarmReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(this, routine.id, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+        alarmManager.cancel(pendingIntent)
+    }
+
 
     companion object {
         const val ADD_ROUTINE_REQUEST_CODE = 1
