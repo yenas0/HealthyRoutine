@@ -8,6 +8,7 @@ import android.widget.EditText
 import android.widget.TextView
 import com.google.firebase.firestore.FirebaseFirestore
 import com.example.healthyroutine.R
+import android.util.Log
 
 class FindIdFragment : Fragment() {
     private lateinit var emailEditText: EditText
@@ -44,20 +45,22 @@ class FindIdFragment : Fragment() {
     }
 
     private fun findIdByEmail(email: String, callback: (String?) -> Unit) {
-        // Query Firestore to find the user with the given email
+        Log.d("FindIdFragment", "Starting Firestore query for email: $email")
+
         db.collection("users").whereEqualTo("email", email).get()
             .addOnSuccessListener { documents ->
                 if (!documents.isEmpty) {
-                    // Assuming there's only one user with the given email
                     val userDocument = documents.documents[0]
                     val username = userDocument.getString("username")
+                    Log.d("FindIdFragment", "Username found: $username")
                     callback(username)
                 } else {
+                    Log.d("FindIdFragment", "No documents found")
                     callback(null)
                 }
             }
             .addOnFailureListener { exception ->
-                // Handle any errors that might occur during the query
+                Log.e("FindIdFragment", "Error getting documents: ", exception)
                 callback(null)
             }
     }
