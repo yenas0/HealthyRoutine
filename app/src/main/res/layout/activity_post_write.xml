@@ -28,12 +28,19 @@
             android:focusable="true" />
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
             android:text="게시글 작성"
             android:textSize="18sp"
-            android:textColor="@color/black"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:textColor="@color/black"/>
+
+        <View
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:visibility="invisible" />
     </LinearLayout>
 
     <!-- 게시글 작성 내용 -->

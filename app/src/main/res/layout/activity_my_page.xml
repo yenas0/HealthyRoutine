@@ -79,7 +79,8 @@
                 android:layout_height="wrap_content"
                 android:text="user_1234"
                 android:textSize="18sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:textColor="@color/black"/>
 
             <TextView
                 android:id="@+id/emailTextView"
@@ -136,7 +137,8 @@
                 android:layout_marginBottom="12dp"
                 android:text="내가 쓴 글"
                 android:textSize="16sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:textColor="@color/black"/>
 
             <TextView
                 android:id="@+id/postsCount"
@@ -164,7 +166,8 @@
                 android:layout_marginBottom="12dp"
                 android:text="좋아요한 글"
                 android:textSize="16sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:textColor="@color/black"/>
 
             <TextView
                 android:id="@+id/likedCount"
@@ -192,7 +195,8 @@
                 android:layout_marginBottom="12dp"
                 android:text="나의 포인트"
                 android:textSize="16sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:textColor="@color/black"/>
 
             <TextView
                 android:id="@+id/pointsCount"

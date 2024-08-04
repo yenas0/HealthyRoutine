@@ -46,7 +46,8 @@
         android:layout_marginLeft="25dp"
         android:layout_marginBottom="20dp"
         android:textStyle="bold"
-        android:textSize="18sp" />
+        android:textSize="18sp"
+        android:textColor="@color/black"/>
 
     <View
         android:background="#A1A1A1"

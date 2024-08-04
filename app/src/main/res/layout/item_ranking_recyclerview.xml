@@ -19,7 +19,8 @@
             android:text="4"
             android:paddingTop="12dp"
             android:paddingRight="15dp"
-            android:textSize="20sp"/>
+            android:textSize="20sp"
+            android:textColor="@color/black"/>
 
         <!--프로필 사진-->
         <ImageView
@@ -37,7 +38,7 @@
             android:layout_weight="1"
             android:text="User_000"
             android:textSize="16sp"
-            android:textColor="#000"/>
+            android:textColor="@color/black"/>
 
         <!--포인트-->
         <TextView

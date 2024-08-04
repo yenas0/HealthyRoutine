@@ -254,7 +254,8 @@
                         android:text="나의 포인트"
                         android:layout_marginRight="60dp"
                         android:textSize="13sp"
-                        android:textStyle="bold"/>
+                        android:textStyle="bold"
+                        android:textColor="@color/black"/>
 
                     <TextView
                         android:id="@+id/my_points"
