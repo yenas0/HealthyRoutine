@@ -193,45 +193,38 @@ class HomeActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == ADD_ROUTINE_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            data?.let {
-                val routineName = it.getStringExtra("routine_name") ?: ""
-                val notificationEnabled = it.getBooleanExtra("notification_enabled", true)
-                val routineDays = it.getStringExtra("routine_days") ?: ""
-
-                Log.d("HomeActivity", "Routine added: Name: $routineName, Notification: $notificationEnabled, Days: $routineDays")
-
-                val routine = Routine(id = 0, name = routineName, notificationEnabled = notificationEnabled, days = routineDays)
-                dbHelper.addRoutine(routine)
-                loadRoutinesFromDatabase()
-            }
-        } else if (requestCode == EDIT_ROUTINE_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+        if (requestCode == EDIT_ROUTINE_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             data?.let {
                 val routineId = it.getIntExtra("routine_id", 0)
                 val routineName = it.getStringExtra("routine_name") ?: ""
                 val notificationEnabled = it.getBooleanExtra("notification_enabled", true)
                 val routineDays = it.getStringExtra("routine_days") ?: ""
+                val startDate = it.getStringExtra("start_date") ?: ""
 
-                Log.d("HomeActivity", "Routine updated: ID: $routineId, Name: $routineName, Notification: $notificationEnabled, Days: $routineDays")
+                Log.d("HomeActivity", "Routine updated: ID: $routineId, Name: $routineName, Notification: $notificationEnabled, Days: $routineDays, StartDate: $startDate")
 
-                val updatedRoutine = Routine(id = routineId, name = routineName, notificationEnabled = notificationEnabled, days = routineDays)
+                val updatedRoutine = Routine(id = routineId, name = routineName, notificationEnabled = notificationEnabled, days = routineDays, startDate = startDate)
                 dbHelper.updateRoutine(updatedRoutine)
                 loadRoutinesFromDatabase()
             }
         }
     }
 
+
     private fun handleIncomingIntent() {
         intent?.let {
             val routineName = it.getStringExtra("routine_name")
-            val notificationEnabled = it.getBooleanExtra("notification_enabled", false)
+            val notificationEnabled = it.getBooleanExtra("notification_enabled", true)
             val routineDays = it.getStringExtra("routine_days")
+            val startDate = it.getStringExtra("start_date")
 
-            if (routineName != null && routineDays != null) {
+            if (routineName != null && routineDays != null && startDate != null) {
                 val newRoutine = Routine(
+                    id = 0, // 새 루틴이므로 ID는 0으로 설정
                     name = routineName,
+                    notificationEnabled = notificationEnabled,
                     days = routineDays,
-                    notificationEnabled = notificationEnabled
+                    startDate = startDate // 시작일 추가
                 )
 
                 // 루틴 리스트에 추가
@@ -307,7 +300,10 @@ class HomeActivity : AppCompatActivity() {
 
     private fun updateChecklistForDate(date: LocalDate) {
 
-        val todayRoutines = routines.filter { it.days.contains(date.dayOfWeek.name.substring(0, 1)) }
+        val todayRoutines = routines.filter {
+            it.days.contains(date.dayOfWeek.name.substring(0, 1)) &&
+                    LocalDate.parse(it.startDate).isBefore(date.plusDays(1)) // 시작일이 오늘 이전이거나 오늘인 루틴만 필터링
+        }
         Log.d("HomeActivity", "Today's routines: ${todayRoutines.size}")
         todayRoutines.forEach {
             Log.d("HomeActivity", "Routine for today: ${it.name}")

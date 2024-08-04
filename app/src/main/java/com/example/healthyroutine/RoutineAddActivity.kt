@@ -73,20 +73,26 @@ class RoutineAddActivity : AppCompatActivity() {
         btnSave.setOnClickListener {
             val routineName = etRoutineName.text.toString()
             val notificationEnabled = switchNotification.isChecked
-            val selectedDays = dayButtons.filter { it.tag == "active" }.joinToString(",") { it.text.toString() }
+            val routineDays = dayButtons.filter { it.tag == "active" }.joinToString(",") { it.text.toString() }
+            val startDate = startDateTextView.text.toString()
 
-            val newRoutine = Routine(
+            val routine = Routine(
+                id = 0, // 새 루틴이므로 ID는 0으로 설정
                 name = routineName,
                 notificationEnabled = notificationEnabled,
-                days = selectedDays
+                days = routineDays,
+                startDate = startDate
             )
 
-            dbHelper.addRoutine(newRoutine)
+            // 데이터베이스에 추가
+            dbHelper.addRoutine(routine)
 
+            // 결과 전달 및 액티비티 종료
             val resultIntent = Intent().apply {
                 putExtra("routine_name", routineName)
                 putExtra("notification_enabled", notificationEnabled)
-                putExtra("routine_days", selectedDays)
+                putExtra("routine_days", routineDays)
+                putExtra("start_date", startDate)
             }
 
             setResult(Activity.RESULT_OK, resultIntent)

@@ -8,10 +8,11 @@ import android.util.Log
 import java.time.LocalDate
 
 data class Routine(
-    val id: Int = 0,
+    val id: Int,
     val name: String,
     val notificationEnabled: Boolean,
-    val days: String
+    val days: String,
+    val startDate: String
 )
 
 data class RoutineCheck(
@@ -41,7 +42,8 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 + COLUMN_ROUTINE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + COLUMN_ROUTINE_NAME + " TEXT,"
                 + COLUMN_NOTIFICATION_ENABLED + " INTEGER,"
-                + COLUMN_ROUTINE_DAYS + " TEXT)")  // days 컬럼 추가
+                + COLUMN_ROUTINE_DAYS + " TEXT,"
+                + COLUMN_START_DATE + " TEXT)")  // 시작일 컬럼 추가
 
         val createRoutineChecksTable = ("CREATE TABLE " + TABLE_ROUTINE_CHECKS + "("
                 + COLUMN_ROUTINE_ID + " INTEGER,"
@@ -73,6 +75,9 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             if (oldVersion < 10) {
                 db.execSQL("ALTER TABLE $TABLE_ROUTINES ADD COLUMN $COLUMN_ROUTINE_DAYS TEXT DEFAULT ''")
             }
+            if (oldVersion < 11) {
+                db.execSQL("ALTER TABLE $TABLE_ROUTINES ADD COLUMN $COLUMN_START_DATE TEXT DEFAULT ''")
+            }
         }
     }
 
@@ -82,28 +87,50 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             put(COLUMN_ROUTINE_NAME, routine.name)
             put(COLUMN_NOTIFICATION_ENABLED, if (routine.notificationEnabled) 1 else 0)
             put(COLUMN_ROUTINE_DAYS, routine.days)
+            put(COLUMN_START_DATE, routine.startDate) // 시작일 필드 추가
         }
         db.insert(TABLE_ROUTINES, null, values)
         db.close()
-        Log.d("DatabaseHelper", "Routine added to database: Name: ${routine.name}, Notification: ${routine.notificationEnabled}, Days: ${routine.days}")
+        Log.d("DatabaseHelper", "Routine added to database: Name: ${routine.name}, Notification: ${routine.notificationEnabled}, Days: ${routine.days}, Start Date: ${routine.startDate}")
     }
 
+    // 예시로 SQLite 데이터베이스에 루틴을 업데이트하는 메서드
     fun updateRoutine(routine: Routine) {
-        val db = this.writableDatabase
+        val db = writableDatabase
         val values = ContentValues().apply {
             put(COLUMN_ROUTINE_NAME, routine.name)
             put(COLUMN_NOTIFICATION_ENABLED, if (routine.notificationEnabled) 1 else 0)
             put(COLUMN_ROUTINE_DAYS, routine.days)
+            put(COLUMN_START_DATE, routine.startDate) // 시작일 추가
         }
         db.update(TABLE_ROUTINES, values, "$COLUMN_ROUTINE_ID = ?", arrayOf(routine.id.toString()))
         db.close()
     }
 
 
+
     fun deleteRoutine(routineId: Int) {
         val db = this.writableDatabase
         db.delete(TABLE_ROUTINES, "$COLUMN_ROUTINE_ID = ?", arrayOf(routineId.toString()))
         db.close()
+    }
+
+    fun getRoutine(routineId: Int): Routine? {
+        val db = this.readableDatabase
+        val cursor = db.rawQuery("SELECT * FROM $TABLE_ROUTINES WHERE $COLUMN_ROUTINE_ID = ?", arrayOf(routineId.toString()))
+        var routine: Routine? = null
+        if (cursor.moveToFirst()) {
+            routine = Routine(
+                id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ROUTINE_ID)),
+                name = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ROUTINE_NAME)),
+                notificationEnabled = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NOTIFICATION_ENABLED)) == 1,
+                days = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ROUTINE_DAYS)),
+                startDate = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_START_DATE))
+            )
+        }
+        cursor.close()
+        db.close()
+        return routine
     }
 
     fun getAllRoutines(): List<Routine> {
@@ -116,7 +143,8 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                     id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ROUTINE_ID)),
                     name = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ROUTINE_NAME)),
                     notificationEnabled = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NOTIFICATION_ENABLED)) == 1,
-                    days = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ROUTINE_DAYS))  // days 추가
+                    days = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ROUTINE_DAYS)),
+                    startDate = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_START_DATE)) // startDate 추가
                 )
                 routines.add(routine)
             } while (cursor.moveToNext())
@@ -126,14 +154,15 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         return routines
     }
 
-    fun insertRoutine(routine: Routine): Long {
+    fun insertRoutine(routine: Routine) {
         val db = writableDatabase
         val values = ContentValues().apply {
             put("name", routine.name)
-            put("routine_days", routine.days)
             put("notification_enabled", routine.notificationEnabled)
+            put("days", routine.days)
+            put("start_date", routine.startDate)
         }
-        return db.insert("routine_table", null, values)
+        db.insert("routines", null, values)
     }
 
     fun addPost(post: Post) {
@@ -284,7 +313,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
     fun getPopularPosts(): List<Post> {
         val popularPosts = mutableListOf<Post>()
         val db = this.readableDatabase
-        val cursor = db.rawQuery("SELECT * FROM $TABLE_POSTS WHERE $COLUMN_LIKES >= 5 ORDER BY $COLUMN_LIKES DESC", null)
+        val cursor = db.rawQuery("SELECT * FROM $TABLE_POSTS WHERE $COLUMN_LIKES >= 5 ORDER BY $COLUMN_LIKES DESC, $COLUMN_ID DESC", null)
         if (cursor.moveToFirst()) {
             do {
                 val post = Post(
@@ -376,7 +405,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
     }
 
     companion object {
-        private const val DATABASE_VERSION = 10 // 버전 증가
+        private const val DATABASE_VERSION = 11 // 버전 증가
         private const val DATABASE_NAME = "healthyroutine.db"
 
         const val TABLE_POSTS = "posts"
@@ -385,7 +414,6 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         const val COLUMN_CONTENT = "content"
         const val COLUMN_LIKES = "likes"
         const val COLUMN_ROUTINE = "routine"
-        const val COLUMN_ROUTINE_DAYS = "routine_days"
         const val COLUMN_USER_ID = "user_id"
 
         const val TABLE_LIKES = "likes"
@@ -396,6 +424,8 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         const val COLUMN_ROUTINE_ID = "routine_id"
         const val COLUMN_ROUTINE_NAME = "name"
         const val COLUMN_NOTIFICATION_ENABLED = "notification_enabled"
+        const val COLUMN_ROUTINE_DAYS = "routine_days"
+        const val COLUMN_START_DATE = "start_date" // 시작일 추가
 
         const val TABLE_ROUTINE_CHECKS = "routine_checks"
         const val COLUMN_DATE = "date"

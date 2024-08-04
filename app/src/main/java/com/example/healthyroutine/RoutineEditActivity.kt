@@ -5,6 +5,7 @@ import android.app.Activity
 import android.app.DatePickerDialog
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
@@ -33,8 +34,8 @@ class RoutineEditActivity : AppCompatActivity() {
         switchNotification = findViewById(R.id.et_notification_switch)
         btnSave = findViewById(R.id.save_button)
         backButton = findViewById(R.id.back_button)
-
         startDateTextView = findViewById(R.id.tv_start_date)
+
         dayButtons = listOf(
             findViewById(R.id.day_mon),
             findViewById(R.id.day_tue),
@@ -57,29 +58,41 @@ class RoutineEditActivity : AppCompatActivity() {
             }
         }
 
+        // 루틴 ID 가져오기
         routineId = intent.getIntExtra("routine_id", 0)
-        val routineName = intent.getStringExtra("routine_name") ?: ""
-        val notificationEnabled = intent.getBooleanExtra("notification_enabled", true)
-        val routineDays = intent.getStringExtra("routine_days")
+
+        // 가져온 ID로 DB 읽어오기
+        var routine: Routine? = null
+        routine = dbHelper.getRoutine(routineId)
+
+        // 루틴 값 적용
+        val routineName = routine!!.name ?: ""
+        val notificationEnabled = routine.notificationEnabled
+        val routineDays = routine.days
+        val startDate = routine.startDate
 
         etRoutineName.setText(routineName)
         switchNotification.isChecked = notificationEnabled
         setSelectedDays(routineDays ?: "")
+        startDateTextView.text = startDate
 
         btnSave.setOnClickListener {
             val updatedRoutineName = etRoutineName.text.toString()
             val updatedNotificationEnabled = switchNotification.isChecked
             val updatedDays = dayButtons.filter { it.tag == "active" }.joinToString(",") { it.text.toString() }
+            val updatedStartDate = startDateTextView.text.toString()
 
             val updatedRoutine = Routine(
-                id = routineId, // 기존 루틴의 ID를 사용
+                id = routineId,
                 name = updatedRoutineName,
-                days = updatedDays, // days 매개변수를 추가
-                notificationEnabled = updatedNotificationEnabled
+                days = updatedDays,
+                notificationEnabled = updatedNotificationEnabled,
+                startDate = updatedStartDate
             )
 
             // 데이터베이스에 업데이트
             dbHelper.updateRoutine(updatedRoutine)
+            Log.d("updatedRoutine", "현재 값은 $updatedRoutine 입니다.")
 
             // 결과 전달 및 액티비티 종료
             val resultIntent = Intent().apply {
@@ -87,9 +100,10 @@ class RoutineEditActivity : AppCompatActivity() {
                 putExtra("routine_name", updatedRoutineName)
                 putExtra("notification_enabled", updatedNotificationEnabled)
                 putExtra("routine_days", updatedDays)
+                putExtra("start_date", updatedStartDate) // 시작일 추가
             }
-
             setResult(Activity.RESULT_OK, resultIntent)
+
             finish()
         }
 
