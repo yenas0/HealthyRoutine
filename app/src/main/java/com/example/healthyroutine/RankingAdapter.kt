@@ -44,11 +44,13 @@ class RankingAdapter : RecyclerView.Adapter<RankingAdapter.ViewHolder>() {
             ranking.text = rank.toString() // 4위부터 순위 설정
             name.text = item.name
             points.text = "${item.points}p"
+            val defaultProfileImage = R.drawable.ic_profile  // 기본 프로필 이미지 리소스 ID 설정
 
             // Glide를 사용하여 프로필 이미지 로드
             Glide.with(itemView.context)
                 .load(item.profileImageUrl)
                 .apply(RequestOptions.bitmapTransform(CircleCrop()))
+                .placeholder(defaultProfileImage)
                 .into(profile)
         }
     }
